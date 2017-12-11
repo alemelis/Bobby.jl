@@ -1,0 +1,16 @@
+language: julia
+os:
+  - linux
+julia:
+  - 0.6
+notifications:
+  email: false
+script:
+  - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
+  - julia -e 'Pkg.clone(pwd())'
+  - mkdir -p ~/.julia/v0.6/Bobby
+  - cp -r src ~/.julia/v0.6/Bobby/
+  - cd test/
+  - julia --code-coverage runtests.jl
+after_success:
+  - echo "done!"
