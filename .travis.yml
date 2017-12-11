@@ -5,6 +5,8 @@ julia:
   - 0.6
 notifications:
   email: false
+install:
+  - sudo apt-get install texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended 
 script:
   - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
   - julia -e 'Pkg.clone(pwd())'
