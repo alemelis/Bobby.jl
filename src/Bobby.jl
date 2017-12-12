@@ -1,9 +1,9 @@
 module Bobby
 
-export hello
+export hello, writeGame, compileGame, rmLaTeXcompilationFiles
 
 function hello(name :: String)
-    return "Hello $name"
+    return "Hello $name\!"
 end
 
 include("xskak.jl")
