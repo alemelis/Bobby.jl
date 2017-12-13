@@ -5,4 +5,5 @@ using Bobby
 @time @test include("hello_test.jl")
 
 # @time include("skak_test.jl")
-# rm("skak_test.png")
+
+@time include("renderer_test.jl")
