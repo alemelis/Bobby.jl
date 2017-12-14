@@ -11,6 +11,15 @@ Bobby is a chess position classifier. Once running, Bobby will be able to predic
 
 **Hasn't already been done?** sort of...
 
-- CNN binary classifier for position evaluation in Julia [here](http://int8.io/chess-position-evaluation-with-convolutional-neural-networks-in-julia/)
-- CNN for reinforcement learning: [AlphaZero](https://www.chess.com/news/view/google-s-alphazero-destroys-stockfish-in-100-game-match)
-- TensorFlow [chessbot](https://github.com/Elucidation/tensorflow_chessbot) trained on screenshots
+- CNN _binary_ classifier for position evaluation in Julia [here](http://int8.io/chess-position-evaluation-with-convolutional-neural-networks-in-julia/)
+- CNN for reinforcement learning: [AlphaZero](https://www.chess.com/news/view/google-s-alphazero-destroys-stockfish-in-100-game-match) taught itself to play chess :hushed:
+- TensorFlow [chessbot](https://github.com/Elucidation/tensorflow_chessbot) trained to recognise pieces from board screenshots
+
+## Install
+
+For training Bobby depends on several additional packages
+
+- Compose.jl
+- FileIO.jl
+- PyCall.jl
+- python-chess

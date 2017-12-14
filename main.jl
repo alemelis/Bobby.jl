@@ -21,7 +21,7 @@ filter_games = Bobby.filterGames(games_list)
 
 labels = []
 i = 1
-for k = 1:2#length(filter_games)
+for k = 1:length(filter_games)
     game = filter_games[k]
 
     moves = Bobby.parseGame(game)
