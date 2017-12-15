@@ -183,7 +183,7 @@ function decodeToMoves(moves)
 
     for move in moves
         label = ""
-        label = decodeMove(move, files_inv, ranks_inv, pieces_labels_inv, label)
+        label = decodeToMove(move, files_inv, ranks_inv, pieces_labels_inv, label)
         push!(new_labels, label)
     end
 

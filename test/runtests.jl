@@ -7,3 +7,5 @@ using Bobby
 # @time include("skak_test.jl")
 
 @time include("renderer_test.jl")
+
+@time include("preprocess_test.jl")

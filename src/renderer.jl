@@ -37,24 +37,24 @@ function drawEmptyBoard(;board_name :: String = "chessboard", fmt :: String = "P
 
 end
 
-function loadPieces()
-    r = load("pieces/r.png")
-    wr = load("pieces/wR.png")
+function loadPieces(path :: String = "")
+    r = load("$path/r.png")
+    wr = load("$path/wR.png")
 
-    b = load("pieces/b.png")
-    wb = load("pieces/wB.png")
+    b = load("$path/b.png")
+    wb = load("$path/wB.png")
 
-    n = load("pieces/n.png")
-    wn = load("pieces/wN.png")
+    n = load("$path/n.png")
+    wn = load("$path/wN.png")
 
-    k = load("pieces/k.png")
-    wk = load("pieces/wK.png")
+    k = load("$path/k.png")
+    wk = load("$path/wK.png")
 
-    q = load("pieces/q.png")
-    wq = load("pieces/wQ.png")
+    q = load("$path/q.png")
+    wq = load("$path/wQ.png")
 
-    p = load("pieces/p.png")
-    wp = load("pieces/wP.png")
+    p = load("$path/p.png")
+    wp = load("$path/wP.png")
 
     pieces = Dict('r' => r, 'R' => wr, 'n' => n, 'N' => wn, 'b' => b, 'B' => wb,
                     'q' => q, 'Q' => wq, 'k' => k, 'K' => wk, 'p' => p, 'P' => wp)
