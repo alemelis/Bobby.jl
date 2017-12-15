@@ -6,7 +6,7 @@ julia:
 notifications:
   email: false
 install:
-  # - sudo apt-get install texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended 
+  # - sudo apt-get install texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended
 script:
   - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
   - julia -e 'Pkg.clone(pwd())'
@@ -16,3 +16,4 @@ script:
   - julia --code-coverage runtests.jl
 after_success:
   - echo "done!"
+  - julia -e 'cd(Pkg.dir("MyPkg")); Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'

@@ -5,6 +5,8 @@ A mediocre chess engine written in Julia and LaTeX
 
 \*nix: [![Build Status](https://travis-ci.org/alemelis/Bobby.jl.svg?branch=master)](https://travis-ci.org/alemelis/Bobby.jl)
 
+[![codecov](https://codecov.io/gh/alemelis/Bobby.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/alemelis/Bobby.jl)
+
 ## Idea
 
 Bobby is a chess position classifier. Once running, Bobby will be able to predict a move for any given chess scheme. The predicted move will not be necessarely the best ever, as Bobby is not [Minimax](https://en.wikipedia.org/wiki/Minimax) based. Conversely, we use a supervised-learning approach based on [Convolutional Neural Networks](https://medium.com/technologymadeeasy/the-best-explanation-of-convolutional-neural-networks-on-the-internet-fbb8b1ad5df8) (CNNs). CNNs are tipically used for image recognition and this is exactly how we are using them. Starting from a huge dataset of games, we can generate a 2D image of the chessboard for each move in a game and assign to that image the next move in the game as the target label for learning.
