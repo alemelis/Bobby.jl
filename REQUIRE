@@ -1,4 +1,4 @@
 julia 0.6.0
 FileIO
-Compose
+Compose 0.5.4
 PyCall
