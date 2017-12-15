@@ -23,7 +23,7 @@ function parseGame(game)
     return moves
 end
 
-function parseLabels(labels)
+function encodeToLabels(labels)
     new_labels = []
 
     files = Dict('a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5, 'f' => 6, 'g' => 7, 'h' => 8)
@@ -31,31 +31,33 @@ function parseLabels(labels)
     pieces_labels = Dict('P' => 1, 'R' => 2, 'N' => 3, 'B' => 4, 'Q' => 5, 'K' => 6)
 
     for label in labels
-        move = zeros(Int64, 6)
-        try
-
-            move = parseLabel(label, pieces_labels, ranks, files, move)
-            push!(new_labels, move)
-        catch
-            println(label)
-        end
-        #
-        #     error(e)
-        # end
-
+        move = zeros(Int64, 8)
+        move = encodeToLabel(label, files, ranks, pieces_labels, move)
+        push!(new_labels, move)
     end
 
     return new_labels
 end
 
-function parseLabel(label, pieces_labels, ranks, files, move)
+"Parse a PGN move (label) and encode in 8 digit number
 
-    # don't care about checks
+P f1 #1 x f2 #2 + =
+
+P: piece can be pawn, rook, knight, bishop, queen, king = {1, ..., 6}
+f1: starting file = {a, ..., h}
+#1: starting rank = {1, ..., 8}. These two are used only to handle ambiguity
+x: take or not = {1, 0}
+f2: landing file
+#2: landing rank
++: check or not = {1, 0}
+=: promote pawn to rook, knight, bishop, queen = {2, 5}
+"
+function encodeToLabel(label, files, ranks, pieces_labels, move)
+    # handle checks
     if '+' in label
+        move[7] = 1
         label = label[1:end-1]
     end
-
-    l = length(label)
 
     # first, handle castling and pawn promotion
     if label == "O-O"
@@ -76,22 +78,11 @@ function parseLabel(label, pieces_labels, ranks, files, move)
 
     elseif '=' in label
         move[1] = 1
-        move[4] = pieces_labels[label[end]]
-
-        if l == 6
-            move[2] = files[label[1]]
-            move[5] = files[label[3]]
-            move[6] = ranks[label[4]]
-            return move
-
-        else
-            move[5] = files[label[1]]
-            move[6] = ranks[label[2]]
-            return move
-        end
+        move[8] = pieces_labels[label[end]]
+        label = label[1:end-2]
     end
 
-
+    l = length(label)
 
     if l == 2 # move pawn
         move[1] = 1
@@ -167,10 +158,79 @@ function parseLabel(label, pieces_labels, ranks, files, move)
             return move
 
         elseif label[2] in ranks.keys
-            move[4] = ranks[label[2]]
+            move[3] = ranks[label[2]]
             move[5] = files[label[3]]
             move[6] = ranks[label[4]]
             return move
         end
+
+    # super ambiguity, both starting rank and file are specified
+    elseif l > 4 && ('x' in label) == false
+        move[1] = pieces_labels[label[1]]
+        move[2] = files[label[2]]
+        move[3] = ranks[label[3]]
+        move[5] = files[label[4]]
+        move[6] = ranks[label[5]]
+        return move
     end
+end
+
+function decodeToMoves(moves)
+    new_labels = []
+    files_inv = Dict(0 => "", 1 => "a", 2 => "b", 3 => "c", 4 => "d", 5 => "e", 6 => "f", 7 => "g", 8 => "h")
+    ranks_inv = Dict(0 => "", 1 => "1", 2 => "2", 3 => "3", 4 => "4", 5 => "5", 6 => "6", 7 => "7", 8 => "8")
+    pieces_labels_inv = Dict(1 => "", 2 => "R", 3 => "N", 4 => "B", 5 => "Q", 6 => "K")
+
+    for move in moves
+        label = ""
+        label = decodeMove(move, files_inv, ranks_inv, pieces_labels_inv, label)
+        push!(new_labels, label)
+    end
+
+    return new_labels
+end
+
+function decodeToMove(move, files_inv, ranks_inv, pieces_labels_inv, label)
+    P  = move[1]
+    f1 = move[2]
+    r1 = move[3]
+    x  = move[4]
+    f2 = move[5]
+    r2 = move[6]
+    c  = move[7]
+    p  = move[8]
+
+    label *= pieces_labels_inv[P] # piece
+    label *= files_inv[f1] # starting file (ambiguity)
+    label *= ranks_inv[r1] # starting rank
+
+    # take piece?
+    if x == 1
+        label *= "x"
+    end
+
+    # landing file and rank
+    label *= files_inv[f2]
+    label *= ranks_inv[r2]
+
+    # promotion?
+    if p != 0
+        label *= "="
+        label *= pieces_labels_inv[p]
+    end
+
+    # castling?
+    if label == "Ke1g1"
+        label = "O-O"
+
+    elseif label == "Ke1c1"
+        label = "O-O-O"
+    end
+
+    # check?
+    if c == 1
+        label *= "+"
+    end
+
+    return label
 end

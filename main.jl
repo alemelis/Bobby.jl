@@ -58,7 +58,7 @@ for k = 1:length(filter_games)
     end
 end
 
-labels_file = open("labels.txt", "w")
+labels_file = open("moves.txt", "w")
 for l in labels
     write(labels_file, "$l\n")
 end
