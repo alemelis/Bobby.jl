@@ -1,6 +1,1 @@
-julia 0.6.0
-FileIO
-Compose 0.5.4
-PyCall
-Cairo
-FontConfig
+julia 1.0
