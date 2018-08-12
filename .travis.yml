@@ -1,20 +1,17 @@
 language: julia
 os:
   - linux
+  - osx
 julia:
-  - 0.6
+  - 0.7
+  - nightly
 notifications:
   email: false
-install:
-  # - sudo apt-get install texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended
-  - pip install --user python-chess[engine,gaviota]
 script:
   - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
-  - julia -e 'Pkg.clone(pwd())'
-  - mkdir -p ~/.julia/v0.6/Bobby
-  - cp -r src ~/.julia/v0.6/Bobby/
-  - cd test/
-  - julia --code-coverage runtests.jl
+  - julia -e 'import Pkg; Pkg.clone(pwd(), "Bobby"); Pkg.build("Bobby"); Pkg.test("Bobby"; coverage=true)'
 after_success:
   - echo "done!"
-  - julia -e 'cd(Pkg.dir("MyPkg")); Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'
+  - julia -e 'import Pkg; cd(Pkg.dir("Bobby")); Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'
+matrix:
+  fast_finish: true
