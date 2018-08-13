@@ -1,3 +1,8 @@
+"""
+	Bitboard
+
+Bitboard mutable structure.
+"""
 mutable struct Bitboard
 	white :: BitArray{1}
 	P :: BitArray{1}
@@ -17,6 +22,11 @@ mutable struct Bitboard
 end
 
 
+"""
+	buildBoard()
+
+Bitboard structure constructor.
+"""
 function buildBoard()
 	white = falses(64)
 	black = falses(64)
@@ -53,11 +63,11 @@ function buildBoard()
 end
 
 
-```
+"""
 	setPawns(color="white")
 
 Constructor function for pawns.
-```
+"""
 function setPawns(color="white")
 	pawns = falses(64)
 	if color == "white"
@@ -73,11 +83,11 @@ function setPawns(color="white")
 end
 
 
-```
+"""
 	setRooks(color="white")
 
 Constructor function for rooks.
-```
+"""
 function setRooks(color="white")
 	rooks = falses(64)
 	if color == "white"
@@ -91,11 +101,11 @@ function setRooks(color="white")
 end
 
 
-```
+"""
 	setNights(color="white")
 
 Constructor function for (k)nights.
-```
+"""
 function setNights(color="white")
 	nights = falses(64)
 	if color == "white"
@@ -109,11 +119,11 @@ function setNights(color="white")
 end
 
 
-```
+"""
 	setBishops(color="white")
 
 Constructor function for bishops.
-```
+"""
 function setBishops(color="white")
 	bishops = falses(64)
 	if color == "white"
@@ -127,11 +137,11 @@ function setBishops(color="white")
 end
 
 
-```
+"""
 	setKing(color="white")
 
 Constructor function for king.
-```
+"""
 function setKing(color="white")
 	king = falses(64)
 	if color == "white"
@@ -143,11 +153,11 @@ function setKing(color="white")
 end
 
 
-```
+"""
 	setQueen(color="white")
 
 Constructor function for queen.
-```
+"""
 function setQueen(color="white")
 	queen = falses(64)
 	if color == "white"
