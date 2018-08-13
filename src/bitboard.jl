@@ -107,15 +107,15 @@ end
 Constructor function for (k)nights.
 """
 function setNights(color="white")
-	nights = falses(64)
+	knights = falses(64)
 	if color == "white"
-		nights[58] = true
-		nights[63] = true
+		knights[58] = true
+		knights[63] = true
 	else
-		nights[2] = true
-		nights[7] = true
+		knights[2] = true
+		knights[7] = true
 	end
-	return nights
+	return knights
 end
 
 
@@ -166,9 +166,4 @@ function setQueen(color="white")
 		queen[4] = true
 	end
 	return queen
-end
-
-
-function printBoard(board::Bitboard)
-	println(board.white)
 end
