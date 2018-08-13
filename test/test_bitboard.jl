@@ -33,13 +33,13 @@ black_bishops = Bobby.setBishops("black")
 white_king = Bobby.setKings()
 @test white_king[61] == true
 
-black_king = Bobby.setKings()
+black_king = Bobby.setKings("black")
 @test black_king[5] == true
 
 white_queen = Bobby.setQueens()
 @test white_queen[60] == true
 
-black_queen = Bobby.setQueens()
+black_queen = Bobby.setQueens("black")
 @test black_queen[4] == true
 
 
