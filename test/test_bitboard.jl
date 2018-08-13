@@ -30,17 +30,33 @@ black_bishops = Bobby.setBishops("black")
 @test black_bishops[6] == true
 @test black_bishops[3] == true
 
-white_king = Bobby.setKings()
+white_king = Bobby.setKing()
 @test white_king[61] == true
 
-black_king = Bobby.setKings("black")
+black_king = Bobby.setKing("black")
 @test black_king[5] == true
 
-white_queen = Bobby.setQueens()
+white_queen = Bobby.setQueen()
 @test white_queen[60] == true
 
-black_queen = Bobby.setQueens("black")
+black_queen = Bobby.setQueen("black")
 @test black_queen[4] == true
+
+board = Bobby.buildBoard()
+@test all(board.P .== white_pawns)
+@test all(board.R .== white_rooks)
+@test all(board.N .== white_knights)
+@test all(board.B .== white_bishops)
+@test all(board.K .== white_king)
+@test all(board.Q .== white_queen)
+
+@test all(board.p .== black_pawns)
+@test all(board.r .== black_rooks)
+@test all(board.n .== black_knights)
+@test all(board.b .== black_bishops)
+@test all(board.k .== black_king)
+@test all(board.q .== black_queen)
+
 
 
 # A = zeros(Int8, 64)

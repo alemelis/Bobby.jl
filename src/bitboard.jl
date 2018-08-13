@@ -29,6 +29,27 @@ function buildBoard()
 
 	N = setNights()
 	n = setNights("black")
+
+	B = setBishops()
+	b = setBishops("black")
+
+	K = setKing()
+	k = setKing("black")
+
+	Q = setQueen()
+	q = setQueen("black")
+
+	for i = 1:64
+		if P[i] | R[i] | N[i] | B[i] | K[i] | Q[i]
+			white[i] = true
+		end
+		if  p[i] | r[i] | n[i] | b[i] | k[i] | q[i]
+			black[i] = true
+		end
+	end
+
+	return Bitboard(white, P, R, N, B, Q, K,
+					black, p, r, n, b, q, k)
 end
 
 
@@ -107,32 +128,32 @@ end
 
 
 ```
-	setKings(color="white")
+	setKing(color="white")
 
-Constructor function for kings.
+Constructor function for king.
 ```
-function setKings(color="white")
-	kings = falses(64)
+function setKing(color="white")
+	king = falses(64)
 	if color == "white"
-		kings[61] = true
+		king[61] = true
 	else
-		kings[5] = true
+		king[5] = true
 	end
-	return kings
+	return king
 end
 
 
 ```
-	setQueens(color="white")
+	setQueen(color="white")
 
-Constructor function for queens.
+Constructor function for queen.
 ```
-function setQueens(color="white")
-	queens = falses(64)
+function setQueen(color="white")
+	queen = falses(64)
 	if color == "white"
-		queens[60] = true
+		queen[60] = true
 	else
-		queens[4] = true
+		queen[4] = true
 	end
-	return queens
+	return queen
 end
