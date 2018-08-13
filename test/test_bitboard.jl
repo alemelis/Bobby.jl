@@ -7,20 +7,28 @@ black_pawns = Bobby.setPawns("black")
 @test all(black_pawns[9:16] .== true)
 
 white_rooks = Bobby.setRooks()
-@test white_rooks[1] == false
+@test white_rooks[56] == false
 @test white_rooks[64] == true
 
 black_rooks = Bobby.setRooks("black")
-@test black_rooks[56] == false
+@test black_rooks[1] == true
 @test black_rooks[8] == true
 
 white_knights = Bobby.setNights()
-@test white_knights[2] == false
+@test white_knights[57] == true
 @test white_knights[63] == true
 
 black_knights = Bobby.setNights("black")
-@test black_knights[57] == false
+@test black_knights[7] == true
 @test black_knights[2] == true
+
+white_bishops = Bobby.setBishops()
+@test white_bishops[58] == true
+@test white_bishops[62] == true
+
+black_bishops = Bobby.setBishops("black")
+@test black_bishops[6] == true
+@test black_bishops[3] == true
 
 # A = zeros(Int8, 64)
 # B = zeros(Int8, 64)

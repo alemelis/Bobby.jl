@@ -86,3 +86,21 @@ function setNights(color="white")
 	end
 	return nights
 end
+
+
+```
+	setBishops(color="white")
+
+Constructor function for bishops.
+```
+function setBishops(color="white")
+	bishops = falses(64)
+	if color == "white"
+		bishops[59] = true
+		bishops[62] = true
+	else
+		bishops[3] = true
+		bishops[6] = true
+	end
+	return bishops
+end
