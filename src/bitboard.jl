@@ -24,14 +24,19 @@ function buildBoard()
 	p = placePawns("black")
 end
 
-function placePawns(color="white")
+```
+	placePawns(color="white")
+
+Constructor function for pawns.
+```
+function setPawns(color="white")
 	pawns = falses(64)
 	if color == "white"
-		for i = 49:64
+		for i = 49:56
 			pawns[i] = true
 		end
 	else
-		for i = 1:16
+		for i = 9:16
 			pawns[i] = true
 		end
 	end

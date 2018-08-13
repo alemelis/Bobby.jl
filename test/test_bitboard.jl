@@ -1,6 +1,6 @@
-@time @test Bobby.placePawns()
-
-
+white_pawns = Bobby.setPawns()
+@test white_pawns[57:end] .== false
+@test white_pawns[49:56] .== true
 
 # A = zeros(Int8, 64)
 # B = zeros(Int8, 64)
