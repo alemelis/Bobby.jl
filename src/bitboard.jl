@@ -20,12 +20,12 @@ function buildBoard()
 	white = falses(64)
 	black = falses(64)
 
-	P = placePawns()
-	p = placePawns("black")
+	P = setPawns()
+	p = setPawns("black")
 end
 
 ```
-	placePawns(color="white")
+	setPawns(color="white")
 
 Constructor function for pawns.
 ```
@@ -41,4 +41,21 @@ function setPawns(color="white")
 		end
 	end
 	return pawns
+end
+
+```
+	setRooks(color="white")
+
+Constructor function for rooks.
+```
+function setRooks(color="white")
+	rooks = falses(64)
+	if color == "white"
+		rooks[57] = true
+		rooks[64] = true
+	else
+		rooks[1] = true
+		rooks[8] = true
+	end
+	return rooks
 end

@@ -1,6 +1,18 @@
 white_pawns = Bobby.setPawns()
-@test white_pawns[57:end] .== false
-@test white_pawns[49:56] .== true
+@test all(white_pawns[57:end] .== false)
+@test all(white_pawns[49:56] .== true)
+
+black_pawns = Bobby.setPawns(color="black")
+@test all(black_pawns[1:8] .== false)
+@test all(black_pawns[9:16] .== true)
+
+white_rooks = Bobby.setRooks()
+@test white_rooks[1] == false
+@test white_rooks[64] == true
+
+black_rooks = Bobby.setRooks(color="black")
+@test black_rooks[56] == false
+@test black_rooks[8] == true
 
 # A = zeros(Int8, 64)
 # B = zeros(Int8, 64)
