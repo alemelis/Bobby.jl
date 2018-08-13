@@ -7,7 +7,7 @@ black_pawns = Bobby.setPawns("black")
 @test all(black_pawns[9:16] .== true)
 
 white_rooks = Bobby.setRooks()
-@test white_rooks[56] == false
+@test white_rooks[57] == false
 @test white_rooks[64] == true
 
 black_rooks = Bobby.setRooks("black")
@@ -15,7 +15,7 @@ black_rooks = Bobby.setRooks("black")
 @test black_rooks[8] == true
 
 white_knights = Bobby.setNights()
-@test white_knights[57] == true
+@test white_knights[58] == true
 @test white_knights[63] == true
 
 black_knights = Bobby.setNights("black")
@@ -23,7 +23,7 @@ black_knights = Bobby.setNights("black")
 @test black_knights[2] == true
 
 white_bishops = Bobby.setBishops()
-@test white_bishops[58] == true
+@test white_bishops[59] == true
 @test white_bishops[62] == true
 
 black_bishops = Bobby.setBishops("black")
