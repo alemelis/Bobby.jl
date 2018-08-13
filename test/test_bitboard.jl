@@ -30,6 +30,19 @@ black_bishops = Bobby.setBishops("black")
 @test black_bishops[6] == true
 @test black_bishops[3] == true
 
+white_king = Bobby.setKings()
+@test white_king[61] == true
+
+black_king = Bobby.setKings()
+@test black_king[5] == true
+
+white_queen = Bobby.setQueens()
+@test white_queen[60] == true
+
+black_queen = Bobby.setQueens()
+@test black_queen[4] == true
+
+
 # A = zeros(Int8, 64)
 # B = zeros(Int8, 64)
 # A[49:56] .= 1

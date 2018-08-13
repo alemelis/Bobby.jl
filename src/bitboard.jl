@@ -104,3 +104,35 @@ function setBishops(color="white")
 	end
 	return bishops
 end
+
+
+```
+	setKings(color="white")
+
+Constructor function for kings.
+```
+function setKings(color="white")
+	kings = falses(64)
+	if color == "white"
+		kings[61] = true
+	else
+		kings[5] = true
+	end
+	return kings
+end
+
+
+```
+	setQueens(color="white")
+
+Constructor function for queens.
+```
+function setQueens(color="white")
+	queens = falses(64)
+	if color == "white"
+		queens[60] = true
+	else
+		queens[4] = true
+	end
+	return queens
+end
