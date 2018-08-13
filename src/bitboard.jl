@@ -16,13 +16,21 @@ mutable struct Bitboard
 	k :: BitArray{1}
 end
 
+
 function buildBoard()
 	white = falses(64)
 	black = falses(64)
 
 	P = setPawns()
 	p = setPawns("black")
+
+	R = setRooks()
+	r = setRooks("black")
+
+	N = setNights()
+	n = setNights("black")
 end
+
 
 ```
 	setPawns(color="white")
@@ -43,6 +51,7 @@ function setPawns(color="white")
 	return pawns
 end
 
+
 ```
 	setRooks(color="white")
 
@@ -58,4 +67,22 @@ function setRooks(color="white")
 		rooks[8] = true
 	end
 	return rooks
+end
+
+
+```
+	setNights(color="white")
+
+Constructor function for (k)nights.
+```
+function setNights(color="white")
+	nights = falses(64)
+	if color == "white"
+		nights[58] = true
+		nights[63] = true
+	else
+		nights[2] = true
+		nights[7] = true
+	end
+	return nights
 end

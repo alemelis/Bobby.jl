@@ -14,6 +14,14 @@ black_rooks = Bobby.setRooks("black")
 @test black_rooks[56] == false
 @test black_rooks[8] == true
 
+white_knights = Bobby.setNights()
+@test white_knights[2] == false
+@test white_knights[63] == true
+
+black_knights = Bobby.setNights("black")
+@test black_knights[57] == false
+@test black_knights[2] == true
+
 # A = zeros(Int8, 64)
 # B = zeros(Int8, 64)
 # A[49:56] .= 1
