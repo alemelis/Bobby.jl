@@ -7,7 +7,7 @@ black_pawns = Bobby.setPawns("black")
 @test all(black_pawns[9:16] .== true)
 
 white_rooks = Bobby.setRooks()
-@test white_rooks[57] == false
+@test white_rooks[57] == true
 @test white_rooks[64] == true
 
 black_rooks = Bobby.setRooks("black")
