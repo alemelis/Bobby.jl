@@ -1,3 +1,6 @@
 using Documenter, Bobby
 
-makedocs()
+makedocs(
+    format = :html,
+    sitename = "Bobby.jl",
+)
