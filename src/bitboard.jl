@@ -167,3 +167,8 @@ function setQueen(color="white")
 	end
 	return queen
 end
+
+
+function printBoard(board::Bitboard)
+	println(board.white)
+end
