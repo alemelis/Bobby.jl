@@ -1,56 +1,39 @@
-A = zeros(Int8, 64)
-B = zeros(Int8, 64)
-A[49:56] .= 1
+mutable struct Bitboard
+	white :: BitArray{1}
+	P :: BitArray{1}
+	R :: BitArray{1}
+	N :: BitArray{1}
+	B :: BitArray{1}
+	Q :: BitArray{1}
+	K :: BitArray{1}
 
-function intest(A, B)
-	C = zeros(Int8, 64)
-	for i=1:64
-		if A[i] != B[i]
-			C[i] = 1
-		end
-	end
-	return C
+	black :: BitArray{1}
+	p :: BitArray{1}
+	r :: BitArray{1}
+	n :: BitArray{1}
+	b :: BitArray{1}
+	q :: BitArray{1}
+	k :: BitArray{1}
 end
 
-@benchmark intest(A, B)
+function buildBoard()
+	white = falses(64)
+	black = falses(64)
 
-a = falses(64)
-b = falses(64)
-a[49:56] .= true
-
-@benchmark .~(a.|b)
-
-
-function bitest(a, b)
-	c = falses(64)
-	for i=1:64
-		if a[i] != b[i]
-			c[i] = true
-		end
-	end
-	return c
+	P = placePawns()
+	p = placePawns("black")
 end
 
-@benchmark bitest(a, b)
-
-function and(a, b)
-	c = falses(length(a))
-	for i=1:length(a)
-		if a[i] == b[i] & a[i] == true
-			c[i] = true
+function placePawns(color="white")
+	pawns = falses(64)
+	if color == "white"
+		for i = 49:64
+			pawns[i] = true
+		end
+	else
+		for i = 1:16
+			pawns[i] = true
 		end
 	end
-	return c
+	return pawns
 end
-
-function or(a, b)
-	c = falses(length(a))
-	for i=1:length(a)
-		if a[i] | b[i]
-			c[i] = true
-		end
-	end
-	return c
-end
-
-transpose(reshape(a, 8, :))

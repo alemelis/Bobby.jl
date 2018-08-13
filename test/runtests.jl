@@ -2,4 +2,4 @@ using Test
 using Bobby
 
 # Run tests
-@time @test true
+@time @test include("test_bitboard.jl")
