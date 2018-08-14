@@ -206,7 +206,7 @@ end
 
 Allocate taken squares board.
 """
-function setFree(white::BitArray{1}, black::BitArray{1})
+function setTaken(free::BitArray{1})
 	taken = trues(64)
 	for i = 1:64
 		if free[i]
