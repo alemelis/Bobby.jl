@@ -19,7 +19,13 @@ function uglyPrintBoard(b::BitArray)
 	@printf("    a b c d e f g h\n")
 end
 
-function prettyPrint(board::Bobby.Bitboard)
+
+"""
+	prettyPrint(board::Bitboard)
+
+Print a colorful board with pieces in algebraic notation.
+"""
+function prettyPrint(board::Bitboard)
 	ranks = ["8", "7", "6", "5", "4", "3", "2", "1"]
 	
 	free = transpose(reshape(board.free, 8, :))
@@ -41,7 +47,7 @@ function prettyPrint(board::Bobby.Bitboard)
 
 	@printf("\n  o-----------------o\n")
 	for i = 1:8
-		@printf("%s | ", ranks[i])
+		@printf(Crayon(reset=true), "%s | ", ranks[i])
 		for j = 1:8
 			if free[i,j]
 				@printf("⋅ ")
@@ -62,6 +68,7 @@ function prettyPrint(board::Bobby.Bitboard)
 					else
 						error("Black piece not found")
 					end
+					color = :cyan
 				else
 					if P[i,j]
 						c = "P"
@@ -78,13 +85,13 @@ function prettyPrint(board::Bobby.Bitboard)
 					else
 						error("White piece not found")
 					end
+					color = :light_gray
 				end
-				@printf("%s ", c)
+				@printf(Crayon(bold=true, foreground=color), "%s ", c)
 			end
 		end
-		@printf("|\n")
+		@printf(Crayon(reset=true), "|\n")
 	end
-	@printf("  o-----------------o\n")
+	@printf(Crayon(reset=true), "  o-----------------o\n")
 	@printf("    a b c d e f g h\n")
 end
-	# @printf("\e[1;34m%-6s\e[m", "This is blue text")

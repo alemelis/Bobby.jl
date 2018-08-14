@@ -45,6 +45,6 @@ These can be formatted to look like a proper _8x8_ board
     a b c d e f g h
 ```
 
-We may want to have a bitboard for all the white pieces, all the black pieces, and individual bitboards for each different color/piece combination and a global board showing free/occupied squares, i.e. _6*2+2+1=15_ 64-bit numbers in total.
+We may want to have a bitboard for all the white pieces, all the black pieces, and individual bitboards for each different color/piece combination and two global boards showing free and occupied squares, i.e. _6*2+2+2=16_ 64-bit numbers in total.
 
 The reason why bitboards are so popular is because you can operate on them with logical operators (1-cycle operations!). For instance, given the two bitboards `white_only` and `black_only`, all the free squares are given by `free_squares = ~(white_only | black_only)`.
