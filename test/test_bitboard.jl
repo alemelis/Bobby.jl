@@ -96,7 +96,7 @@ clearRank8 = [0,0,0,0,0,0,0,0,
 			  1,1,1,1,1,1,1,1,
 			  1,1,1,1,1,1,1,1,
 			  1,1,1,1,1,1,1,1]
-@test all(clearRank[:,1] .!= clearRank[:,end])
+@test clearRank[:,1] != clearRank[:,end]
 @test Int.(clearRank[:,1]) == clearRank1
 @test Int.(clearRank[:,8]) == clearRank8
 
@@ -117,6 +117,6 @@ maskRank8 = [1,1,1,1,1,1,1,1,
 			  0,0,0,0,0,0,0,0,
 			  0,0,0,0,0,0,0,0,
 			  0,0,0,0,0,0,0,0]
-@test all(maskRank[:,1] .!= maskRank[:,end])
+@test maskRank[:,1] != maskRank[:,end]
 @test Int.(maskRank[:,1]) == maskRank1
 @test Int.(maskRank[:,8]) == maskRank8

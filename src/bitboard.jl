@@ -254,7 +254,7 @@ function setMaskRank()
 
 	r = 8
 	for j = 1:8
-		mr = transpose(reshape(trues(64), 8, :))
+		mr = transpose(reshape(falses(64), 8, :))
 		mr[r,:] .= true
 		maskRank[:,j] = reshape(transpose(mr), 64)
 		r -= 1
