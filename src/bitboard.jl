@@ -249,6 +249,20 @@ function setClearRank()
 	return clearRank
 end
 
+function setClearFile()
+	clearFile = trues(64, 8)
+
+	f = 8
+	for j = 1:8
+		cf = transpose(reshape(trues(64), 8, :))
+		cf[:,f] .= false
+		clearFile[:,j] = reshape(transpose(cf), 64)
+		f -= 1
+	end
+
+	return clearFile
+end
+
 function setMaskRank()
 	maskRank = falses(64, 8)
 
@@ -261,4 +275,18 @@ function setMaskRank()
 	end
 
 	return maskRank
+end
+
+function setMaskFile()
+	maskFile = falses(64, 8)
+
+	f = 8
+	for j = 1:8
+		mf = transpose(reshape(falses(64), 8, :))
+		mf[:,f] .= true
+		maskFile[:,j] = reshape(transpose(mf), 64)
+		f -= 1
+	end
+
+	return maskFile
 end
