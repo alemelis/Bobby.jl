@@ -228,11 +228,13 @@ end
 function buildLookUpTables()
 
 	clearRank = setClearRank()
-	clearFile = 0
+	clearFile = setClearFile()
 
 	maskRank = setMaskRank()
-	maskFile = falses(64, 8)
+	maskFile = setMaskFile()
 
+	return lookUpTables(clearRank, maskRank,
+						clearFile, maskFile)
 end
 
 function setClearRank()

@@ -162,3 +162,13 @@ maskFileH = [0,0,0,0,0,0,0,1,
 @test maskFile[:,1] != maskFile[:,end]
 @test Int.(maskFile[:,1]) == maskFileA
 @test Int.(maskFile[:,8]) == maskFileH
+
+lookUpTables = Bobby.buildLookUpTables()
+@test Int.(lookUpTables.clearRank[:,1]) == clearRank1
+@test Int.(lookUpTables.clearRank[:,8]) == clearRank8
+@test Int.(lookUpTables.clearFile[:,1]) == clearFileA
+@test Int.(lookUpTables.clearFile[:,8]) == clearFileH
+@test Int.(lookUpTables.maskRank[:,1]) == maskRank1
+@test Int.(lookUpTables.maskRank[:,8]) == maskRank8
+@test Int.(lookUpTables.maskFile[:,1]) == maskFileA
+@test Int.(lookUpTables.maskFile[:,8]) == maskFileH
