@@ -208,14 +208,29 @@ function uglyPrintBoard(b::BitArray)
 	r_b = Int.(transpose(reshape(b, 8, :)))
 	ranks = ["8", "7", "6", "5", "4", "3", "2", "1"]
 
-	@printf("\n")
+	@printf("\n  o-----------------o\n")
 	for i = 1:8
 		@printf("%s | ", ranks[i])
 		for j = 1:8
 			@printf("%d ", r_b[i,j])
 		end
-		@printf("\n")
+		@printf("|\n")
 	end
-	@printf("  ------------------\n")
+	@printf("  o------------------\n")
 	@printf("    a b c d e f g h\n")
 end
+
+
+
+```
+  o-----------------o
+8 | 1 1 1 1 1 1 1 1 |
+7 | 1 1 1 1 1 1 1 1 |
+6 | 0 0 0 0 0 0 0 0 |
+5 | 0 0 0 0 0 0 0 0 |
+4 | 0 0 0 0 0 0 0 0 |
+3 | 0 0 0 0 0 0 0 0 |
+2 | 1 1 1 1 1 1 1 1 |
+1 | 1 1 1 1 1 1 1 1 |
+  o-----------------o
+    a b c d e f g h
