@@ -252,12 +252,10 @@ end
 function setClearFile()
 	clearFile = trues(64, 8)
 
-	f = 8
 	for j = 1:8
 		cf = transpose(reshape(trues(64), 8, :))
-		cf[:,f] .= false
+		cf[:,j] .= false
 		clearFile[:,j] = reshape(transpose(cf), 64)
-		f -= 1
 	end
 
 	return clearFile
@@ -280,12 +278,10 @@ end
 function setMaskFile()
 	maskFile = falses(64, 8)
 
-	f = 8
 	for j = 1:8
 		mf = transpose(reshape(falses(64), 8, :))
-		mf[:,f] .= true
+		mf[:,j] .= true
 		maskFile[:,j] = reshape(transpose(mf), 64)
-		f -= 1
 	end
 
 	return maskFile
