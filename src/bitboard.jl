@@ -63,8 +63,11 @@ function buildBoard()
 
 	# allocate free squares board
 	free = trues(64)
-	# free[white] = false
-	# free[black] = false
+	for i = 1:65
+		if white[i] | black[i]
+			free[i] = false
+		end
+	end
 
 
 	return Bitboard(white, P, R, N, B, Q, K,
