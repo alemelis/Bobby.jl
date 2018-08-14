@@ -53,6 +53,10 @@ black = Bobby.setSide(black_pawns, black_rooks,
 free = Bobby.setFree(white, black)
 @test all(free[.~white .& .~black] .== true)
 
+taken = Bobby.setTaken(free)
+@test all(taken[.~free] .== true)
+@test all(taken[free] .== false)
+
 board = Bobby.buildBoard()
 @test all(board.P .== white_pawns)
 @test all(board.R .== white_rooks)
@@ -73,3 +77,4 @@ board = Bobby.buildBoard()
 @test all(board.free[board.white] .== false)
 @test all(board.free[board.black] .== false)
 @test all(board.free .== free)
+@test all(board.taken .== taken)

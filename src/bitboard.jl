@@ -21,6 +21,7 @@ mutable struct Bitboard
 	k :: BitArray{1}
 
 	free :: BitArray{1}
+	taken :: BitArray{1}
 end
 
 
@@ -52,10 +53,11 @@ function buildBoard()
 	black = setSide(p, r, n, b, k, q)
 
 	free = setFree(white, black)
+	taken = setTaken(free)
 
 	return Bitboard(white, P, R, N, B, Q, K,
 					black, p, r, n, b, q, k,
-					free)
+					free, taken)
 end
 
 
@@ -200,6 +202,22 @@ end
 
 
 """
+	setTaken(free::BitArray{1})
+
+Allocate taken squares board.
+"""
+function setFree(white::BitArray{1}, black::BitArray{1})
+	taken = trues(64)
+	for i = 1:64
+		if free[i]
+			taken[i] = false
+		end
+	end
+	return taken
+end
+
+
+"""
 	uglyPrintBoard(b::BitArray)
 
 Print bitboard to REPL for debuggin purposes (very ugly).
@@ -216,21 +234,6 @@ function uglyPrintBoard(b::BitArray)
 		end
 		@printf("|\n")
 	end
-	@printf("  o------------------\n")
+	@printf("  o-----------------o\n")
 	@printf("    a b c d e f g h\n")
 end
-
-
-
-```
-  o-----------------o
-8 | 1 1 1 1 1 1 1 1 |
-7 | 1 1 1 1 1 1 1 1 |
-6 | 0 0 0 0 0 0 0 0 |
-5 | 0 0 0 0 0 0 0 0 |
-4 | 0 0 0 0 0 0 0 0 |
-3 | 0 0 0 0 0 0 0 0 |
-2 | 1 1 1 1 1 1 1 1 |
-1 | 1 1 1 1 1 1 1 1 |
-  o-----------------o
-    a b c d e f g h
