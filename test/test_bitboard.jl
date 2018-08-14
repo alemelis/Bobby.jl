@@ -79,7 +79,7 @@ board = Bobby.buildBoard()
 @test all(board.free .== free)
 @test all(board.taken .== taken)
 
-clearRank = setClearRank()
+clearRank = Bobby.setClearRank()
 clearRank1 = [1,1,1,1,1,1,1,1,
 			  1,1,1,1,1,1,1,1,
 			  1,1,1,1,1,1,1,1,
@@ -100,7 +100,7 @@ clearRank8 = [0,0,0,0,0,0,0,0,
 @test Int.(clearRank[:,1]) == clearRank1
 @test Int.(clearRank[:,8]) == clearRank8
 
-maskRank = setMaskRank()
+maskRank = Bobby.setMaskRank()
 maskRank1 = [0,0,0,0,0,0,0,0,
 			  0,0,0,0,0,0,0,0,
 			  0,0,0,0,0,0,0,0,
