@@ -63,7 +63,7 @@ function buildBoard()
 
 	# allocate free squares board
 	free = trues(64)
-	for i = 1:65
+	for i = 1:64
 		if white[i] | black[i]
 			free[i] = false
 		end
