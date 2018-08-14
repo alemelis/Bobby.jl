@@ -215,25 +215,3 @@ function setTaken(free::BitArray{1})
 	end
 	return taken
 end
-
-
-"""
-	uglyPrintBoard(b::BitArray)
-
-Print bitboard to REPL for debuggin purposes (very ugly).
-"""
-function uglyPrintBoard(b::BitArray)
-	r_b = Int.(transpose(reshape(b, 8, :)))
-	ranks = ["8", "7", "6", "5", "4", "3", "2", "1"]
-
-	@printf("\n  o-----------------o\n")
-	for i = 1:8
-		@printf("%s | ", ranks[i])
-		for j = 1:8
-			@printf("%d ", r_b[i,j])
-		end
-		@printf("|\n")
-	end
-	@printf("  o-----------------o\n")
-	@printf("    a b c d e f g h\n")
-end
