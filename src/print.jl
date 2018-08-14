@@ -1,10 +1,9 @@
 """
 	uglyPrint(b::BitArray)
 
-Print bitboard to REPL for debuggin purposes (very ugly).
-This prints a generic `BitArray` in shape 8x8 (transposed).
+Print any bitboard in shape 8x8 (transposed) to REPL for debuggin purposes.
 """
-function uglyPrintBoard(b::BitArray)
+function uglyPrint(b::BitArray)
 	r_b = Int.(transpose(reshape(b, 8, :)))
 	ranks = ["8", "7", "6", "5", "4", "3", "2", "1"]
 
