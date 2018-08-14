@@ -19,6 +19,8 @@ mutable struct Bitboard
 	b :: BitArray{1}
 	q :: BitArray{1}
 	k :: BitArray{1}
+
+	free :: BitArray{1}
 end
 
 
@@ -49,6 +51,7 @@ function buildBoard()
 	Q = setQueen()
 	q = setQueen("black")
 
+	# build white-only and black-only boards
 	for i = 1:64
 		if P[i] | R[i] | N[i] | B[i] | K[i] | Q[i]
 			white[i] = true
@@ -58,8 +61,15 @@ function buildBoard()
 		end
 	end
 
+	# allocate free squares board
+	free = trues(64)
+	free[white] = false
+	free[black] = false
+
+
 	return Bitboard(white, P, R, N, B, Q, K,
-					black, p, r, n, b, q, k)
+					black, p, r, n, b, q, k,
+					free)
 end
 
 

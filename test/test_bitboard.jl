@@ -58,3 +58,7 @@ board = Bobby.buildBoard()
 @test all(board.k .== black_king)
 @test all(board.q .== black_queen)
 @test all(board.black[1:16] .== true)
+
+@test all(board.free[board.white] .== false)
+@test all(board.free[board.black] .== false)
+@test all(board.free[~board.white & ~board.black] .== true)
