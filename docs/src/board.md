@@ -8,7 +8,7 @@ In the _bitboard_ approach, the board is represented by a binary number of 64 di
 rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR
 ```
 
-which, in binary notation reads
+and in binary notation reads
 
 ```
 1111111111111111000000000000000000000000000000001111111111111111
@@ -29,6 +29,21 @@ White rooks
 ...
 ```
 
-We may want to have a bitboard for all the white pieces, all the black pieces, and individual bitboards for each different color/piece combination. Hence, (at least) _6*2+2=14_ bitboards in total.
+These can be formatted to look like a proper _8x8_ board
 
-The reason why bitboards are so popular is because you can operate on them with logical operators (1-cycle operations!). For instance, given the two bitboards `white_only` and `black_only`, all the free squares are given by `free_squares = .~(white_only .| black_only)`
+```
+8 | 1 1 1 1 1 1 1 1 
+7 | 1 1 1 1 1 1 1 1 
+6 | 0 0 0 0 0 0 0 0 
+5 | 0 0 0 0 0 0 0 0 
+4 | 0 0 0 0 0 0 0 0 
+3 | 0 0 0 0 0 0 0 0 
+2 | 1 1 1 1 1 1 1 1 
+1 | 1 1 1 1 1 1 1 1 
+  ------------------
+    a b c d e f g h
+```
+
+We may want to have a bitboard for all the white pieces, all the black pieces, and individual bitboards for each different color/piece combination and a global board showing free/occupied squares, i.e. _6*2+2+1=15_ 64-bit numbers in total.
+
+The reason why bitboards are so popular is because you can operate on them with logical operators (1-cycle operations!). For instance, given the two bitboards `white_only` and `black_only`, all the free squares are given by `free_squares = ~(white_only | black_only)`.

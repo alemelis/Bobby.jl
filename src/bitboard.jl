@@ -51,7 +51,6 @@ function buildBoard()
 	white = setSide(P, R, N, B, K, Q)
 	black = setSide(p, r, n, b, k, q)
 
-	# allocate free squares board
 	free = setFree(white, black)
 
 	return Bitboard(white, P, R, N, B, Q, K,
@@ -174,7 +173,6 @@ Build white-only and black-only boards.
 """
 function setSide(p::BitArray{1}, r::BitArray{1}, n::BitArray{1},
 				 b::BitArray{1}, q::BitArray{1}, k::BitArray{1})
-
 	side = falses(64)
 	for i = 1:64
 		if  p[i] | r[i] | n[i] | b[i] | k[i] | q[i]
@@ -198,4 +196,26 @@ function setFree(white::BitArray{1}, black::BitArray{1})
 		end
 	end
 	return free
+end
+
+
+"""
+	uglyPrintBoard(b::BitArray)
+
+Print bitboard to REPL for debuggin purposes (very ugly).
+"""
+function uglyPrintBoard(b::BitArray)
+	r_b = Int.(transpose(reshape(b, 8, :)))
+	ranks = ["8", "7", "6", "5", "4", "3", "2", "1"]
+
+	@printf("\n")
+	for i = 1:8
+		@printf("%s | ", ranks[i])
+		for j = 1:8
+			@printf("%d ", r_b[i,j])
+		end
+		@printf("\n")
+	end
+	@printf("  ------------------\n")
+	@printf("    a b c d e f g h\n")
 end
