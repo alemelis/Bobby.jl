@@ -29,22 +29,22 @@ White rooks
 ...
 ```
 
-These can be formatted to look like a proper _8x8_ board
+We may want to have a bitboard for all the white pieces, all the black pieces, and individual bitboards for each different color/piece combination and two global boards showing free and occupied squares, i.e. _6*2+2+2=16_ 64-bit numbers in total. These can be reshaped and formatted to look like a proper _8x8_ chess board
 
 ```
   o-----------------o
-8 | 1 1 1 1 1 1 1 1 |
-7 | 1 1 1 1 1 1 1 1 |
-6 | 0 0 0 0 0 0 0 0 |
-5 | 0 0 0 0 0 0 0 0 |
-4 | 0 0 0 0 0 0 0 0 |
-3 | 0 0 0 0 0 0 0 0 |
-2 | 1 1 1 1 1 1 1 1 |
-1 | 1 1 1 1 1 1 1 1 |
+8 | r n b q k b n r |
+7 | p p p p p p p p |
+6 | ⋅ ⋅ ⋅ ⋅ ⋅ ⋅ ⋅ ⋅ |
+5 | ⋅ ⋅ ⋅ ⋅ ⋅ ⋅ ⋅ ⋅ |
+4 | ⋅ ⋅ ⋅ ⋅ ⋅ ⋅ ⋅ ⋅ |
+3 | ⋅ ⋅ ⋅ ⋅ ⋅ ⋅ ⋅ ⋅ |
+2 | P P P P P P P P |
+1 | R N B Q K B N R |
   o-----------------o
     a b c d e f g h
 ```
 
-We may want to have a bitboard for all the white pieces, all the black pieces, and individual bitboards for each different color/piece combination and two global boards showing free and occupied squares, i.e. _6*2+2+2=16_ 64-bit numbers in total.
-
 The reason why bitboards are so popular is because you can operate on them with logical operators (1-cycle operations!). For instance, given the two bitboards `white_only` and `black_only`, all the free squares are given by `free_squares = ~(white_only | black_only)`.
+
+Operations are made easier with [_lookup tables_](http://pages.cs.wisc.edu/~psilord/blog/data/chess-pages/physical.html), i.e., a set of pre-allocated bitboards wich can be `OR`ed or `AND`ed with another bitboard to remove(clear)/keep(mask) a file/rank (32 tables in total).

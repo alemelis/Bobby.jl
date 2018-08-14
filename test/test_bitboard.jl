@@ -78,3 +78,45 @@ board = Bobby.buildBoard()
 @test all(board.free[board.black] .== false)
 @test all(board.free .== free)
 @test all(board.taken .== taken)
+
+clearRank = setClearRank()
+clearRank1 = [1,1,1,1,1,1,1,1,
+			  1,1,1,1,1,1,1,1,
+			  1,1,1,1,1,1,1,1,
+			  1,1,1,1,1,1,1,1,
+			  1,1,1,1,1,1,1,1,
+			  1,1,1,1,1,1,1,1,
+			  1,1,1,1,1,1,1,1,
+			  0,0,0,0,0,0,0,0]
+clearRank8 = [0,0,0,0,0,0,0,0,
+			  1,1,1,1,1,1,1,1,
+			  1,1,1,1,1,1,1,1,
+			  1,1,1,1,1,1,1,1,
+			  1,1,1,1,1,1,1,1,
+			  1,1,1,1,1,1,1,1,
+			  1,1,1,1,1,1,1,1,
+			  1,1,1,1,1,1,1,1]
+@test all(clearRank[:,1] .!= clearRank[:,end])
+@test Int.(clearRank[:,1]) == clearRank1
+@test Int.(clearRank[:,8]) == clearRank8
+
+maskRank = setMaskRank()
+maskRank1 = [0,0,0,0,0,0,0,0,
+			  0,0,0,0,0,0,0,0,
+			  0,0,0,0,0,0,0,0,
+			  0,0,0,0,0,0,0,0,
+			  0,0,0,0,0,0,0,0,
+			  0,0,0,0,0,0,0,0,
+			  0,0,0,0,0,0,0,0,
+			  1,1,1,1,1,1,1,1]
+maskRank8 = [1,1,1,1,1,1,1,1,
+			  0,0,0,0,0,0,0,0,
+			  0,0,0,0,0,0,0,0,
+			  0,0,0,0,0,0,0,0,
+			  0,0,0,0,0,0,0,0,
+			  0,0,0,0,0,0,0,0,
+			  0,0,0,0,0,0,0,0,
+			  0,0,0,0,0,0,0,0]
+@test all(maskRank[:,1] .!= maskRank[:,end])
+@test Int.(maskRank[:,1]) == maskRank1
+@test Int.(maskRank[:,8]) == maskRank8

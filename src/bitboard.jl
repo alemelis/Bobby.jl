@@ -4,7 +4,7 @@
 Bitboard mutable structure.
 """
 mutable struct Bitboard
-	white :: BitArray{1}
+	white :: BitArray{1} # all white pieces
 	P :: BitArray{1}
 	R :: BitArray{1}
 	N :: BitArray{1}
@@ -12,7 +12,7 @@ mutable struct Bitboard
 	Q :: BitArray{1}
 	K :: BitArray{1}
 
-	black :: BitArray{1}
+	black :: BitArray{1} # all black pieces
 	p :: BitArray{1}
 	r :: BitArray{1}
 	n :: BitArray{1}
@@ -20,8 +20,8 @@ mutable struct Bitboard
 	q :: BitArray{1}
 	k :: BitArray{1}
 
-	free :: BitArray{1}
-	taken :: BitArray{1}
+	free :: BitArray{1}  # all free squares
+	taken :: BitArray{1} # all pieces
 end
 
 
@@ -55,9 +55,8 @@ function buildBoard()
 	free = setFree(white, black)
 	taken = setTaken(free)
 
-	return Bitboard(white, P, R, N, B, Q, K,
-					black, p, r, n, b, q, k,
-					free, taken)
+	return Bitboard(white, P, R, N, B, Q, K, black,
+					p, r, n, b, q, k, free, taken)
 end
 
 
@@ -214,4 +213,52 @@ function setTaken(free::BitArray{1})
 		end
 	end
 	return taken
+end
+
+struct lookUpTables
+
+	clearRank :: BitArray{2}
+	maskRank  :: BitArray{2}
+
+	clearFile :: BitArray{2}
+	maskFile  :: BitArray{2}
+
+end
+
+function buildLookUpTables()
+
+	clearRank = setClearRank()
+	clearFile = 0
+
+	maskRank = setMaskRank()
+	maskFile = falses(64, 8)
+
+end
+
+function setClearRank()
+	clearRank = trues(64, 8)
+
+	r = 8
+	for j = 1:8
+		cr = transpose(reshape(trues(64), 8, :))
+		cr[r,:] .= false
+		clearRank[:,j] = reshape(transpose(cr), 64)
+		r -= 1
+	end
+
+	return clearRank
+end
+
+function setMaskRank()
+	maskRank = falses(64, 8)
+
+	r = 8
+	for j = 1:8
+		mr = transpose(reshape(trues(64), 8, :))
+		mr[r,:] .= true
+		maskRank[:,j] = reshape(transpose(mr), 64)
+		r -= 1
+	end
+
+	return maskRank
 end

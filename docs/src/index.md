@@ -13,7 +13,7 @@ $ julia make.jl
 ## Steps
 
 - [Board representation](./board.md)
-- Search
+- [Move generation]
 - Evaluation
 
 ## References
@@ -41,7 +41,7 @@ $ julia make.jl
   - [Evaluation Function](https://www.gamedev.net/articles/programming/artificial-intelligence/chess-programming-part-vi-evaluation-functions-r1208)
   - [Advanced Search](https://www.gamedev.net/articles/programming/artificial-intelligence/chess-programming-part-v-advanced-search-r1197)
 - Bruce Moreland's [Gerbil](https://web.archive.org/web/20071026090003/http://www.brucemo.com/compchess/programming/index.htm) (C)
-
+- [Chess and Bitboards](http://pages.cs.wisc.edu/~psilord/blog/data/chess-pages/) (incomplete)
 
 ### Board representation
 
