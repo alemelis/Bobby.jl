@@ -30,9 +30,6 @@ end
 Bitboard structure constructor.
 """
 function buildBoard()
-	white = falses(64)
-	black = falses(64)
-
 	P = setPawns()
 	p = setPawns("black")
 
@@ -51,24 +48,11 @@ function buildBoard()
 	Q = setQueen()
 	q = setQueen("black")
 
-	# build white-only and black-only boards
-	for i = 1:64
-		if P[i] | R[i] | N[i] | B[i] | K[i] | Q[i]
-			white[i] = true
-		end
-		if  p[i] | r[i] | n[i] | b[i] | k[i] | q[i]
-			black[i] = true
-		end
-	end
+	white = setSide(P, R, N, B, K, Q)
+	black = setSide(p, r, n, b, k, q)
 
 	# allocate free squares board
-	free = trues(64)
-	for i = 1:64
-		if white[i] | black[i]
-			free[i] = false
-		end
-	end
-
+	free = setFree(white, black)
 
 	return Bitboard(white, P, R, N, B, Q, K,
 					black, p, r, n, b, q, k,
@@ -179,4 +163,39 @@ function setQueen(color="white")
 		queen[4] = true
 	end
 	return queen
+end
+
+
+"""
+	setSide(p::BitArray{1}, r::BitArray{1}, n::BitArray{1},
+			b::BitArray{1}, q::BitArray{1}, k::BitArray{1})
+
+Build white-only and black-only boards.
+"""
+function setSide(p::BitArray{1}, r::BitArray{1}, n::BitArray{1},
+				 b::BitArray{1}, q::BitArray{1}, k::BitArray{1})
+
+	side = falses(64)
+	for i = 1:64
+		if  p[i] | r[i] | n[i] | b[i] | k[i] | q[i]
+			side[i] = true
+		end
+	end
+	return side
+end
+
+
+"""
+	setFree(white::BitArray{1}, black::BitArray{1})
+
+Allocate free squares board.
+"""
+function setFree(white::BitArray{1}, black::BitArray{1})
+	free = trues(64)
+	for i = 1:64
+		if white[i] | black[i]
+			free[i] = false
+		end
+	end
+	return free
 end

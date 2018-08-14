@@ -42,6 +42,17 @@ white_queen = Bobby.setQueen()
 black_queen = Bobby.setQueen("black")
 @test black_queen[4] == true
 
+white = Bobby.setSide(white_pawns, white_rooks,
+	white_knights, white_bishops, white_queen, white_king)
+@test all(white[49:end] .== true)
+
+black = Bobby.setSide(black_pawns, black_rooks,
+	black_knights, black_bishops, black_queen, black_king)
+@test all(black[1:16] .== true)
+
+free = Bobby.setFree(white, black)
+@test all(free[.~white .& .~black] .== true)
+
 board = Bobby.buildBoard()
 @test all(board.P .== white_pawns)
 @test all(board.R .== white_rooks)
@@ -49,7 +60,7 @@ board = Bobby.buildBoard()
 @test all(board.B .== white_bishops)
 @test all(board.K .== white_king)
 @test all(board.Q .== white_queen)
-@test all(board.white[49:end] .== true)
+@test all(board.white .== white)
 
 @test all(board.p .== black_pawns)
 @test all(board.r .== black_rooks)
@@ -57,8 +68,8 @@ board = Bobby.buildBoard()
 @test all(board.b .== black_bishops)
 @test all(board.k .== black_king)
 @test all(board.q .== black_queen)
-@test all(board.black[1:16] .== true)
+@test all(board.black .== black)
 
 @test all(board.free[board.white] .== false)
 @test all(board.free[board.black] .== false)
-@test all(board.free[.~board.white .& .~board.black] .== true)
+@test all(board.free .== free)
