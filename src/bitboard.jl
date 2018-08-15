@@ -215,76 +215,76 @@ function setTaken(free::BitArray{1})
 	return taken
 end
 
-struct lookUpTables
+struct LookUpTables
 
-	clearRank :: BitArray{2}
-	maskRank  :: BitArray{2}
+	clear_rank :: BitArray{2}
+	mask_rank  :: BitArray{2}
 
-	clearFile :: BitArray{2}
-	maskFile  :: BitArray{2}
+	clear_file :: BitArray{2}
+	mask_file  :: BitArray{2}
 
 end
 
 function buildLookUpTables()
 
-	clearRank = setClearRank()
-	clearFile = setClearFile()
+	clear_rank = setClearRank()
+	clear_file = setClearFile()
 
-	maskRank = setMaskRank()
-	maskFile = setMaskFile()
+	mask_rank = setMaskRank()
+	mask_file = setMaskFile()
 
-	return lookUpTables(clearRank, maskRank,
-						clearFile, maskFile)
+	return LookUpTables(clear_rank, mask_rank,
+						clear_file, mask_file)
 end
 
 function setClearRank()
-	clearRank = trues(64, 8)
+	clear_rank = trues(64, 8)
 
 	r = 8
 	for j = 1:8
 		cr = transpose(reshape(trues(64), 8, :))
 		cr[r,:] .= false
-		clearRank[:,j] = reshape(transpose(cr), 64)
+		clear_rank[:,j] = reshape(transpose(cr), 64)
 		r -= 1
 	end
 
-	return clearRank
+	return clear_rank
 end
 
 function setClearFile()
-	clearFile = trues(64, 8)
+	clear_file = trues(64, 8)
 
 	for j = 1:8
 		cf = transpose(reshape(trues(64), 8, :))
 		cf[:,j] .= false
-		clearFile[:,j] = reshape(transpose(cf), 64)
+		clear_file[:,j] = reshape(transpose(cf), 64)
 	end
 
-	return clearFile
+	return clear_file
 end
 
 function setMaskRank()
-	maskRank = falses(64, 8)
+	mask_rank = falses(64, 8)
 
 	r = 8
 	for j = 1:8
 		mr = transpose(reshape(falses(64), 8, :))
 		mr[r,:] .= true
-		maskRank[:,j] = reshape(transpose(mr), 64)
+		mask_rank[:,j] = reshape(transpose(mr), 64)
 		r -= 1
 	end
 
-	return maskRank
+	return mask_rank
 end
 
 function setMaskFile()
-	maskFile = falses(64, 8)
+	mask_file = falses(64, 8)
 
 	for j = 1:8
 		mf = transpose(reshape(falses(64), 8, :))
 		mf[:,j] .= true
-		maskFile[:,j] = reshape(transpose(mf), 64)
+		mask_file[:,j] = reshape(transpose(mf), 64)
 	end
 
-	return maskFile
+	return mask_file
 end
