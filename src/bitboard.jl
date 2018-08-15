@@ -61,11 +61,11 @@ end
 
 
 """
-	setPawns(color="white")
+	setPawns(color::String="white")
 
 Constructor function for pawns.
 """
-function setPawns(color="white")
+function setPawns(color::String="white")
 	pawns = falses(64)
 	if color == "white"
 		for i = 49:56
@@ -81,11 +81,11 @@ end
 
 
 """
-	setRooks(color="white")
+	setRooks(color::String="white")
 
 Constructor function for rooks.
 """
-function setRooks(color="white")
+function setRooks(color::String="white")
 	rooks = falses(64)
 	if color == "white"
 		rooks[57] = true
@@ -99,11 +99,11 @@ end
 
 
 """
-	setNights(color="white")
+	setNights(color::String="white")
 
 Constructor function for (k)nights.
 """
-function setNights(color="white")
+function setNights(color::String="white")
 	knights = falses(64)
 	if color == "white"
 		knights[58] = true
@@ -117,11 +117,11 @@ end
 
 
 """
-	setBishops(color="white")
+	setBishops(color::String="white")
 
 Constructor function for bishops.
 """
-function setBishops(color="white")
+function setBishops(color::String="white")
 	bishops = falses(64)
 	if color == "white"
 		bishops[59] = true
@@ -135,11 +135,11 @@ end
 
 
 """
-	setKing(color="white")
+	setKing(color::String="white")
 
 Constructor function for king.
 """
-function setKing(color="white")
+function setKing(color::String="white")
 	king = falses(64)
 	if color == "white"
 		king[61] = true
@@ -151,11 +151,11 @@ end
 
 
 """
-	setQueen(color="white")
+	setQueen(color::String="white")
 
 Constructor function for queen.
 """
-function setQueen(color="white")
+function setQueen(color::String="white")
 	queen = falses(64)
 	if color == "white"
 		queen[60] = true

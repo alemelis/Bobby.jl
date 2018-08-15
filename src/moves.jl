@@ -4,7 +4,7 @@
 Find valid squares for king.
 """
 function getKingValid(board::Bitboard, lu_tabs::Bobby.LookUpTables,
-					  color="white")
+					  color::String="white")
 
 	if color == "white"
 		king = board.K
@@ -23,7 +23,7 @@ function getKingValid(board::Bitboard, lu_tabs::Bobby.LookUpTables,
 		clear_file = "none"
 	end
 
-	# by now, no valid squares have been individuated
+	# no valid squares have been found yet
 	king_valid = falses(64)
 
 	shifts = [9, 8, 7, -1, -9, -8, -7, 1]

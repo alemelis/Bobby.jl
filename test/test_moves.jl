@@ -17,24 +17,7 @@ king35 = [0,0,0,0,0,0,0,0,
 kv = Bobby.getKingValid(b, l)
 @test all(Int.(kv) .== king35)
 
-# test white king on A file
-b = Bobby.buildBoard()
-b.K = falses(64)
-b.K[33] = true
-b.white[33] = true
-b.white[61] = false
-king33 = [0,0,0,0,0,0,0,0,
-		  0,0,0,0,0,0,0,0,
-		  0,0,0,0,0,0,0,0,
-		  1,1,0,0,0,0,0,0,
-		  0,1,0,0,0,0,0,0,
-		  1,1,0,0,0,0,0,0,
-		  0,0,0,0,0,0,0,0,
-		  0,0,0,0,0,0,0,0]
-kv = Bobby.getKingValid(b, l)
-@test all(Int.(kv) .== king33)
-
-# test white king on upper left corner
+# test white king on upper left corner (A file tested as well)
 b = Bobby.buildBoard()
 b.K = falses(64)
 b.K[1] = true
@@ -51,19 +34,19 @@ king1 = [0,1,0,0,0,0,0,0,
 kv = Bobby.getKingValid(b, l)
 @test all(Int.(kv) .== king1)
 
-# test black king on upper right corner (H file as well)
+# test black king on lower right corner (H file tested as well)
 b = Bobby.buildBoard()
 b.k = falses(64)
-b.k[8] = true
-b.black[8] = true
+b.k[64] = true
+b.black[64] = true
 b.black[5] = false
-king8 = [0,0,0,0,0,0,1,0,
+king8 = [0,0,0,0,0,0,0,0,
+		 0,0,0,0,0,0,0,0,
+		 0,0,0,0,0,0,0,0,
+		 0,0,0,0,0,0,0,0,
+		 0,0,0,0,0,0,0,0,
+		 0,0,0,0,0,0,0,0,
 		 0,0,0,0,0,0,1,1,
-		 0,0,0,0,0,0,0,0,
-		 0,0,0,0,0,0,0,0,
-		 0,0,0,0,0,0,0,0,
-		 0,0,0,0,0,0,0,0,
-		 0,0,0,0,0,0,0,0,
-		 0,0,0,0,0,0,0,0]
+		 0,0,0,0,0,0,1,0]
 kv = Bobby.getKingValid(b, l, "black")
 @test all(Int.(kv) .== king8)
