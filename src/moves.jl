@@ -1,9 +1,15 @@
-function testKing(board::Bitboard, lu_tabs::LookUpTables, color="white")
+"""
+	getKingValid(board::Bitboard, lu_tabs::Bobby.LookUpTables, color="white")
+
+Find valid squares for king.
+"""
+function getKingValid(board::Bitboard, lu_tabs::Bobby.LookUpTables,
+					  color="white")
 
 	if color == "white"
 		king = board.K
 		pieces = board.white
-	elseif colot == "black"
+	elseif color == "black"
 		king = board.k
 		pieces = board.black
 	end
@@ -17,19 +23,25 @@ function testKing(board::Bitboard, lu_tabs::LookUpTables, color="white")
 		clear_file = "none"
 	end
 
-	king_valid = .~pieces
+	# by now, no valid squares have been individuated
+	king_valid = falses(64)
 
 	shifts = [9, 8, 7, -1, -9, -8, -7, 1]
 	for i = 1:8
-		if i in [1, 8, 7] & clear_file == "A"
+		# clear A and H files if king on those
+		if (i in [1, 8, 7]) & (clear_file == "A")
 			cleared_king = king .& lu_tabs.clear_file[:,1]
-		elseif i in [3, 4, 5] & clear_file == "H"
+		elseif (i in [3, 4, 5]) & (clear_file == "H")
 			cleared_king = king .& lu_tabs.clear_file[:,8]
 		else
 			cleared_king = king
 		end
+
+		# shift king position
 		shifted_king = cleared_king << shifts[i]
-		king_valid .= king_valid .| shifted_king
+
+		# update valid squares
+		king_valid .= king_valid .| (.~pieces .& shifted_king)
 	end
 
 	return king_valid
