@@ -47,4 +47,20 @@ We may want to have a bitboard for all the white pieces, all the black pieces, a
 
 The reason why bitboards are so popular is because you can operate on them with logical operators (1-cycle operations!). For instance, given the two bitboards `white_only` and `black_only`, all the free squares are given by `free_squares = ~(white_only | black_only)`.
 
-Operations are made easier with [_lookup tables_](http://pages.cs.wisc.edu/~psilord/blog/data/chess-pages/physical.html), i.e., a set of pre-allocated bitboards wich can be `OR`ed or `AND`ed with another bitboard to remove(clear)/keep(mask) a file/rank (32 tables in total).
+Operations are made easier with [_lookup tables_](http://pages.cs.wisc.edu/~psilord/blog/data/chess-pages/physical.html), i.e., a set of pre-allocated bitboards wich can be `OR`ed or `AND`ed with another bitboard to remove(clear)/keep(mask) a file/rank (32 tables in total). For instance, the lookup table `mask_rank1` looks like
+
+```
+  o-----------------o
+8 | 0 0 0 0 0 0 0 0 |
+7 | 0 0 0 0 0 0 0 0 |
+6 | 0 0 0 0 0 0 0 0 |
+5 | 0 0 0 0 0 0 0 0 |
+4 | 0 0 0 0 0 0 0 0 |
+3 | 0 0 0 0 0 0 0 0 |
+2 | 0 0 0 0 0 0 0 0 |
+1 | 1 1 1 1 1 1 1 1 |
+  o-----------------o
+    a b c d e f g h
+```
+
+and we can use it to determine which pieces are in a specific rank/file, e.g., all the black rooks in the fifth rank are retrieved as `black_rooks_rank5 = black_rooks & mask_rank5`.

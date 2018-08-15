@@ -79,96 +79,96 @@ board = Bobby.buildBoard()
 @test all(board.free .== free)
 @test all(board.taken .== taken)
 
-clearRank = Bobby.setClearRank()
-clearRank1 = [1,1,1,1,1,1,1,1,
-			  1,1,1,1,1,1,1,1,
-			  1,1,1,1,1,1,1,1,
-			  1,1,1,1,1,1,1,1,
-			  1,1,1,1,1,1,1,1,
-			  1,1,1,1,1,1,1,1,
-			  1,1,1,1,1,1,1,1,
-			  0,0,0,0,0,0,0,0]
-clearRank8 = [0,0,0,0,0,0,0,0,
-			  1,1,1,1,1,1,1,1,
-			  1,1,1,1,1,1,1,1,
-			  1,1,1,1,1,1,1,1,
-			  1,1,1,1,1,1,1,1,
-			  1,1,1,1,1,1,1,1,
-			  1,1,1,1,1,1,1,1,
+clear_rank = Bobby.setClearRank()
+clear_rank1 = [1,1,1,1,1,1,1,1,
+			   1,1,1,1,1,1,1,1,
+			   1,1,1,1,1,1,1,1,
+			   1,1,1,1,1,1,1,1,
+			   1,1,1,1,1,1,1,1,
+			   1,1,1,1,1,1,1,1,
+			   1,1,1,1,1,1,1,1,
+			   0,0,0,0,0,0,0,0]
+clear_rank8 = [0,0,0,0,0,0,0,0,
+			   1,1,1,1,1,1,1,1,
+			   1,1,1,1,1,1,1,1,
+			   1,1,1,1,1,1,1,1,
+			   1,1,1,1,1,1,1,1,
+			   1,1,1,1,1,1,1,1,
+			   1,1,1,1,1,1,1,1,
+			   1,1,1,1,1,1,1,1]
+@test clear_rank[:,1] != clear_rank[:,end]
+@test Int.(clear_rank[:,1]) == clear_rank1
+@test Int.(clear_rank[:,8]) == clear_rank8
+
+clear_file = Bobby.setClearFile()
+clear_fileA = [0,1,1,1,1,1,1,1,
+			   0,1,1,1,1,1,1,1,
+			   0,1,1,1,1,1,1,1,
+			   0,1,1,1,1,1,1,1,
+			   0,1,1,1,1,1,1,1,
+			   0,1,1,1,1,1,1,1,
+			   0,1,1,1,1,1,1,1,
+			   0,1,1,1,1,1,1,1]
+clear_fileH = [1,1,1,1,1,1,1,0,
+			   1,1,1,1,1,1,1,0,
+			   1,1,1,1,1,1,1,0,
+			   1,1,1,1,1,1,1,0,
+			   1,1,1,1,1,1,1,0,
+			   1,1,1,1,1,1,1,0,
+			   1,1,1,1,1,1,1,0,
+			   1,1,1,1,1,1,1,0]
+@test clear_file[:,1] != clear_file[:,end]
+@test Int.(clear_file[:,1]) == clear_fileA
+@test Int.(clear_file[:,8]) == clear_fileH
+
+mask_rank = Bobby.setMaskRank()
+mask_rank1 = [0,0,0,0,0,0,0,0,
+			  0,0,0,0,0,0,0,0,
+			  0,0,0,0,0,0,0,0,
+			  0,0,0,0,0,0,0,0,
+			  0,0,0,0,0,0,0,0,
+			  0,0,0,0,0,0,0,0,
+			  0,0,0,0,0,0,0,0,
 			  1,1,1,1,1,1,1,1]
-@test clearRank[:,1] != clearRank[:,end]
-@test Int.(clearRank[:,1]) == clearRank1
-@test Int.(clearRank[:,8]) == clearRank8
+mask_rank8 = [1,1,1,1,1,1,1,1,
+			  0,0,0,0,0,0,0,0,
+			  0,0,0,0,0,0,0,0,
+			  0,0,0,0,0,0,0,0,
+			  0,0,0,0,0,0,0,0,
+			  0,0,0,0,0,0,0,0,
+			  0,0,0,0,0,0,0,0,
+			  0,0,0,0,0,0,0,0]
+@test mask_rank[:,1] != mask_rank[:,end]
+@test Int.(mask_rank[:,1]) == mask_rank1
+@test Int.(mask_rank[:,8]) == mask_rank8
 
-clearFile = Bobby.setClearFile()
-clearFileA = [0,1,1,1,1,1,1,1,
-			  0,1,1,1,1,1,1,1,
-			  0,1,1,1,1,1,1,1,
-			  0,1,1,1,1,1,1,1,
-			  0,1,1,1,1,1,1,1,
-			  0,1,1,1,1,1,1,1,
-			  0,1,1,1,1,1,1,1,
-			  0,1,1,1,1,1,1,1]
-clearFileH = [1,1,1,1,1,1,1,0,
-			  1,1,1,1,1,1,1,0,
-			  1,1,1,1,1,1,1,0,
-			  1,1,1,1,1,1,1,0,
-			  1,1,1,1,1,1,1,0,
-			  1,1,1,1,1,1,1,0,
-			  1,1,1,1,1,1,1,0,
-			  1,1,1,1,1,1,1,0]
-@test clearFile[:,1] != clearFile[:,end]
-@test Int.(clearFile[:,1]) == clearFileA
-@test Int.(clearFile[:,8]) == clearFileH
-
-maskRank = Bobby.setMaskRank()
-maskRank1 = [0,0,0,0,0,0,0,0,
-			 0,0,0,0,0,0,0,0,
-			 0,0,0,0,0,0,0,0,
-			 0,0,0,0,0,0,0,0,
-			 0,0,0,0,0,0,0,0,
-			 0,0,0,0,0,0,0,0,
-			 0,0,0,0,0,0,0,0,
-			 1,1,1,1,1,1,1,1]
-maskRank8 = [1,1,1,1,1,1,1,1,
-			 0,0,0,0,0,0,0,0,
-			 0,0,0,0,0,0,0,0,
-			 0,0,0,0,0,0,0,0,
-			 0,0,0,0,0,0,0,0,
-			 0,0,0,0,0,0,0,0,
-			 0,0,0,0,0,0,0,0,
-			 0,0,0,0,0,0,0,0]
-@test maskRank[:,1] != maskRank[:,end]
-@test Int.(maskRank[:,1]) == maskRank1
-@test Int.(maskRank[:,8]) == maskRank8
-
-maskFile = Bobby.setMaskFile()
-maskFileA = [1,0,0,0,0,0,0,0,
-			 1,0,0,0,0,0,0,0,
-			 1,0,0,0,0,0,0,0,
-			 1,0,0,0,0,0,0,0,
-			 1,0,0,0,0,0,0,0,
-			 1,0,0,0,0,0,0,0,
-			 1,0,0,0,0,0,0,0,
-			 1,0,0,0,0,0,0,0]
-maskFileH = [0,0,0,0,0,0,0,1,
-			 0,0,0,0,0,0,0,1,
-			 0,0,0,0,0,0,0,1,
-			 0,0,0,0,0,0,0,1,
-			 0,0,0,0,0,0,0,1,
-			 0,0,0,0,0,0,0,1,
-			 0,0,0,0,0,0,0,1,
-			 0,0,0,0,0,0,0,1]
-@test maskFile[:,1] != maskFile[:,end]
-@test Int.(maskFile[:,1]) == maskFileA
-@test Int.(maskFile[:,8]) == maskFileH
+mask_file = Bobby.setMaskFile()
+mask_fileA = [1,0,0,0,0,0,0,0,
+			  1,0,0,0,0,0,0,0,
+			  1,0,0,0,0,0,0,0,
+			  1,0,0,0,0,0,0,0,
+			  1,0,0,0,0,0,0,0,
+			  1,0,0,0,0,0,0,0,
+			  1,0,0,0,0,0,0,0,
+			  1,0,0,0,0,0,0,0]
+mask_fileH = [0,0,0,0,0,0,0,1,
+			  0,0,0,0,0,0,0,1,
+			  0,0,0,0,0,0,0,1,
+			  0,0,0,0,0,0,0,1,
+			  0,0,0,0,0,0,0,1,
+			  0,0,0,0,0,0,0,1,
+			  0,0,0,0,0,0,0,1,
+			  0,0,0,0,0,0,0,1]
+@test mask_file[:,1] != mask_file[:,end]
+@test Int.(mask_file[:,1]) == mask_fileA
+@test Int.(mask_file[:,8]) == mask_fileH
 
 lookUpTables = Bobby.buildLookUpTables()
-@test Int.(lookUpTables.clearRank[:,1]) == clearRank1
-@test Int.(lookUpTables.clearRank[:,8]) == clearRank8
-@test Int.(lookUpTables.clearFile[:,1]) == clearFileA
-@test Int.(lookUpTables.clearFile[:,8]) == clearFileH
-@test Int.(lookUpTables.maskRank[:,1]) == maskRank1
-@test Int.(lookUpTables.maskRank[:,8]) == maskRank8
-@test Int.(lookUpTables.maskFile[:,1]) == maskFileA
-@test Int.(lookUpTables.maskFile[:,8]) == maskFileH
+@test Int.(lookUpTables.clear_rank[:,1]) == clear_rank1
+@test Int.(lookUpTables.clear_rank[:,8]) == clear_rank8
+@test Int.(lookUpTables.clear_file[:,1]) == clear_fileA
+@test Int.(lookUpTables.clear_file[:,8]) == clear_fileH
+@test Int.(lookUpTables.mask_rank[:,1]) == mask_rank1
+@test Int.(lookUpTables.mask_rank[:,8]) == mask_rank8
+@test Int.(lookUpTables.mask_file[:,1]) == mask_fileA
+@test Int.(lookUpTables.mask_file[:,8]) == mask_fileH

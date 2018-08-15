@@ -13,7 +13,7 @@ $ julia make.jl
 ## Steps
 
 - [Board representation](./board.md)
-- [Move generation]
+- [Valid moves generation](./moves.md)
 - Evaluation
 
 ## References
