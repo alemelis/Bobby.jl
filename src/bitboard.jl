@@ -215,6 +215,7 @@ function setTaken(free::BitArray{1})
 	return taken
 end
 
+
 struct LookUpTables
 
 	clear_rank :: BitArray{2}
@@ -224,6 +225,7 @@ struct LookUpTables
 	mask_file  :: BitArray{2}
 
 end
+
 
 function buildLookUpTables()
 
@@ -236,6 +238,7 @@ function buildLookUpTables()
 	return LookUpTables(clear_rank, mask_rank,
 						clear_file, mask_file)
 end
+
 
 function setClearRank()
 	clear_rank = trues(64, 8)
@@ -251,6 +254,7 @@ function setClearRank()
 	return clear_rank
 end
 
+
 function setClearFile()
 	clear_file = trues(64, 8)
 
@@ -262,6 +266,7 @@ function setClearFile()
 
 	return clear_file
 end
+
 
 function setMaskRank()
 	mask_rank = falses(64, 8)
@@ -276,6 +281,7 @@ function setMaskRank()
 
 	return mask_rank
 end
+
 
 function setMaskFile()
 	mask_file = falses(64, 8)
