@@ -26,6 +26,7 @@ function getKingValid(board::Bitboard, lu_tabs::Bobby.LookUpTables,
 	# no valid squares have been found yet
 	king_valid = falses(64)
 
+	# generate possible moves without considering opposite color pieces
 	shifts = [9, 8, 7, -1, -9, -8, -7, 1]
 	for i = 1:8
 		# clear A and H files if king on those
@@ -45,4 +46,41 @@ function getKingValid(board::Bitboard, lu_tabs::Bobby.LookUpTables,
 	end
 
 	return king_valid
+end
+
+function getAttackedByRooks(board::Bitboard, lu_tabs::Bobby.LookUpTables,
+							color::String="white")
+	if color == "white"
+		rooks = board.R
+	elseif color == "black"
+		rooks = board.r
+	end
+
+	# if no rooks are on the board, return all falses
+	if (all(rooks) .== false)
+		return rooks
+	end
+
+	square_rooks = transpose(reshape(rooks, 8,:))
+
+	attacked = falses(64)
+	found_rooks = 0
+	for i = 1:8
+		for j = 1:8
+
+			if square_rooks[i,j]
+				rook_rank = i
+				rook_file = j
+
+				attacked .= attacked .| lu_tabs.mask_rank[:,i]
+				attacked .= attacked .| lu_tabs.mask_file[:,j]
+
+				found_rooks += 1
+			end
+
+			if found_rooks == 2
+				return attacked
+			end
+		end
+	end
 end
