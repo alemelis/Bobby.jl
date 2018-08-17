@@ -42,6 +42,7 @@ $ julia make.jl
   - [Advanced Search](https://www.gamedev.net/articles/programming/artificial-intelligence/chess-programming-part-v-advanced-search-r1197)
 - Bruce Moreland's [Gerbil](https://web.archive.org/web/20071026090003/http://www.brucemo.com/compchess/programming/index.htm) (C)
 - [Chess and Bitboards](http://pages.cs.wisc.edu/~psilord/blog/data/chess-pages/) (incomplete)
+- [Efficient moves generation](https://peterellisjones.com/posts/generating-legal-chess-moves-efficiently/) (Rust)
 
 ### Board representation
 

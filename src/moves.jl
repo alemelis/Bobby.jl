@@ -48,6 +48,8 @@ function getKingValid(board::Bitboard, lu_tabs::Bobby.LookUpTables,
 	return king_valid
 end
 
+
+# doesn't work....
 function getAttackedByRooks(board::Bitboard, lu_tabs::Bobby.LookUpTables,
 							color::String="white")
 	if color == "white"
@@ -61,26 +63,16 @@ function getAttackedByRooks(board::Bitboard, lu_tabs::Bobby.LookUpTables,
 		return rooks
 	end
 
-	square_rooks = transpose(reshape(rooks, 8,:))
+	square_rooks = transpose(reshape(rooks, 8, :))
 
 	attacked = falses(64)
-	found_rooks = 0
 	for i = 1:8
 		for j = 1:8
-
 			if square_rooks[i,j]
-				rook_rank = i
-				rook_file = j
-
-				attacked .= attacked .| lu_tabs.mask_rank[:,i]
-				attacked .= attacked .| lu_tabs.mask_file[:,j]
-
-				found_rooks += 1
-			end
-
-			if found_rooks == 2
-				return attacked
+				attacked = attacked .| lu_tabs.mask_rank[:,i]
+				attacked = attacked .| lu_tabs.mask_file[:,j]
 			end
 		end
 	end
+	return attacked
 end

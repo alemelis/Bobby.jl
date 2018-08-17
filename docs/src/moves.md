@@ -1,14 +1,24 @@
-# Valid moves generation
+# Nonsliding pieces
 
-- A piece cannot attack a piece of the same color nor move there.
-- A piece can attack a piece of different color and move there.
+## King
 
-## Nonsliding pieces
+### pseudo-legal moves
 
-### King
+- The king cannot attack a piece of the same color nor move there.
+- The king can attack a piece of different color and move there.
 
-We need `white_king_valid` and `black_king_valid` bitboards.
+### legal moves
 
-### Knights
+- The king cannot move to a square attacked by a piece of the opposite color.
 
-### Pawns
+## Knights
+
+## Pawns
+
+# Check evasion
+
+- If the king is in check, the number of possible moves reduces:
+	- move the king out of check;
+	- capture the checking piece;
+	- block the checking piece.
+- If the king is under double check, only king moves are allowed.
