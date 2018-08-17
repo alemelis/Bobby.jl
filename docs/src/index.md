@@ -26,6 +26,8 @@ $ julia make.jl
 - [go-chess](https://github.com/alokmenghrajani/go-chess) A minimalistic chess program written in (Go)
 - [LeelaChessZero](https://github.com/LeelaChessZero/lczero) is a chess adaption of GCP's Leela Zero (C++)
 - [Ethereal](https://github.com/AndyGrant/Ethereal) is a UCI-compliant chess engine (C)
+- [Rust Chess Library](https://jordanbray.github.io/chess/chess/index.html) (Rust)
+- [Snakefish](https://github.com/cglouch/snakefish#sliding-pieces) (Python)
 
 ### Papers
 
@@ -43,6 +45,7 @@ $ julia make.jl
 - Bruce Moreland's [Gerbil](https://web.archive.org/web/20071026090003/http://www.brucemo.com/compchess/programming/index.htm) (C)
 - [Chess and Bitboards](http://pages.cs.wisc.edu/~psilord/blog/data/chess-pages/) (incomplete)
 - [Efficient moves generation](https://peterellisjones.com/posts/generating-legal-chess-moves-efficiently/) (Rust)
+- [Injecting a Chess Engine into Amazon Redshift](http://www.michaelburge.us/2017/09/10/injecting-shellcode-to-speed-up-amazon-redshift.html) (Rust)
 
 ### Board representation
 
