@@ -49,7 +49,7 @@ function getKingValid(board::Bitboard, lu_tabs::Bobby.LookUpTables,
 end
 
 
-# doesn't work....
+# doesn't work....yet!
 function getAttackedByRooks(board::Bitboard, lu_tabs::Bobby.LookUpTables,
 							color::String="white")
 	if color == "white"

@@ -25,7 +25,7 @@ $ julia make.jl
 - [Chess.jl](https://github.com/abahm/Chess.jl) (Julia)
 - [go-chess](https://github.com/alokmenghrajani/go-chess) A minimalistic chess program written in (Go)
 - [LeelaChessZero](https://github.com/LeelaChessZero/lczero) is a chess adaption of GCP's Leela Zero (C++)
-- [Ethereal](https://github.com/AndyGrant/Ethereal) is a UCI-compliant chess engine (C)
+- [Ethereal](https://github.com/AndyGrant/Ethereal) is an UCI-compliant chess engine (C)
 - [Rust Chess Library](https://jordanbray.github.io/chess/chess/index.html) (Rust)
 - [Snakefish](https://github.com/cglouch/snakefish#sliding-pieces) (Python)
 
