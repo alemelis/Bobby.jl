@@ -73,4 +73,4 @@ n33 = [0,0,0,0,0,0,0,0,
 	0,0,1,0,0,0,0,0,
 	0,0,0,0,0,0,0,0]
 n = Bobby.getNightsValid(b, l)
-@test all(Int.(kv) .== n33)
+@test all(Int.(n) .== n33)
