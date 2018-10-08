@@ -65,15 +65,15 @@ function getNightsValid(board::Bitboard, lu_tabs::Bobby.LookUpTables,
 		pieces = board.black
 	end
 
-	spot_1_clip = lu_tabs.clear_file[:,1] & lu_tabs.clear_file[:,2]
+	spot_1_clip = lu_tabs.clear_file[:,1] .& lu_tabs.clear_file[:,2]
 	spot_2_clip = lu_tabs.clear_file[:,1]
 	spot_3_clip = lu_tabs.clear_file[:,8]
-	spot_4_clip = lu_tabs.clear_file[:,8] & lu_tabs.clear_file[:,7]
+	spot_4_clip = lu_tabs.clear_file[:,8] .& lu_tabs.clear_file[:,7]
 
-	spot_5_clip = lu_tabs.clear_file[:,8] & lu_tabs.clear_file[:,7]
+	spot_5_clip = lu_tabs.clear_file[:,8] .& lu_tabs.clear_file[:,7]
 	spot_6_clip = lu_tabs.clear_file[:,8]
 	spot_7_clip = lu_tabs.clear_file[:,1]
-	spot_8_clip = lu_tabs.clear_file[:,1] & lu_tabs.clear_file[:,2]
+	spot_8_clip = lu_tabs.clear_file[:,1] .& lu_tabs.clear_file[:,2]
 
 	# no valid squares have been found yet
 	king_valid = falses(64)
