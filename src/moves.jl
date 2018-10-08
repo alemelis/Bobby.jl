@@ -91,11 +91,11 @@ function getNightsValid(board::Bitboard, lu_tabs::Bobby.LookUpTables,
 	return nights_valid
 end
 
-using Bobby
-b = Bobby.buildBoard();
-l = Bobby.buildLookUpTables();
-n = Bobby.getNightsValid(b, l);
-Bobby.uglyPrint(n)
+# using Bobby
+# b = Bobby.buildBoard();
+# l = Bobby.buildLookUpTables();
+# n = Bobby.getNightsValid(b, l);
+# Bobby.uglyPrint(n)
 
 # doesn't work....yet!
 function getAttackedByRooks(board::Bitboard, lu_tabs::Bobby.LookUpTables,
