@@ -12,3 +12,13 @@ In Julia REPL
 ```
 (v1.0) pkg> add https://github.com/alemelis/Bobby.jl
 ```
+
+## Contributing
+
+Very simple:
+
+1. Pick an issue
+2. Solve it
+3. Add unit tests
+4. Update docs
+5. Make a pull request
