@@ -75,9 +75,6 @@ function getNightsValid(board::Bitboard, lu_tabs::Bobby.LookUpTables,
 	spot_7_clip = lu_tabs.clear_file[:,1]
 	spot_8_clip = lu_tabs.clear_file[:,1] .& lu_tabs.clear_file[:,2]
 
-	# no valid squares have been found yet
-	king_valid = falses(64)
-
 	spot_1 = (nights .& spot_1_clip) << 10
 	spot_2 = (nights .& spot_2_clip) << 17
 	spot_3 = (nights .& spot_3_clip) << 15
@@ -88,10 +85,10 @@ function getNightsValid(board::Bitboard, lu_tabs::Bobby.LookUpTables,
 	spot_7 = (nights .& spot_7_clip) >> 15
 	spot_8 = (nights .& spot_8_clip) >> 6
 
-	night_valid = spot_1 .| spot_2 .| spot_3 .| spot_4 .| spot_5 .| spot_6 .|
-                    spot_7 .| spot_8 .& pieces
+	nights_valid = spot_1 .| spot_2 .| spot_3 .| spot_4 .| spot_5 .| spot_6 .|
+                    spot_7 .| spot_8 .& .~pieces
 
-	return night_valid
+	return nights_valid
 end
 
 
