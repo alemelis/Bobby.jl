@@ -85,19 +85,14 @@ function getNightsValid(board::Bitboard, lu_tabs::Bobby.LookUpTables,
 	spot_7 = (nights .& spot_7_clip) >> 15
 	spot_8 = (nights .& spot_8_clip) >> 6
 
-	nights_valid = spot_1 .| spot_2 .| spot_3 .| spot_4 .| spot_5 .| spot_6 .|
-                    spot_7 .| spot_8 .| pieces
+	nights_valid = spot_1 .| spot_2 .| spot_3 .| spot_4 .|
+				   spot_5 .| spot_6 .| spot_7 .| spot_8
 
-	return nights_valid
+	return nights_valid .& .~pieces
 end
 
-# using Bobby
-# b = Bobby.buildBoard();
-# l = Bobby.buildLookUpTables();
-# n = Bobby.getNightsValid(b, l);
-# Bobby.uglyPrint(n)
 
-# doesn't work....yet!
+# doesn't work
 function getAttackedByRooks(board::Bitboard, lu_tabs::Bobby.LookUpTables,
 							color::String="white")
 	if color == "white"
