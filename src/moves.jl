@@ -86,7 +86,7 @@ function getNightsValid(board::Bitboard, lu_tabs::Bobby.LookUpTables,
 	spot_8 = (nights .& spot_8_clip) >> 6
 
 	nights_valid = spot_1 .| spot_2 .| spot_3 .| spot_4 .| spot_5 .| spot_6 .|
-                    spot_7 .| spot_8 .& .~pieces
+                    spot_7 .| spot_8 .& pieces
 
 	return nights_valid
 end
