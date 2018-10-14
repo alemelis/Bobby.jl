@@ -237,7 +237,7 @@ function buildLookUpTables()
 	mask_rank = setMaskRank()
 	mask_file = setMaskFile()
 
-	clear_night_files = setNightFiles(clear_file)
+	clear_night_files = getNightClearFiles(clear_file)
 
 	return LookUpTables(clear_rank, mask_rank,
 						clear_file, mask_file,
@@ -301,7 +301,7 @@ function setMaskFile()
 end
 
 
-function setNightFiles(clear_file::BitArray{2})
+function getNightClearFiles(clear_file::BitArray{2})
 	clear_night_files = falses(64, 8)
 
 	clear_night_files[:,1] = clear_file[:,1] .& clear_file[:,2]
