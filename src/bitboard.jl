@@ -224,6 +224,8 @@ struct LookUpTables
 	clear_file :: BitArray{2}
 	mask_file  :: BitArray{2}
 
+	clear_night_files :: BitArray{2}
+
 end
 
 
@@ -235,8 +237,11 @@ function buildLookUpTables()
 	mask_rank = setMaskRank()
 	mask_file = setMaskFile()
 
+	clear_night_files = setNightFiles(clear_file)
+
 	return LookUpTables(clear_rank, mask_rank,
-						clear_file, mask_file)
+						clear_file, mask_file,
+						clear_night_files)
 end
 
 
@@ -293,4 +298,21 @@ function setMaskFile()
 	end
 
 	return mask_file
+end
+
+
+function setNightFiles(clear_file::BitArray{2})
+	clear_night_files = falses(64, 8)
+
+	clear_night_files[:,1] = clear_file[:,1] .& clear_file[:,2]
+	clear_night_files[:,2] = clear_file[:,1]
+	clear_night_files[:,3] = clear_file[:,8]
+	clear_night_files[:,4] = clear_file[:,8] .& clear_file[:,7]
+
+	clear_night_files[:,5] = clear_file[:,8] .& clear_file[:,7]
+	clear_night_files[:,6] = clear_file[:,8]
+	clear_night_files[:,7] = clear_file[:,1]
+	clear_night_files[:,8] = clear_file[:,1] .& clear_file[:,2]
+
+	return clear_night_files
 end
