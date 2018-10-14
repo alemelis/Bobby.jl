@@ -65,25 +65,15 @@ function getNightsValid(board::Bitboard, lu_tabs::Bobby.LookUpTables,
 		pieces = board.black
 	end
 
-	spot_1_clip = lu_tabs.clear_file[:,1] .& lu_tabs.clear_file[:,2]
-	spot_2_clip = lu_tabs.clear_file[:,1]
-	spot_3_clip = lu_tabs.clear_file[:,8]
-	spot_4_clip = lu_tabs.clear_file[:,8] .& lu_tabs.clear_file[:,7]
+	spot_1 = (nights .& lu_tabs.clear_night_files[:,1]) << 10
+	spot_2 = (nights .& lu_tabs.clear_night_files[:,2]) << 17
+	spot_3 = (nights .& lu_tabs.clear_night_files[:,3]) << 15
+	spot_4 = (nights .& lu_tabs.clear_night_files[:,4]) << 6
 
-	spot_5_clip = lu_tabs.clear_file[:,8] .& lu_tabs.clear_file[:,7]
-	spot_6_clip = lu_tabs.clear_file[:,8]
-	spot_7_clip = lu_tabs.clear_file[:,1]
-	spot_8_clip = lu_tabs.clear_file[:,1] .& lu_tabs.clear_file[:,2]
-
-	spot_1 = (nights .& spot_1_clip) << 10
-	spot_2 = (nights .& spot_2_clip) << 17
-	spot_3 = (nights .& spot_3_clip) << 15
-	spot_4 = (nights .& spot_4_clip) << 6
-
-	spot_5 = (nights .& spot_5_clip) >> 10
-	spot_6 = (nights .& spot_6_clip) >> 17
-	spot_7 = (nights .& spot_7_clip) >> 15
-	spot_8 = (nights .& spot_8_clip) >> 6
+	spot_5 = (nights .& lu_tabs.clear_night_files[:,5]) >> 10
+	spot_6 = (nights .& lu_tabs.clear_night_files[:,6]) >> 17
+	spot_7 = (nights .& lu_tabs.clear_night_files[:,7]) >> 15
+	spot_8 = (nights .& lu_tabs.clear_night_files[:,8]) >> 6
 
 	nights_valid = spot_1 .| spot_2 .| spot_3 .| spot_4 .|
 				   spot_5 .| spot_6 .| spot_7 .| spot_8
