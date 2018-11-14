@@ -7,5 +7,6 @@ module Bobby
 	include("bitboard.jl")
 	include("print.jl")
 	include("moves.jl")
+	include("magic.jl")
 
 end
