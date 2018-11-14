@@ -82,6 +82,44 @@ function getNightsValid(board::Bitboard, lu_tabs::Bobby.LookUpTables,
 end
 
 
+function getRooksValid(board::Bitboard, color::String="white")
+	if color == "white"
+		rooks = board.R
+		same = board.white
+		other = board.black
+	elseif color == "black"
+		rooks = board.r
+		same = board.black
+		other = board.white
+	end
+
+
+	rooks_valid_board = falses(64)
+
+	rooks_square = transpose(reshape(rooks, 8, :))
+	for i = 1:7
+		if any(rooks_square[i,:])
+			if i == 1
+				src_i = i
+			else
+				src_i = (i-1)*8+1
+			end
+			same_color = same[src_i:src_i+7]
+			other_color = other[src_i:src_i+7]
+			for j = 1:8
+				if rooks_square[i,j]
+					rook_idx = j
+					rooks_valid = slideRook(same_color, other_color, rook_idx)
+					println(rooks_valid)
+					rooks_valid_board[src_i:src_i+7] .|= rooks_valid
+				end
+			end
+		end
+	end
+	return rooks_valid_board
+end
+
+
 # doesn't work
 function getAttackedByRooks(board::Bitboard, lu_tabs::Bobby.LookUpTables,
 							color::String="white")
