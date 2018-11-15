@@ -93,10 +93,11 @@ function getRooksValid(board::Bitboard, color::String="white")
 		other = board.white
 	end
 
-
 	rooks_valid_board = falses(64)
 
 	rooks_square = transpose(reshape(rooks, 8, :))
+
+	#ranks
 	for i = 1:7
 		if any(rooks_square[i,:])
 			if i == 1
@@ -110,40 +111,26 @@ function getRooksValid(board::Bitboard, color::String="white")
 				if rooks_square[i,j]
 					rook_idx = j
 					rooks_valid = slideRook(same_color, other_color, rook_idx)
-					println(rooks_valid)
 					rooks_valid_board[src_i:src_i+7] .|= rooks_valid
 				end
 			end
 		end
 	end
-	return rooks_valid_board
-end
 
+	#files
+	for j = 1:8
+		if any(rooks_square[:,j])
+			same_color = same[j:8:end]
+			other_color = other[j:8:end]
 
-# doesn't work
-function getAttackedByRooks(board::Bitboard, lu_tabs::Bobby.LookUpTables,
-							color::String="white")
-	if color == "white"
-		rooks = board.R
-	elseif color == "black"
-		rooks = board.r
-	end
-
-	# if no rooks are on the board, return all falses
-	if (all(rooks) .== false)
-		return rooks
-	end
-
-	square_rooks = transpose(reshape(rooks, 8, :))
-
-	attacked = falses(64)
-	for i = 1:8
-		for j = 1:8
-			if square_rooks[i,j]
-				attacked = attacked .| lu_tabs.mask_rank[:,i]
-				attacked = attacked .| lu_tabs.mask_file[:,j]
+			for i = 1:8
+				if rooks_square[i,j]
+					rook_idx = i
+					rooks_valid = slideRook(same_color, other_color, rook_idx)
+					rooks_valid_board[j:8:end] .|= rooks_valid
+				end
 			end
 		end
 	end
-	return attacked
+	return rooks_valid_board
 end
