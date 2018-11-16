@@ -23,7 +23,8 @@ function slideRook(rook_valid::BitArray{1}, same_color::BitArray{1},
 end
 
 
-function slideRook(same_color::BitArray{1}, other_color::BitArray{1}, rook_idx::Int64)
+function slideRook(same_color::BitArray{1}, other_color::BitArray{1},
+					rook_idx::Int64)
 	rook_valid = falses(8)
 	for increment in [1, -1]
 		rook_valid = slideRook(rook_valid, same_color,
