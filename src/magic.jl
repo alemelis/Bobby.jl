@@ -22,7 +22,17 @@ function slideRook(rook_valid::BitArray{1}, same_color::BitArray{1},
 	return rook_valid
 end
 
+"""
+	slideRook(same_color::BitArray{1}, other_color::BitArray{1},
+               rook_idx::Int64)
 
+Find valid squares in a rank/file for a rook give its position.
+The rook position is slided rightward and leftward and same/other
+color pieces position is checked.
+
+This function can be used to brute force generate rook positions
+to be magic-hashed.
+"""
 function slideRook(same_color::BitArray{1}, other_color::BitArray{1},
 					rook_idx::Int64)
 	rook_valid = falses(8)
