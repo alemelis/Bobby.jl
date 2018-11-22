@@ -1,12 +1,20 @@
-function slideRook(rook_valid::BitArray{1}, same_color::BitArray{1},
-					other_color::BitArray{1}, rook_idx::Int64, increment::Int64)
-	current_idx = rook_idx + increment
-	if current_idx == 0 || current_idx == 9
-		return rook_valid
+"""
+	slidePiece(piece_valid::BitArray{1}, same_color::BitArray{1},
+			other_color::BitArray{1}, piece_idx::Int64, increment::Int64)
+
+Find valid squares in file/rank/diagonal for a sliding piece given its
+position. This function looks only to the left/right of the piece as 
+indicated by the sign of `increment` variable.
+"""
+function slidePiece(piece_valid::BitArray{1}, same_color::BitArray{1},
+			other_color::BitArray{1}, piece_idx::Int64, increment::Int64)
+	current_idx = piece_idx + increment
+	if current_idx == 0 || current_idx == length(same_color) + 1
+		return piece_valid
 	end
 	while true
 		if same_color[current_idx] == false
-			rook_valid[current_idx] = true
+			piece_valid[current_idx] = true
 			if other_color[current_idx] == false
 				current_idx += increment
 				if current_idx == 0 || current_idx == 9
@@ -19,26 +27,27 @@ function slideRook(rook_valid::BitArray{1}, same_color::BitArray{1},
 			break
 		end
 	end
-	return rook_valid
+	return piece_valid
 end
 
-"""
-	slideRook(same_color::BitArray{1}, other_color::BitArray{1},
-               rook_idx::Int64)
 
-Find valid squares in a rank/file for a rook give its position.
-The rook position is slided rightward and leftward and same/other
-color pieces position is checked.
-
-This function can be used to brute force generate rook positions
-to be magic-hashed.
 """
-function slideRook(same_color::BitArray{1}, other_color::BitArray{1},
-					rook_idx::Int64)
-	rook_valid = falses(8)
+	slidePiece(same_color::BitArray{1}, other_color::BitArray{1},
+		piece_idx::Int64)
+
+Find valid squares in a rank/file/diagonal for a sliding piece given
+its position. The piece position is slided rightward and leftward 
+and same/other color pieces position is checked.
+
+This function can be used to brute force generate sliding piece
+positions to be magic-hashed.
+"""
+function slidePiece(same_color::BitArray{1}, other_color::BitArray{1},
+			piece_idx::Int64)
+	piece_valid = falses(8)
 	for increment in [1, -1]
-		rook_valid = slideRook(rook_valid, same_color,
-							other_color, rook_idx, increment)
+		piece_valid = slidePiece(piece_valid, same_color,
+							other_color, piece_idx, increment)
 	end
-	return rook_valid
+	return piece_valid
 end

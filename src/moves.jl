@@ -82,6 +82,11 @@ function getNightsValid(board::Bitboard, lu_tabs::Bobby.LookUpTables,
 end
 
 
+"""
+	getRooksValid(board::Bitboard, color::String="white")
+
+Find valid dquares for rooks.
+"""
 function getRooksValid(board::Bitboard, color::String="white")
 	if color == "white"
 		rooks = board.R
@@ -110,7 +115,7 @@ function getRooksValid(board::Bitboard, color::String="white")
 			for j = 1:8
 				if rooks_square[i,j]
 					rook_idx = j
-					rooks_valid = slideRook(same_color, other_color, rook_idx)
+					rooks_valid = slidePiece(same_color, other_color, rook_idx)
 					rooks_valid_board[src_i:src_i+7] .|= rooks_valid
 				end
 			end
@@ -126,7 +131,7 @@ function getRooksValid(board::Bitboard, color::String="white")
 			for i = 1:8
 				if rooks_square[i,j]
 					rook_idx = i
-					rooks_valid = slideRook(same_color, other_color, rook_idx)
+					rooks_valid = slidePiece(same_color, other_color, rook_idx)
 					rooks_valid_board[j:8:end] .|= rooks_valid
 				end
 			end
