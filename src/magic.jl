@@ -44,7 +44,7 @@ positions to be magic-hashed.
 """
 function slidePiece(same_color::BitArray{1}, other_color::BitArray{1},
 			piece_idx::Int64)
-	piece_valid = falses(8)
+	piece_valid = falses(length(same_color))
 	for increment in [1, -1]
 		piece_valid = slidePiece(piece_valid, same_color,
 							other_color, piece_idx, increment)

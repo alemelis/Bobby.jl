@@ -115,7 +115,7 @@ function getRooksValid(board::Bitboard, color::String="white")
 			for j = 1:8
 				if rooks_square[i,j]
 					rook_idx = j
-					rooks_valid = slidePiece(same_color, other_color, rook_idx)
+					rooks_valid = Bobby.slidePiece(same_color, other_color, rook_idx)
 					rooks_valid_board[src_i:src_i+7] .|= rooks_valid
 				end
 			end
@@ -131,11 +131,69 @@ function getRooksValid(board::Bitboard, color::String="white")
 			for i = 1:8
 				if rooks_square[i,j]
 					rook_idx = i
-					rooks_valid = slidePiece(same_color, other_color, rook_idx)
+					rooks_valid = Bobby.slidePiece(same_color, other_color, rook_idx)
 					rooks_valid_board[j:8:end] .|= rooks_valid
 				end
 			end
 		end
 	end
 	return rooks_valid_board
+end
+
+
+"""
+	getBishopsValid(board::Bitboard, color::String="white")
+
+My implementation of 45-degrees rotated bitboards for bishops.
+"""
+function getBishopsValid(board::Bitboard, color::String="white")
+	if color == "white"
+		bishops = board.B
+		same = board.white
+		other = board.black
+	elseif color == "black"
+		bishops = board.b
+		same = board.black
+		other = board.white
+	end
+
+	bishops_no = sum.(Int.(same))
+	bishops_seen = 0
+
+	bishops_valid = falses(64)
+
+	if bishops_no == 0
+		return bishops_valid
+	end
+
+	# TODO: move these into LookUpTables
+	# white squares
+	starts = [1,  7,  16, 17, 3,  5,  32, 33, 5,  49, 7,  3,  48]
+	steps =  [9,  7,  7,  9,  9,  7,  7,  9,  9,  9,  9,  7,  7]
+	ends =   [64, 49, 58, 62, 48, 33, 60, 60, 32, 58, 16, 17, 62]
+
+	# black squares
+	append!(starts, [8,  2,  9,  6,  24, 4,  25, 4,  40, 6,  2, 56, 41])
+	append!(steps,  [7,  9,  9,  7,  7,  9,  9,  7,  7,  9,  7, 7,  9])
+	append!(ends,   [57, 56, 63, 41, 59, 40, 61, 25, 61, 24, 9, 63, 59])
+
+	for s in zip(starts, steps, ends)
+		bishops_on_diagonal = sum.(Int.(bishops[s[1]:s[2]:s[3]]))
+
+		if bishops_on_diagonal != 0
+			bishops_arr = bishops[s[1]:s[2]:s[3]]
+
+			for j = 1:length(bishops_arr)
+				if bishops_arr[j]
+					bishops_seen += 1
+					valid_array = Bobby.slidePiece(same[s[1]:s[2]:s[3]],
+												   other[s[1]:s[2]:s[3]], j)
+					bishops_valid[s[1]:s[2]:s[3]] .|= valid_array
+				end
+				if bishops_seen == bishops_no
+					return bishops_valid
+				end
+			end
+		end
+	end
 end
