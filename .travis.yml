@@ -4,12 +4,13 @@ os:
   - osx
 julia:
   - 0.7
+  - 1.0
   - nightly
 notifications:
   email: false
-script:
-  - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
-  - julia -e 'using Pkg; Pkg.clone("https://github.com/alemelis/Bobby.jl.git"); Pkg.build("Bobby"); Pkg.test("Bobby"; coverage=true)'
+# script:
+#   - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
+#   - julia -e 'using Pkg; end; Pkg.clone(pwd()); Pkg.build("Bobby"); Pkg.test("Bobby"; coverage=true)'
 after_success:
   - julia -e 'using Pkg; cd(Pkg.dir("Bobby")); Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'
 matrix:
