@@ -116,6 +116,9 @@ end
 	Rv = Bobby.getRooksValid(b)
 	@test all(Int.(Rv) .== R)
 
+    rv = Bobby.getRooksValid(b, "black")
+    @test all(Int.(rv) .== R)
+
 	b.white[36] = true
 	b.R[36] = true
 	R = [0,0,0,0,0,0,0,0,
@@ -159,17 +162,6 @@ end
 
 	# black rooks
 	b = Bobby.buildBoard()
-	r = [0,0,0,0,0,0,0,0,
-         0,0,0,0,0,0,0,0,
-         0,0,0,0,0,0,0,0,
-         0,0,0,0,0,0,0,0,
-         0,0,0,0,0,0,0,0,
-         0,0,0,0,0,0,0,0,
-         0,0,0,0,0,0,0,0,
-         0,0,0,0,0,0,0,0]
-	rv = Bobby.getRooksValid(b, "black")
-	@test all(Int.(rv) .== r)
-
 	b.black[36] = true
 	b.r[36] = true
 	r = [0,0,0,0,0,0,0,0,
@@ -226,6 +218,9 @@ end
     Bv = Bobby.getBishopsValid(b)
     @test all(Int.(Bv) .== B)
 
+    Bv = Bobby.getBishopsValid(b, "black")
+    @test all(Int.(Bv) .== B)
+
     i = 37
     b.white[i] = true
     b.B[i] = true
@@ -266,6 +261,49 @@ end
          0,0,0,0,0,0,0,0,
          0,0,0,0,0,0,0,0]
     Bv = Bobby.getBishopsValid(b)
+    @test all(Int.(Bv) .== B)
+
+    b = Bobby.buildBoard()
+    i = 41
+    b.black[i] = true
+    b.b[i] = true
+    B = [0,0,0,0,0,0,0,0,
+         0,0,0,0,0,0,0,0,
+         0,0,0,1,0,0,0,0,
+         0,0,1,0,0,0,0,0,
+         0,1,0,0,0,0,0,0,
+         0,0,0,0,0,0,0,0,
+         0,1,0,0,0,0,0,0,
+         0,0,0,0,0,0,0,0]
+    Bv = Bobby.getBishopsValid(b, "black")
+    @test all(Int.(Bv) .== B)
+
+    i = 42
+    b.black[i] = true
+    b.b[i] = true
+    B = [0,0,0,0,0,0,0,0,
+         0,0,0,0,0,0,0,0,
+         0,0,0,1,1,0,0,0,
+         0,0,1,1,0,0,0,0,
+         1,1,1,0,0,0,0,0,
+         0,0,0,0,0,0,0,0,
+         1,1,1,0,0,0,0,0,
+         0,0,0,0,0,0,0,0]
+    Bv = Bobby.getBishopsValid(b, "black")
+    @test all(Int.(Bv) .== B)
+
+    i = 32
+    b.black[i] = true
+    b.b[i] = true
+    B = [0,0,0,0,0,0,0,0,
+         0,0,0,0,0,0,0,0,
+         0,0,0,1,1,0,1,0,
+         0,0,1,1,0,0,0,0,
+         1,1,1,0,0,0,1,0,
+         0,0,0,0,0,1,0,0,
+         1,1,1,0,1,0,0,0,
+         0,0,0,0,0,0,0,0]
+    Bv = Bobby.getBishopsValid(b, "black")
     @test all(Int.(Bv) .== B)
 
 end

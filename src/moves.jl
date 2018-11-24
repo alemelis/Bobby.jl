@@ -157,7 +157,7 @@ function getBishopsValid(board::Bitboard, color::String="white")
 		other = board.white
 	end
 
-	bishops_no = sum.(Int.(same))
+	bishops_no = sum.(Int.(bishops))
 	bishops_seen = 0
 
 	bishops_valid = falses(64)
@@ -196,4 +196,5 @@ function getBishopsValid(board::Bitboard, color::String="white")
 			end
 		end
 	end
+	return bishops_valid
 end
