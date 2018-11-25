@@ -17,8 +17,8 @@ In Julia REPL
 
 Very simple:
 
-1. Pick an issue
-2. Solve it
+1. Pick an issue/new feature
+2. Solve/implement it
 3. Add unit tests
 4. Update docs
 5. Make a pull request

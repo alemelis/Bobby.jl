@@ -116,7 +116,8 @@ function getRooksValid(board::Bitboard, color::String="white")
 			for j = 1:8
 				if rooks_square[i,j]
 					rook_idx = j
-					rooks_valid = Bobby.slidePiece(same_color, other_color, rook_idx)
+					rooks_valid = Bobby.slidePiece(same_color, other_color,
+						rook_idx)
 					rooks_valid_board[src_i:src_i+7] .|= rooks_valid
 				end
 			end
@@ -132,7 +133,8 @@ function getRooksValid(board::Bitboard, color::String="white")
 			for i = 1:8
 				if rooks_square[i,j]
 					rook_idx = i
-					rooks_valid = Bobby.slidePiece(same_color, other_color, rook_idx)
+					rooks_valid = Bobby.slidePiece(same_color, other_color,
+						rook_idx)
 					rooks_valid_board[j:8:end] .|= rooks_valid
 				end
 			end
