@@ -56,7 +56,7 @@ function buildBoard()
 	taken = setTaken(free)
 
 	return Bitboard(white, P, R, N, B, Q, K, black,
-					p, r, n, b, q, k, free, taken)
+		p, r, n, b, q, k, free, taken)
 end
 
 
@@ -66,6 +66,7 @@ end
 Constructor function for pawns.
 """
 function setPawns(color::String="white")
+
 	pawns = falses(64)
 	if color == "white"
 		for i = 49:56
@@ -86,6 +87,7 @@ end
 Constructor function for rooks.
 """
 function setRooks(color::String="white")
+
 	rooks = falses(64)
 	if color == "white"
 		rooks[57] = true
@@ -104,6 +106,7 @@ end
 Constructor function for (k)nights.
 """
 function setNights(color::String="white")
+
 	knights = falses(64)
 	if color == "white"
 		knights[58] = true
@@ -122,6 +125,7 @@ end
 Constructor function for bishops.
 """
 function setBishops(color::String="white")
+
 	bishops = falses(64)
 	if color == "white"
 		bishops[59] = true
@@ -140,6 +144,7 @@ end
 Constructor function for king.
 """
 function setKing(color::String="white")
+
 	king = falses(64)
 	if color == "white"
 		king[61] = true
@@ -156,6 +161,7 @@ end
 Constructor function for queen.
 """
 function setQueen(color::String="white")
+
 	queen = falses(64)
 	if color == "white"
 		queen[60] = true
@@ -173,7 +179,8 @@ end
 Build white-only and black-only boards.
 """
 function setSide(p::BitArray{1}, r::BitArray{1}, n::BitArray{1},
-				 b::BitArray{1}, q::BitArray{1}, k::BitArray{1})
+	b::BitArray{1}, q::BitArray{1}, k::BitArray{1})
+
 	side = falses(64)
 	for i = 1:64
 		if  p[i] | r[i] | n[i] | b[i] | k[i] | q[i]
@@ -190,6 +197,7 @@ end
 Allocate free squares board.
 """
 function setFree(white::BitArray{1}, black::BitArray{1})
+
 	free = trues(64)
 	for i = 1:64
 		if white[i] | black[i]
@@ -206,6 +214,7 @@ end
 Allocate taken squares board.
 """
 function setTaken(free::BitArray{1})
+
 	taken = trues(64)
 	for i = 1:64
 		if free[i]
@@ -217,7 +226,6 @@ end
 
 
 struct LookUpTables
-
 	clear_rank :: BitArray{2}
 	mask_rank  :: BitArray{2}
 
@@ -225,12 +233,10 @@ struct LookUpTables
 	mask_file  :: BitArray{2}
 
 	clear_night_files :: BitArray{2}
-
 end
 
 
 function buildLookUpTables()
-
 	clear_rank = setClearRank()
 	clear_file = setClearFile()
 
@@ -240,8 +246,8 @@ function buildLookUpTables()
 	clear_night_files = getNightClearFiles(clear_file)
 
 	return LookUpTables(clear_rank, mask_rank,
-						clear_file, mask_file,
-						clear_night_files)
+		clear_file, mask_file,
+		clear_night_files)
 end
 
 
@@ -302,6 +308,7 @@ end
 
 
 function getNightClearFiles(clear_file::BitArray{2})
+	
 	clear_night_files = falses(64, 8)
 
 	clear_night_files[:,1] = clear_file[:,1] .& clear_file[:,2]

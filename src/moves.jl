@@ -4,7 +4,7 @@
 Find valid squares for king.
 """
 function getKingValid(board::Bitboard, lu_tabs::Bobby.LookUpTables,
-					  color::String="white")
+	color::String="white")
 
 	if color == "white"
 		king = board.K
@@ -55,7 +55,7 @@ end
 Find valid squares for knights.
 """
 function getNightsValid(board::Bitboard, lu_tabs::Bobby.LookUpTables,
-					  color::String="white")
+	color::String="white")
 
 	if color == "white"
 		nights = board.N
@@ -88,6 +88,7 @@ end
 Find valid dquares for rooks.
 """
 function getRooksValid(board::Bitboard, color::String="white")
+
 	if color == "white"
 		rooks = board.R
 		same = board.white
@@ -147,6 +148,7 @@ end
 My implementation of 45-degrees rotated bitboards for bishops.
 """
 function getBishopsValid(board::Bitboard, color::String="white")
+
 	if color == "white"
 		bishops = board.B
 		same = board.white
@@ -187,7 +189,7 @@ function getBishopsValid(board::Bitboard, color::String="white")
 				if bishops_arr[j]
 					bishops_seen += 1
 					valid_array = Bobby.slidePiece(same[s[1]:s[2]:s[3]],
-												   other[s[1]:s[2]:s[3]], j)
+						other[s[1]:s[2]:s[3]], j)
 					bishops_valid[s[1]:s[2]:s[3]] .|= valid_array
 				end
 				if bishops_seen == bishops_no

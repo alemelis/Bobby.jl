@@ -4,6 +4,7 @@
 Print any bitboard in shape 8x8 (transposed) to REPL for debuggin purposes.
 """
 function uglyPrint(b::BitArray)
+
 	r_b = Int.(transpose(reshape(b, 8, :)))
 	ranks = ["8", "7", "6", "5", "4", "3", "2", "1"]
 
@@ -27,6 +28,7 @@ Print a colorful board with pieces in algebraic notation
 (capitalised for white and lower cased for black).
 """
 function prettyPrint(board::Bitboard)
+	
 	ranks = ["8", "7", "6", "5", "4", "3", "2", "1"]
 	
 	free = transpose(reshape(board.free, 8, :))
