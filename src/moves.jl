@@ -85,7 +85,7 @@ end
 """
 	getRooksValid(board::Bitboard, color::String="white")
 
-Find valid dquares for rooks.
+Find valid squares for rooks.
 """
 function getRooksValid(board::Bitboard, color::String="white")
 
@@ -99,48 +99,41 @@ function getRooksValid(board::Bitboard, color::String="white")
 		other = board.white
 	end
 
-	rooks_valid_board = falses(64)
-
-	rooks_square = transpose(reshape(rooks, 8, :))
-
-	#ranks
-	for i = 1:7
-		if any(rooks_square[i,:])
-			if i == 1
-				src_i = i
-			else
-				src_i = (i-1)*8+1
-			end
-			same_color = same[src_i:src_i+7]
-			other_color = other[src_i:src_i+7]
-			for j = 1:8
-				if rooks_square[i,j]
-					rook_idx = j
-					rooks_valid = Bobby.slidePiece(same_color, other_color,
-						rook_idx)
-					rooks_valid_board[src_i:src_i+7] .|= rooks_valid
-				end
-			end
-		end
-	end
+	rooks_valid = falses(64)
 
 	#files
 	for j = 1:8
-		if any(rooks_square[:,j])
-			same_color = same[j:8:end]
-			other_color = other[j:8:end]
-
+		rooks_arr = rooks[j:8:64]
+		if any(rooks_arr)
+			same_arr = same[j:8:64]
+			other_arr = other[j:8:64]
 			for i = 1:8
-				if rooks_square[i,j]
+				if rooks_arr[i]
 					rook_idx = i
-					rooks_valid = Bobby.slidePiece(same_color, other_color,
-						rook_idx)
-					rooks_valid_board[j:8:end] .|= rooks_valid
+					rooks_valid[j:8:64] .|= Bobby.slidePiece(same_arr,
+						other_arr, rook_idx)
 				end
 			end
 		end
 	end
-	return rooks_valid_board
+
+	#ranks
+	for i = 1:8:64
+		rooks_arr = rooks[i:i+7]
+		if any(rooks_arr)
+			same_arr = same[i:i+7]
+			other_arr = other[i:i+7]
+			for j = 1:8
+				if rooks_arr[j]
+					rook_idx = j
+					rooks_valid[i:i+7] .|= Bobby.slidePiece(same_arr,
+						other_arr, rook_idx)
+				end
+			end
+		end
+	end
+
+	return rooks_valid
 end
 
 
@@ -149,7 +142,8 @@ end
 
 My implementation of 45-degrees rotated bitboards for bishops.
 """
-function getBishopsValid(board::Bitboard, color::String="white")
+function getBishopsValid(board::Bitboard, lu_tabs::Bobby.LookUpTables,
+	color::String="white")
 
 	if color == "white"
 		bishops = board.B
@@ -170,18 +164,7 @@ function getBishopsValid(board::Bitboard, color::String="white")
 		return bishops_valid
 	end
 
-	# TODO: move these into LookUpTables
-	# white squares
-	starts = [1,  7,  16, 17, 3,  5,  32, 33, 5,  49, 7,  3,  48]
-	steps =  [9,  7,  7,  9,  9,  7,  7,  9,  9,  9,  9,  7,  7]
-	ends =   [64, 49, 58, 62, 48, 33, 60, 60, 32, 58, 16, 17, 62]
-
-	# black squares
-	append!(starts, [8,  2,  9,  6,  24, 4,  25, 4,  40, 6,  2, 56, 41])
-	append!(steps,  [7,  9,  9,  7,  7,  9,  9,  7,  7,  9,  7, 7,  9])
-	append!(ends,   [57, 56, 63, 41, 59, 40, 61, 25, 61, 24, 9, 63, 59])
-
-	for s in zip(starts, steps, ends)
+	for s in zip(lu_tabs.starts, lu_tabs.steps, lu_tabs.ends)
 		bishops_on_diagonal = sum.(Int.(bishops[s[1]:s[2]:s[3]]))
 
 		if bishops_on_diagonal != 0

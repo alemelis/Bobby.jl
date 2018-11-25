@@ -207,6 +207,7 @@ end
 
 @testset "bishops" begin
     b = Bobby.buildBoard()
+    l = Bobby.buildLookUpTables()
     B = [0,0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,0,
@@ -215,10 +216,10 @@ end
     0,0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,0]
-    Bv = Bobby.getBishopsValid(b)
+    Bv = Bobby.getBishopsValid(b, l)
     @test all(Int.(Bv) .== B)
 
-    Bv = Bobby.getBishopsValid(b, "black")
+    Bv = Bobby.getBishopsValid(b, l, "black")
     @test all(Int.(Bv) .== B)
 
     i = 37
@@ -232,7 +233,7 @@ end
     0,0,0,1,0,1,0,0,
     0,0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,0]
-    Bv = Bobby.getBishopsValid(b)
+    Bv = Bobby.getBishopsValid(b, l)
     @test all(Int.(Bv) .== B)
 
     i = 38
@@ -246,7 +247,7 @@ end
     0,0,0,1,1,1,1,0,
     0,0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,0]
-    Bv = Bobby.getBishopsValid(b)
+    Bv = Bobby.getBishopsValid(b, l)
     @test all(Int.(Bv) .== B)
 
     i = 44
@@ -260,7 +261,7 @@ end
     0,0,0,0,1,1,1,0,
     0,0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,0]
-    Bv = Bobby.getBishopsValid(b)
+    Bv = Bobby.getBishopsValid(b, l)
     @test all(Int.(Bv) .== B)
 
     b = Bobby.buildBoard()
@@ -275,7 +276,7 @@ end
     0,0,0,0,0,0,0,0,
     0,1,0,0,0,0,0,0,
     0,0,0,0,0,0,0,0]
-    Bv = Bobby.getBishopsValid(b, "black")
+    Bv = Bobby.getBishopsValid(b, l, "black")
     @test all(Int.(Bv) .== B)
 
     i = 42
@@ -289,7 +290,7 @@ end
     0,0,0,0,0,0,0,0,
     1,1,1,0,0,0,0,0,
     0,0,0,0,0,0,0,0]
-    Bv = Bobby.getBishopsValid(b, "black")
+    Bv = Bobby.getBishopsValid(b, l, "black")
     @test all(Int.(Bv) .== B)
 
     i = 32
@@ -303,7 +304,7 @@ end
     0,0,0,0,0,1,0,0,
     1,1,1,0,1,0,0,0,
     0,0,0,0,0,0,0,0]
-    Bv = Bobby.getBishopsValid(b, "black")
+    Bv = Bobby.getBishopsValid(b, l, "black")
     @test all(Int.(Bv) .== B)
 
 end

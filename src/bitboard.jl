@@ -233,6 +233,11 @@ struct LookUpTables
 	mask_file  :: BitArray{2}
 
 	clear_night_files :: BitArray{2}
+
+	# diagonals
+	starts :: Array{Int64,1}
+	steps  :: Array{Int64,1}
+	ends  :: Array{Int64,1}
 end
 
 
@@ -245,9 +250,12 @@ function buildLookUpTables()
 
 	clear_night_files = getNightClearFiles(clear_file)
 
+	starts, steps, ends = setDiagonals()
+
 	return LookUpTables(clear_rank, mask_rank,
 		clear_file, mask_file,
-		clear_night_files)
+		clear_night_files,
+		starts, steps, ends)
 end
 
 
@@ -322,4 +330,19 @@ function getNightClearFiles(clear_file::BitArray{2})
 	clear_night_files[:,8] = clear_file[:,1] .& clear_file[:,2]
 
 	return clear_night_files
+end
+
+
+function setDiagonals()
+	# white squares
+	starts = [1,  7,  16, 17, 3,  5,  32, 33, 5,  49, 7,  3,  48]
+	steps =  [9,  7,  7,  9,  9,  7,  7,  9,  9,  9,  9,  7,  7]
+	ends =   [64, 49, 58, 62, 48, 33, 60, 60, 32, 58, 16, 17, 62]
+
+	# black squares
+	append!(starts, [8,  2,  9,  6,  24, 4,  25, 4,  40, 6,  2, 56, 41])
+	append!(steps,  [7,  9,  9,  7,  7,  9,  9,  7,  7,  9,  7, 7,  9])
+	append!(ends,   [57, 56, 63, 41, 59, 40, 61, 25, 61, 24, 9, 63, 59])
+
+	return starts, steps, ends
 end
