@@ -306,5 +306,50 @@ end
     0,0,0,0,0,0,0,0]
     Bv = Bobby.getBishopsValid(b, l, "black")
     @test all(Int.(Bv) .== B)
+end
 
+@testset "queen" begin
+    b = Bobby.buildBoard()
+    l = Bobby.buildLookUpTables()
+    Q = [0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0]
+    Qv = Bobby.getQueenValid(b, l)
+    @test all(Int.(Qv) .== Q)
+
+    Qv = Bobby.getQueenValid(b, l, "black")
+    @test all(Int.(Qv) .== Q)
+
+    i = 37
+    b.white[i] = true
+    b.Q[i] = true
+    Q = [0,0,0,0,0,0,0,0,
+    0,1,0,0,1,0,0,1,
+    0,0,1,0,1,0,1,0,
+    0,0,0,1,1,1,0,0,
+    1,1,1,1,0,1,1,1,
+    0,0,0,1,1,1,0,0,
+    0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0]
+    Qv = Bobby.getQueenValid(b, l)
+    @test all(Int.(Qv) .== Q)
+
+    i = 35
+    b.white[i] = true
+    b.Q[i] = true
+    Q = [0,0,0,0,0,0,0,0,
+    0,1,1,0,1,1,0,1,
+    1,0,1,0,1,0,1,0,
+    0,1,1,1,1,1,0,0,
+    1,1,0,1,0,1,1,1,
+    0,1,1,1,1,1,0,0,
+    0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0]
+    Qv = Bobby.getQueenValid(b, l)
+    @test all(Int.(Qv) .== Q)
 end
