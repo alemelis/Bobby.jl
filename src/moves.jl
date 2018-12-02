@@ -250,3 +250,51 @@ function getQueenValid(board::Bitboard, lu_tabs::Bobby.LookUpTables,
 
 	return queen_valid
 end
+
+
+function getPawnsValid(board::Bitboard, lu_tabs::Bobby.LookUpTables,
+	color::String="white")
+
+	if color == "white"
+		pawns = board.P
+		same = board.white
+		other = board.black
+		increment = -1 #upward
+	elseif color == "black"
+		pawns = board.p
+		same = board.black
+		other = board.white
+		increment = +1 #downward
+	end
+
+	taken = board.taken
+
+	pawns_valid = falses(64)
+
+	for i = 1:64
+		if pawns[i]
+			# check the single space infront of the pawn
+			front_square = i + increment*8
+			if taken[front_square]
+				continue
+			else
+				pawns_valid[front_square] = true
+
+				# check double space if on home rank
+				if (increment == -1 && any(pawns .& lu_tabs.mask_rank[:,2])) || 
+					(increment == 1 && any(pawns .& lu_tabs.mask_rank[:,7]))
+					double_square = front_square + increment*8
+					if taken[double_square]
+						continue
+					else
+						pawns_valid[double_square] = true
+					end
+				end
+
+			end
+
+
+		end
+	end
+	return pawns_valid
+end
