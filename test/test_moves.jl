@@ -207,7 +207,6 @@ end
 
 @testset "bishops" begin
     b = Bobby.buildBoard()
-    l = Bobby.buildLookUpTables()
     B = [0,0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,0,
@@ -310,7 +309,6 @@ end
 
 @testset "queen" begin
     b = Bobby.buildBoard()
-    l = Bobby.buildLookUpTables()
     Q = [0,0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,0,
@@ -352,4 +350,103 @@ end
     0,0,0,0,0,0,0,0]
     Qv = Bobby.getQueenValid(b, l)
     @test all(Int.(Qv) .== Q)
+end
+
+@testset "pawns" begin
+    b = Bobby.buildBoard()
+    P = [0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,
+    1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,
+    0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0]
+    Pv = Bobby.getPawnsValid(b, l)
+    @test all(Int.(Pv) .== P)
+
+    P = [0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,
+    1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,
+    0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0]
+    Pv = Bobby.getPawnsValid(b, l, "black")
+    @test all(Int.(Pv) .== P)
+
+    i = 41
+    b.taken[i] = true
+    P = [0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,
+    0,1,1,1,1,1,1,1,
+    0,1,1,1,1,1,1,1,
+    0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0]
+    Pv = Bobby.getPawnsValid(b, l)
+    @test all(Int.(Pv) .== P)
+
+    i = 34
+    b.taken[i] = true
+    P = [0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,
+    0,0,1,1,1,1,1,1,
+    0,1,1,1,1,1,1,1,
+    0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0]
+    Pv = Bobby.getPawnsValid(b, l)
+    @test all(Int.(Pv) .== P)
+
+    i = 35
+    b.P[i] = true
+    b.taken[i] = true
+    b.white[i] = true
+    j = 26
+    b.taken[j] = true
+    b.black[j] = true
+    P = [0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,
+    0,1,1,0,0,0,0,0,
+    0,0,0,1,1,1,1,1,
+    0,1,1,1,1,1,1,1,
+    0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0]
+    Pv = Bobby.getPawnsValid(b, l)
+    @test all(Int.(Pv) .== P)
+
+    b = Bobby.buildBoard()
+    i = 20
+    b.black[i] = true
+    b.taken[i] = true
+    P = [0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,
+    1,1,1,0,1,1,1,1,
+    1,1,1,0,1,1,1,1,
+    0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0]
+    Pv = Bobby.getPawnsValid(b, l, "black")
+    @test all(Int.(Pv) .== P)
+
+    i = 21
+    b.white[i] = true
+    b.taken[i] = true
+    P = [0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,
+    1,1,1,0,1,1,1,1,
+    1,1,1,0,0,1,1,1,
+    0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0]
+    Pv = Bobby.getPawnsValid(b, l, "black")
+    @test all(Int.(Pv) .== P)
+
 end
