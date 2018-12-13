@@ -8,5 +8,6 @@ module Bobby
 	include("print.jl")
 	include("moves.jl")
 	include("magic.jl")
-
+	include("check.jl")
+	
 end
