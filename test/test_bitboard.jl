@@ -79,6 +79,11 @@
 	@test all(board.free[board.black] .== false)
 	@test all(board.free .== free)
 	@test all(board.taken .== taken)
+
+	@test all(board.white_attacks[41:48] .== true)
+	@test all(board.black_attacks[17:24] .== true)
+	@test all(board.white_attacks[17:24] .== false)
+	@test all(board.black_attacks[41:48] .== false)
 end
 
 @testset "look up tables" begin

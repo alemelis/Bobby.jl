@@ -22,6 +22,9 @@ mutable struct Bitboard
 
 	free :: BitArray{1}  # all free squares
 	taken :: BitArray{1} # all pieces
+
+	white_attacks :: BitArray{1} # attacked squares
+	black_attacks :: BitArray{1}
 end
 
 
@@ -54,9 +57,12 @@ function buildBoard()
 
 	free = setFree(white, black)
 	taken = setTaken(free)
+	white_attacks = setAttacked()
+	black_attacks = setAttacked("black")
 
 	return Bitboard(white, P, R, N, B, Q, K, black,
-		p, r, n, b, q, k, free, taken)
+		p, r, n, b, q, k, free, taken,
+		white_attacks, black_attacks)
 end
 
 
@@ -224,6 +230,19 @@ function setTaken(free::BitArray{1})
 	return taken
 end
 
+function setAttacked(color::String="white")
+	attacked = falses(64)
+	if color == "white"
+		for i = 41:48
+			attacked[i] = true
+		end
+	else
+		for i = 17:24
+			attacked[i] = true
+		end
+	end
+	return attacked
+end
 
 struct LookUpTables
 	clear_rank :: BitArray{2}
