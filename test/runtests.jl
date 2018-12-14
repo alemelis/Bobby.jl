@@ -16,3 +16,7 @@ end
 @testset "check.jl" begin
 	include("test_check.jl")
 end
+
+@testset "game.jl" begin
+	include("test_game.jl")
+end

@@ -9,5 +9,6 @@ module Bobby
 	include("moves.jl")
 	include("magic.jl")
 	include("check.jl")
+	include("game.jl")
 	
 end
