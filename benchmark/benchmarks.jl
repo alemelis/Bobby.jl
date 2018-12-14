@@ -18,7 +18,3 @@ SUITE["moves"]["getRooksValid"] = @benchmarkable Bobby.getRooksValid(b)
 
 SUITE["check"] = BenchmarkGroup()
 SUITE["check"]["checkCheck"] = @benchmarkable Bobby.checkCheck(b)
-
-# using PkgBenchmark
-# bmr = benchmarkpkg("Bobby")
-# export_markdown("bm_results.md", bmr)
