@@ -6,7 +6,9 @@
 	@test_throws DomainError Bobby.pgn2int("11")
 	@test_throws DomainError Bobby.pgn2int("k1")
 
-	# square_pgn = "a8"
-	# square_idx = 1
-	# @test square_idx == Bobby.pgn2int(square_pgn)
+	@test Bobby.pgn2int("a8") == 1
+	@test Bobby.pgn2int("h1") == 64
+	@test Bobby.pgn2int("h8") == 8
+	@test Bobby.pgn2int("a1") == 57
+
 end
