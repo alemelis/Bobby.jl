@@ -11,4 +11,19 @@
 	@test Bobby.pgn2int("h8") == 8
 	@test Bobby.pgn2int("a1") == 57
 
+	b = Bobby.buildBoard()
+	@test Bobby.int2piece(b, 1) == "r"
+	@test Bobby.int2piece(b, 2) == "n"
+	@test Bobby.int2piece(b, 3) == "b"
+	@test Bobby.int2piece(b, 4) == "q"
+	@test Bobby.int2piece(b, 5) == "k"
+	@test Bobby.int2piece(b, 9) == "p"
+	@test Bobby.int2piece(b, 17) == ""
+	@test Bobby.int2piece(b, 64) == "R"
+	@test Bobby.int2piece(b, 63) == "N"
+	@test Bobby.int2piece(b, 62) == "B"
+	@test Bobby.int2piece(b, 61) == "K"
+	@test Bobby.int2piece(b, 60) == "Q"
+	@test Bobby.int2piece(b, 56) == "P"
+
 end
