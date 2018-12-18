@@ -1,9 +1,15 @@
-function move(source::String, target::String, color::String)
+function move(board::Bitboard, source::String, target::String, color::String)
 	# convert pgn to integer
 	s = pgn2int(source)
 	t = pgn2int(target)
 
 	# find piece type to move
+	piece_type = int2piece(board, s)
+
+	# check piece color
+	# if 
+	# check destination valid destination
+
 end
 
 function pgn2int(square::String)
@@ -34,30 +40,30 @@ end
 
 function int2piece(board::Bitboard, idx::Int64)
 	if board.free[idx]
-		return ""
+		return ' '
 	elseif board.K[idx]
-		return "K"
+		return 'K'
 	elseif board.P[idx]
-		return "P"
+		return 'P'
 	elseif board.Q[idx]
-		return "Q"
+		return 'Q'
 	elseif board.B[idx]
-		return "B"
+		return 'B'
 	elseif board.N[idx]
-		return "N"
+		return 'N'
 	elseif board.R[idx]
-		return "R"
+		return 'R'
 	elseif board.k[idx]
-		return "k"
+		return 'k'
 	elseif board.p[idx]
-		return "p"
+		return 'p'
 	elseif board.q[idx]
-		return "q"
+		return 'q'
 	elseif board.b[idx]
-		return "b"
+		return 'b'
 	elseif board.n[idx]
-		return "n"
+		return 'n'
 	elseif board.r[idx]
-		return "r"
+		return 'r'
 	end
 end
