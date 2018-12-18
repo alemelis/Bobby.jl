@@ -1,9 +1,9 @@
 """
-	getKingValid(board::Bitboard, lu_tabs::Bobby.LookUpTables, color="white")
+	getKingValid(board::Bitboard, lu_tabs::LookUpTables, color="white")
 
 Find valid squares for king.
 """
-function getKingValid(board::Bitboard, lu_tabs::Bobby.LookUpTables,
+function getKingValid(board::Bitboard, lu_tabs::LookUpTables,
 	color::String="white")
 
 	if color == "white"
@@ -50,11 +50,11 @@ end
 
 
 """
-	getNightsValid(board::Bitboard, lu_tabs::Bobby.LookUpTables, color="white")
+	getNightsValid(board::Bitboard, lu_tabs::LookUpTables, color="white")
 
 Find valid squares for knights.
 """
-function getNightsValid(board::Bitboard, lu_tabs::Bobby.LookUpTables,
+function getNightsValid(board::Bitboard, lu_tabs::LookUpTables,
 	color::String="white")
 
 	if color == "white"
@@ -140,7 +140,7 @@ end
 
 My implementation of 45-degrees rotated bitboards for bishops.
 """
-function getBishopsValid(board::Bitboard, lu_tabs::Bobby.LookUpTables,
+function getBishopsValid(board::Bitboard, lu_tabs::LookUpTables,
 	color::String="white")
 
 	if color == "white"
@@ -184,7 +184,7 @@ function getBishopsValid(board::Bitboard, lu_tabs::Bobby.LookUpTables,
 end
 
 
-function getQueenValid(board::Bitboard, lu_tabs::Bobby.LookUpTables,
+function getQueenValid(board::Bitboard, lu_tabs::LookUpTables,
 	color::String="white")
 	
 	if color == "white"
@@ -252,7 +252,7 @@ function getQueenValid(board::Bitboard, lu_tabs::Bobby.LookUpTables,
 end
 
 
-function getPawnsValid(board::Bitboard, lu_tabs::Bobby.LookUpTables,
+function getPawnsValid(board::Bitboard, lu_tabs::LookUpTables,
 	color::String="white")
 
 	if color == "white"
