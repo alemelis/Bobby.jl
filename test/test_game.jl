@@ -34,4 +34,6 @@
 	valid_moves = Bobby.getPawnsValid(b, l, "black")
 	@test_throws DomainError Bobby.checkDestination(64, valid_moves)
 
+	b = Bobby.move(b, l, "e2", "e4")
+
 end

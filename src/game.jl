@@ -1,6 +1,6 @@
 function move(board::Bitboard, lu_tabs::LookUpTables, source::String,
 	target::String,	color::String="white")
-
+	
 	# convert pgn to integer
 	s = pgn2int(source)
 	t = pgn2int(target)
@@ -12,25 +12,32 @@ function move(board::Bitboard, lu_tabs::LookUpTables, source::String,
 	checkColor(s_piece_type, color)
 
 	# find valid moves
-	movers = Dict()
-	movers['k'] = getKingValid
-	movers['p'] = getPawnsValid
-	movers['q'] = getQueenValid
-	movers['b'] = getBishopsValid
-	movers['r'] = getRooksValid
-	movers['n'] = getNightsValid
-	valid_moves = movers[lowercase(s_piece_type)](board, lu_tabs, color)
+	validators = Dict()
+	validators['k'] = getKingValid
+	validators['p'] = getPawnsValid
+	validators['q'] = getQueenValid
+	validators['b'] = getBishopsValid
+	validators['r'] = getRooksValid
+	validators['n'] = getNightsValid
+	valid_moves = validators[lowercase(s_piece_type)](board, lu_tabs, color)
 
 	# check valid destination
 	checkDestination(t, valid_moves)
 
 	# check if the move leads to auto-check
+	movers = Dict()
+	movers['k'] = moveKing
+	movers['p'] = movePawns
+	movers['q'] = moveQueen
+	movers['b'] = moveBishops
+	movers['r'] = moveRooks
+	movers['n'] = moveNights
 	tmp_b = deepcopy(board)
+	tmp_b = movers[lowercase(s_piece_type)](tmp_b, s, t, color)
+	board = updateAttacked(tmp_b, lu_tabs, color)
 
-
-
+	return board
 end
-
 
 function checkDestination(target_idx::Int64, valid_moves::BitArray{1})
 	if !valid_moves[target_idx]

@@ -37,51 +37,77 @@ function getPawnsValid(board::Bitboard, lu_tabs::LookUpTables,
 		end
 	end
 
+	pawns_valid .|= getPawnsAttackTaken(board, lu_tabs, color)
+	
+	return pawns_valid
+end
+
+
+function getPawnsAttackTaken(board::Bitboard, lu_tabs::LookUpTables,
+	color::String="white")
+	if color == "white"
+		pawns = board.P
+		other = board.black
+		increment = -8 #upward
+	elseif color == "black"
+		pawns = board.p
+		other = board.white
+		increment = +8 #downward
+	end
+
 	# check attacking squares
 	if increment == -8
 		pawns_lx_atk = (pawns .& lu_tabs.clear_file[:,1]) << 9
 		pawns_rx_atk = (pawns .& lu_tabs.clear_file[:,8]) << 7
 	elseif increment == 8
-		pawns_lx_atk = (pawns .& lu_tabs.clear_file[:,8]) >> 7
-		pawns_rx_atk = (pawns .& lu_tabs.clear_file[:,1]) >> 9
+		pawns_lx_atk = (pawns .& lu_tabs.clear_file[:,8]) >> 9
+		pawns_rx_atk = (pawns .& lu_tabs.clear_file[:,1]) >> 7
 	end
 	pawns_attack = pawns_lx_atk .& other
 	pawns_attack .|= pawns_rx_atk .& other
-	pawns_valid .|= pawns_attack
-	
-	return pawns_valid
+
+	return pawns_attack
 end
 
-function movePawn(board::Bitboard, source::Int64, target::Int64,
+
+function getPawnsAttackGeneric(board::Bitboard, lu_tabs::LookUpTables,
+	color::String="white")
+	if color == "white"
+		pawns = board.P
+		same = board.white
+		increment = -8 #upward
+	elseif color == "black"
+		pawns = board.p
+		same = board.black
+		increment = +8 #downward
+	end
+
+	# check attacking squares
+	if increment == -8
+		pawns_lx_atk = (pawns .& lu_tabs.clear_file[:,1]) << 9
+		pawns_rx_atk = (pawns .& lu_tabs.clear_file[:,8]) << 7
+	elseif increment == 8
+		pawns_lx_atk = (pawns .& lu_tabs.clear_file[:,8]) >> 9
+		pawns_rx_atk = (pawns .& lu_tabs.clear_file[:,1]) >> 7
+	end
+	pawns_attack = pawns_lx_atk  .& .~same
+	pawns_attack .|= pawns_rx_atk  .& .~same
+
+	return pawns_attack
+end
+
+
+function movePawns(board::Bitboard, source::Int64, target::Int64,
 	color::String="white")
 
 	if color == "white"
 		board.P[source] = false
 		board.P[target] = true
-		board.free[source] = true
-		board.free[target] = false
-		board.taken[source] = false
-		board.taken[target] = true
-		board.white[source] = false
-		board.white[target] = true
-
-		if board.black[target]
-			board.black[target] = false
-			if board.p[target]
-				board.p[target] = false
-			elseif board.r[target]
-				board.r[target] = false
-			elseif board.n[target]
-				board.n[target] = false
-			elseif board.b[target]
-				board.b[target] = false
-			elseif board.q[target]
-				board.q[target] = false
-			elseif board.k[target]
-				throw(DomainError("black king in target square"))
-
-		end
+		board = moveSourceTargetWhite(board, source, target)
 	else
-
+		board.p[source] = false
+		board.p[target] = true
+		board = moveSourceTargetBlack(board, source, target)
 	end
+	return board
 end
