@@ -1,15 +1,53 @@
-function move(board::Bitboard, source::String, target::String, color::String)
+function move(board::Bitboard, lu_tabs::LookUpTables, source::String,
+	target::String,	color::String="white")
+
 	# convert pgn to integer
 	s = pgn2int(source)
 	t = pgn2int(target)
 
 	# find piece type to move
-	piece_type = int2piece(board, s)
+	s_piece_type = int2piece(board, s)
 
 	# check piece color
-	# if 
-	# check destination valid destination
+	checkColor(s_piece_type, color)
 
+	# find valid moves
+	movers = Dict()
+	movers['k'] = getKingValid
+	movers['p'] = getPawnsValid
+	movers['q'] = getQueenValid
+	movers['b'] = getBishopsValid
+	movers['r'] = getRooksValid
+	movers['n'] = getNightsValid
+	valid_moves = movers[lowercase(s_piece_type)](board, lu_tabs, color)
+
+	# check valid destination
+	checkDestination(t, valid_moves)
+
+	# check if the move leads to auto-check
+	tmp_b = deepcopy(board)
+
+
+
+end
+
+
+function checkDestination(target_idx::Int64, valid_moves::BitArray{1})
+	if !valid_moves[target_idx]
+		throw(DomainError("target square not available"))
+	end
+end
+
+function checkColor(s_piece_type::Char, color::String)
+	if color == "white"
+		if !isuppercase(s_piece_type)
+			throw(ErrorException("it's white to move!"))
+		end
+	else
+		if isuppercase(s_piece_type)
+			throw(ErrorException("it's black to move!"))
+		end
+	end
 end
 
 function pgn2int(square::String)

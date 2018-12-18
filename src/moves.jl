@@ -82,6 +82,12 @@ function getNightsValid(board::Bitboard, lu_tabs::LookUpTables,
 end
 
 
+function getRooksValid(board::Bitboard, lu_tabs::LookUpTables,
+	color::String="white")
+	return getRooksValid(board, color)
+end
+
+
 """
 	getRooksValid(board::Bitboard, color::String="white")
 
@@ -252,56 +258,4 @@ function getQueenValid(board::Bitboard, lu_tabs::LookUpTables,
 end
 
 
-function getPawnsValid(board::Bitboard, lu_tabs::LookUpTables,
-	color::String="white")
-
-	if color == "white"
-		pawns = board.P
-		other = board.black
-		increment = -8 #upward
-	elseif color == "black"
-		pawns = board.p
-		other = board.white
-		increment = +8 #downward
-	end
-
-	taken = board.taken
-
-	pawns_valid = falses(64)
-
-	for i = 1:64
-		if pawns[i]
-			# check the single space infront of the pawn
-			front_square = i + increment
-			if taken[front_square]
-				continue
-			else
-				pawns_valid[front_square] = true
-				# check double space if on home rank
-				if (increment < 0 && pawns[i] & lu_tabs.mask_rank[i,2]) || 
-					(increment > 0 && pawns[i] .& lu_tabs.mask_rank[i,7])
-					double_square = front_square + increment
-					if taken[double_square]
-						continue
-					else
-						pawns_valid[double_square] = true
-					end
-				end
-			end
-		end
-	end
-
-	# check attacking squares
-	if increment == -8
-		pawns_lx_atk = (pawns .& lu_tabs.clear_file[:,1]) << 9
-		pawns_rx_atk = (pawns .& lu_tabs.clear_file[:,8]) << 7
-	elseif increment == 8
-		pawns_lx_atk = (pawns .& lu_tabs.clear_file[:,8]) >> 7
-		pawns_rx_atk = (pawns .& lu_tabs.clear_file[:,1]) >> 9
-	end
-	pawns_attack = pawns_lx_atk .& other
-	pawns_attack .|= pawns_rx_atk .& other
-	pawns_valid .|= pawns_attack
-	
-	return pawns_valid
-end
+include("pawns.jl")

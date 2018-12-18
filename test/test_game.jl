@@ -26,4 +26,12 @@
 	@test Bobby.int2piece(b, 60) == 'Q'
 	@test Bobby.int2piece(b, 56) == 'P'
 
+	@test_throws ErrorException Bobby.checkColor('P', "black")
+	@test_throws ErrorException Bobby.checkColor('p', "white")
+
+	valid_moves = Bobby.getPawnsValid(b, l)
+	@test_throws DomainError Bobby.checkDestination(1, valid_moves)
+	valid_moves = Bobby.getPawnsValid(b, l, "black")
+	@test_throws DomainError Bobby.checkDestination(64, valid_moves)
+
 end
