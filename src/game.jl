@@ -1,51 +1,117 @@
+function play()
+	b = buildBoard()
+	l = buildLookUpTables()
+	color = "white"
+	opponent_color = "black"
+
+	while true
+		Bobby.prettyPrint(b)
+		println("$color to move, enter source square and press enter")
+		source = readline()
+		if source == "q"
+			break
+		end
+		println("enter target square and press enter")
+		target = readline()
+		try
+			b, e = move(b, l, source, target, color)
+			if e != ""
+				@printf(Crayon(bold=true, foreground=:red), "%s ", e)
+				@printf(Crayon(reset=true), "\n")
+				continue
+			end
+		catch er
+			@printf(Crayon(bold=true, foreground=:red), "%s ", er)
+			@printf(Crayon(reset=true), "\n")
+			continue
+		end
+		
+		if checkCheck(b, opponent_color)
+			if checkMate(b, l, opponent_color)
+				@printf(Crayon(bold=true, foreground=:red), "%s ", "check mate!")
+				@printf(Crayon(reset=true), "\n")
+				Bobby.prettyPrint(b)
+				break
+			else
+				@printf(Crayon(bold=true, foreground=:red), "%s ", "$opponent_color is in check!")
+				@printf(Crayon(reset=true), "\n")
+			end
+		end
+
+		color, opponent_color = changeColor(color, opponent_color)
+
+	end
+end
+
+function changeColor(color, opponent_color)
+	tmp_color = opponent_color
+	opponent_color = color
+	color = tmp_color
+	return color, opponent_color
+end
+
 function move(board::Bitboard, lu_tabs::LookUpTables, source::String,
 	target::String,	color::String="white")
 	
-	# convert pgn to integer
-	s = pgn2int(source)
-	t = pgn2int(target)
+	try
+		# convert pgn to integer
+		s = pgn2int(source)
+		t = pgn2int(target)
 
-	# find piece type to move
-	s_piece_type = int2piece(board, s)
+		# find piece type to move
+		s_piece_type = int2piece(board, s)
 
-	# check piece color
-	checkColor(s_piece_type, color)
+		checkSource(s, board)
 
-	# find valid moves
-	validators = Dict()
-	validators['k'] = getKingValid
-	validators['p'] = getPawnsValid
-	validators['q'] = getQueenValid
-	validators['b'] = getBishopsValid
-	validators['r'] = getRooksValid
-	validators['n'] = getNightsValid
-	valid_moves = validators[lowercase(s_piece_type)](board, lu_tabs, color)
+		# check piece color
+		checkColor(s_piece_type, color)
 
-	# check valid destination
-	checkDestination(t, valid_moves)
+		# find valid moves
+		validators = Dict()
+		validators['k'] = getKingValid
+		validators['p'] = getPawnsValid
+		validators['q'] = getQueenValid
+		validators['b'] = getBishopsValid
+		validators['r'] = getRooksValid
+		validators['n'] = getNightsValid
+		valid_moves = validators[lowercase(s_piece_type)](board, lu_tabs, color)
 
-	# check if the move leads to auto-check
-	movers = Dict()
-	movers['k'] = moveKing
-	movers['p'] = movePawns
-	movers['q'] = moveQueen
-	movers['b'] = moveBishops
-	movers['r'] = moveRooks
-	movers['n'] = moveNights
-	tmp_b = deepcopy(board)
-	tmp_b = movers[lowercase(s_piece_type)](tmp_b, s, t, color)
-	board = updateAttacked(tmp_b, lu_tabs, color)
+		# check valid destination
+		checkTarget(t, valid_moves)
 
-	return board
+		# check if the move leads to auto-check
+		movers = Dict()
+		movers['k'] = moveKing
+		movers['p'] = movePawns
+		movers['q'] = moveQueen
+		movers['b'] = moveBishops
+		movers['r'] = moveRooks
+		movers['n'] = moveNights
+		tmp_b = deepcopy(board)
+		tmp_b = movers[lowercase(s_piece_type)](tmp_b, s, t, color)
+
+	
+		board = updateAttacked(tmp_b, lu_tabs, color)
+
+		return board, ""
+	catch e
+		return board, e
+	end
 end
 
-function checkDestination(target_idx::Int64, valid_moves::BitArray{1})
+function checkSource(source_idx::Int64, board::Bitboard)
+	if board.free[source_idx]
+		throw(DomainError("empty source square"))
+	end
+end
+
+function checkTarget(target_idx::Int64, valid_moves::BitArray{1})
 	if !valid_moves[target_idx]
 		throw(DomainError("target square not available"))
 	end
 end
 
-function checkColor(s_piece_type::Char, color::String)
+function checkColor(s_piece_type::Char, color::String="white")
 	if color == "white"
 		if !isuppercase(s_piece_type)
 			throw(ErrorException("it's white to move!"))
