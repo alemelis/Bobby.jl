@@ -16,24 +16,24 @@ function play()
 		try
 			b, e = move(b, l, source, target, color)
 			if e != ""
-				@printf(Crayon(bold=true, foreground=:red), "%s ", e)
+				@printf(Crayon(bold=true, foreground=:yellow), "\n%s ", e)
 				@printf(Crayon(reset=true), "\n")
 				continue
 			end
 		catch er
-			@printf(Crayon(bold=true, foreground=:red), "%s ", er)
+			@printf(Crayon(bold=true, foreground=:yellow), "\n%s ", er)
 			@printf(Crayon(reset=true), "\n")
 			continue
 		end
 		
 		if checkCheck(b, opponent_color)
 			if checkMate(b, l, opponent_color)
-				@printf(Crayon(bold=true, foreground=:red), "%s ", "check mate!")
+				@printf(Crayon(bold=true, foreground=:red), "\n%s ", "check mate!")
 				@printf(Crayon(reset=true), "\n")
 				Bobby.prettyPrint(b)
 				break
 			else
-				@printf(Crayon(bold=true, foreground=:red), "%s ", "$opponent_color is in check!")
+				@printf(Crayon(bold=true, foreground=:red), "\n%s ", "$opponent_color is in check!")
 				@printf(Crayon(reset=true), "\n")
 			end
 		end
