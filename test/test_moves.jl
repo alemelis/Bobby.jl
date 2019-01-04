@@ -350,6 +350,45 @@ end
     0,0,0,0,0,0,0,0]
     Qv = Bobby.getQueenValid(b, l)
     @test all(Int.(Qv) .== Q)
+
+    b = Bobby.buildBoard()
+    Q = [0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,1,
+    0,0,0,0,0,0,1,0,
+    0,0,0,0,0,1,0,0,
+    0,0,0,0,1,0,0,0,
+    0,0,0,0,0,0,0,0]
+    b.P[45] = true
+    b.taken[45] = true
+    b.free[45] = false
+    b.taken[53] = false
+    b.free[53] = true
+    b.white[53] = false
+    b.white[45] = true
+    Qv = Bobby.getQueenValid(b, l)
+    @test all(Int.(Qv) .== Q)
+
+    b = Bobby.buildBoard()
+    Q = [0,0,0,0,0,0,0,0,
+    0,0,1,0,0,0,0,0,
+    0,1,0,0,0,0,0,0,
+    1,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0]
+    b.p[11] = false
+    b.p[19] = true
+    b.taken[19] = true
+    b.free[19] = false
+    b.taken[11] = false
+    b.free[11] = true
+    b.black[11] = false
+    b.black[19] = true
+    Qv = Bobby.getQueenValid(b, l, "black")
+    @test all(Int.(Qv) .== Q)
 end
 
 @testset "pawns" begin

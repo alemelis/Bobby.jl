@@ -78,11 +78,11 @@ function updateAttacked(board::Bitboard, lu_tabs::LookUpTables,
 		opponent_color = "white"
 	end
 
-	attacked = getAttacked(board, lu_tabs, opponent_color)
+	opponent_attacked = getAttacked(board, lu_tabs, opponent_color)
 	if opponent_color == "white"
-		board.white_attacks = attacked
+		board.white_attacks = opponent_attacked
 	else
-		board.black_attacks = attacked
+		board.black_attacks = opponent_attacked
 	end
 
 	if checkCheck(board, color)
