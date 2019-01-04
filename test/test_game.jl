@@ -30,9 +30,9 @@
 	@test_throws ErrorException Bobby.checkColor('p', "white")
 
 	valid_moves = Bobby.getPawnsValid(b, l)
-	@test_throws DomainError Bobby.checkDestination(1, valid_moves)
+	@test_throws DomainError Bobby.checkTarget(1, valid_moves)
 	valid_moves = Bobby.getPawnsValid(b, l, "black")
-	@test_throws DomainError Bobby.checkDestination(64, valid_moves)
+	@test_throws DomainError Bobby.checkTarget(64, valid_moves)
 
 	b = Bobby.move(b, l, "e2", "e4")
 
