@@ -13,12 +13,13 @@ function slidePiece(piece_valid::BitArray{1}, same_color::BitArray{1},
 	if current_idx == 0 || current_idx == length(same_color) + 1
 		return piece_valid
 	end
+
 	while true
 		if same_color[current_idx] == false
 			piece_valid[current_idx] = true
 			if other_color[current_idx] == false
 				current_idx += increment
-				if current_idx == 0 || current_idx == 9
+				if current_idx == 0 || current_idx == length(same_color) + 1
 					break
 				end
 			else
