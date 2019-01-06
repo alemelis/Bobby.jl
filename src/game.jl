@@ -94,7 +94,7 @@ function move(board::Bitboard, lu_tabs::LookUpTables, source::String,
 
 	
 		board = updateAttacked(tmp_b, lu_tabs, color)
-		board = updateCastling(board, color)
+		board = updateCastling(board)
 
 		return board, ""
 	catch e
