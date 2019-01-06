@@ -56,7 +56,6 @@ function getRooksValid(board::Bitboard, color::String="white")
 	return rooks_valid
 end
 
-
 function moveRook(board::Bitboard, source::Int64, target::Int64,
 	color::String="white")
 
@@ -64,10 +63,22 @@ function moveRook(board::Bitboard, source::Int64, target::Int64,
 		board.R[source] = false
 		board.R[target] = true
 		board = moveSourceTargetWhite(board, source, target)
+
+		if source == 57
+			board.a1_rook_moved = true
+		elseif source == 64
+			board.h1_rook_moved = true
+		end
 	else
 		board.r[source] = false
 		board.r[target] = true
 		board = moveSourceTargetBlack(board, source, target)
+
+		if source == 1
+			board.a8_rook_moved = true
+		elseif source == 8
+			board.h8_rook_moved = true
+		end
 	end
 	return board
 end

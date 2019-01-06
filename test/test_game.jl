@@ -59,10 +59,12 @@ end
 	# move king
 	b, e = Bobby.move(b, l, "e1", "e2")
 	@test e == ""
+	@test b.white_king_moved
 
 	# move rook
 	b, e = Bobby.move(b, l, "a8", "b8", "black")
 	@test e == ""
+	@test b.a8_rook_moved
 
 	# move queen
 	b, e = Bobby.move(b, l, "d1", "e1")
