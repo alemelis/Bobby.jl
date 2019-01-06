@@ -98,16 +98,52 @@ end
 
 
 function movePawn(board::Bitboard, source::Int64, target::Int64,
-	color::String="white")
+	color::String="white", new_piece::String="Q")
 
 	if color == "white"
 		board.P[source] = false
 		board.P[target] = true
 		board = moveSourceTargetWhite(board, source, target)
+		if target <= 8
+			board = promotePawn(board, target, color, new_piece)
+		end
 	else
 		board.p[source] = false
 		board.p[target] = true
 		board = moveSourceTargetBlack(board, source, target)
+		if target >= 57
+			board = promotePawn(b, target, color, new_piece)
+		end
 	end
+	return board
+end
+
+function promotePawn(board::Bitboard, target::Int64, color::String="white",
+	new_piece::String="Q")
+
+	if color == "white"
+		board.P[target] = false
+		if new_piece == "Q"
+			board.Q[target] = true
+		elseif new_piece == "R"
+			board.R[target] = true
+		elseif new_piece == "B"
+			board.B[target] = true
+		elseif new_piece == "N"
+			board.N[target] = true
+		end
+	else
+		board.P[target] = false
+		if new_piece == "Q"
+			board.q[target] = true
+		elseif new_piece == "R"
+			board.r[target] = true
+		elseif new_piece == "B"
+			board.b[target] = true
+		elseif new_piece == "N"
+			board.n[target] = true
+		end
+	end
+
 	return board
 end

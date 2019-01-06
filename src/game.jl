@@ -25,7 +25,7 @@ function play()
 			@printf(Crayon(reset=true), "\n")
 			continue
 		end
-		
+
 		if checkCheck(b, opponent_color)
 			if checkMate(b, l, opponent_color)
 				@printf(Crayon(bold=true, foreground=:red), "\n%s ",
@@ -92,13 +92,30 @@ function move(board::Bitboard, lu_tabs::LookUpTables, source::String,
 		tmp_b = deepcopy(board)
 		tmp_b = movers[lowercase(s_piece_type)](tmp_b, s, t, color)
 
-	
+		if checkPromotion(s_piece_type, target)
+			promotion = "promote"
+		else
+			promotion = ""
+		end
+
 		board = updateAttacked(tmp_b, lu_tabs, color)
 		board = updateCastling(board)
 
-		return board, ""
+		return board, promotion
 	catch e
 		return board, e
+	end
+end
+
+function checkPromotion(s_piece_type::Char, target::String)
+	if lowercase(s_piece_type) != 'p'
+		return false
+	else
+		if target[2] == '8'
+			return true
+		else
+			return false
+		end
 	end
 end
 
