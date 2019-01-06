@@ -1,5 +1,6 @@
-@testset "slide rook" begin
+@testset "check" begin
 	b = Bobby.buildBoard()
+	l = Bobby.buildLookUpTables()
 
 	@test !Bobby.checkCheck(b)
 	@test !Bobby.checkCheck(b, "black")
@@ -9,4 +10,7 @@
 
 	b.k[44] = true
 	@test Bobby.checkCheck(b, "black")
+
+	b, e = Bobby.move(b, l, "e2", "e3")
+	@test Bobby.checkMate(b, l) == false
 end

@@ -97,7 +97,7 @@ function getPawnsAttackGeneric(board::Bitboard, lu_tabs::LookUpTables,
 end
 
 
-function movePawns(board::Bitboard, source::Int64, target::Int64,
+function movePawn(board::Bitboard, source::Int64, target::Int64,
 	color::String="white")
 
 	if color == "white"

@@ -28,12 +28,14 @@ function play()
 		
 		if checkCheck(b, opponent_color)
 			if checkMate(b, l, opponent_color)
-				@printf(Crayon(bold=true, foreground=:red), "\n%s ", "check mate!")
+				@printf(Crayon(bold=true, foreground=:red), "\n%s ",
+					"check mate!")
 				@printf(Crayon(reset=true), "\n")
 				Bobby.prettyPrint(b)
 				break
 			else
-				@printf(Crayon(bold=true, foreground=:red), "\n%s ", "$opponent_color is in check!")
+				@printf(Crayon(bold=true, foreground=:red), "\n%s ",
+					"$opponent_color is in check!")
 				@printf(Crayon(reset=true), "\n")
 			end
 		end
@@ -43,7 +45,7 @@ function play()
 	end
 end
 
-function changeColor(color, opponent_color)
+function changeColor(color::String, opponent_color::String)
 	tmp_color = opponent_color
 	opponent_color = color
 	color = tmp_color
@@ -82,11 +84,11 @@ function move(board::Bitboard, lu_tabs::LookUpTables, source::String,
 		# check if the move leads to auto-check
 		movers = Dict()
 		movers['k'] = moveKing
-		movers['p'] = movePawns
+		movers['p'] = movePawn
 		movers['q'] = moveQueen
-		movers['b'] = moveBishops
-		movers['r'] = moveRooks
-		movers['n'] = moveNights
+		movers['b'] = moveBishop
+		movers['r'] = moveRook
+		movers['n'] = moveNight
 		tmp_b = deepcopy(board)
 		tmp_b = movers[lowercase(s_piece_type)](tmp_b, s, t, color)
 
@@ -124,7 +126,6 @@ function checkColor(s_piece_type::Char, color::String="white")
 end
 
 function pgn2int(square::String)
-
 	if length(square) != 2
 		throw(DomainError("square name must be long 2"))
 	end

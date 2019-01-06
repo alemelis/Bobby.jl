@@ -57,7 +57,7 @@ function getRooksValid(board::Bitboard, color::String="white")
 end
 
 
-function moveRooks(board::Bitboard, source::Int64, target::Int64,
+function moveRook(board::Bitboard, source::Int64, target::Int64,
 	color::String="white")
 
 	if color == "white"

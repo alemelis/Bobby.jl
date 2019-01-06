@@ -47,7 +47,7 @@ function getBishopsValid(board::Bitboard, lu_tabs::LookUpTables,
 end
 
 
-function moveBishops(board::Bitboard, source::Int64, target::Int64,
+function moveBishop(board::Bitboard, source::Int64, target::Int64,
 	color::String="white")
 
 	if color == "white"

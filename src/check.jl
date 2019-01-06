@@ -10,14 +10,16 @@ function checkCheck(board::Bitboard, color::String="white")
 	return any(king .& attacked)
 end
 
-function checkMate(board::Bitboard, lu_tabs::LookUpTables, color::String="white")
+function checkMate(board::Bitboard, lu_tabs::LookUpTables,
+	color::String="white")
+
 	if color == "white"
 		king = board.K
 	elseif color == "black"
 		king = board.k
 	end
 
-	if !all(getKingValid(board, lu_tabs, color))
+	if sum(Int.(getKingValid(board, lu_tabs, color))) == 0
 		return true
 	else
 		return false

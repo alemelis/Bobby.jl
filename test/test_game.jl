@@ -12,6 +12,7 @@
 	@test Bobby.pgn2int("a1") == 57
 
 	b = Bobby.buildBoard()
+	l = Bobby.buildLookUpTables()
 	@test Bobby.int2piece(b, 1) == 'r'
 	@test Bobby.int2piece(b, 2) == 'n'
 	@test Bobby.int2piece(b, 3) == 'b'
@@ -34,6 +35,41 @@
 	valid_moves = Bobby.getPawnsValid(b, l, "black")
 	@test_throws DomainError Bobby.checkTarget(64, valid_moves)
 
-	b = Bobby.move(b, l, "e2", "e4")
+	@test_throws DomainError Bobby.checkSource(35, b)
 
+	color = "white"
+	opponent_color = "black"
+	c, oc = Bobby.changeColor(color, opponent_color)
+	@test color == oc
+	@test opponent_color == c
+end
+
+@testset "game" begin
+	b = Bobby.buildBoard()
+	l = Bobby.buildLookUpTables()
+
+	# move pawn
+	b, e = Bobby.move(b, l, "e2", "e4")
+	@test e == ""
+
+	# move knight
+	b, e = Bobby.move(b, l, "b8", "c6", "black")
+	@test e == ""
+
+	# move king
+	b, e = Bobby.move(b, l, "e1", "e2")
+	@test e == ""
+
+	# move rook
+	b, e = Bobby.move(b, l, "a8", "b8", "black")
+	@test e == ""
+
+	# move queen
+	b, e = Bobby.move(b, l, "d1", "e1")
+	@test e == ""
+
+	#move bishop
+	b, e = Bobby.move(b, l, "g2", "g3")
+	b, e = Bobby.move(b, l, "f1", "g2")
+	@test e == ""
 end
