@@ -25,6 +25,19 @@ mutable struct Bitboard
 
 	white_attacks :: BitArray{1} # attacked squares
 	black_attacks :: BitArray{1}
+
+	white_castled :: Bool
+	black_castled :: Bool
+	white_king_moved :: Bool
+	black_king_moved :: Bool
+	a1_rook_moved :: Bool
+	h1_rook_moved :: Bool
+	a8_rook_moved :: Bool
+	h8_rook_moved :: Bool
+	white_OO :: Bool
+	white_OOO :: Bool
+	black_OO :: Bool
+	black_OOO :: Bool
 end
 
 
@@ -60,9 +73,27 @@ function buildBoard()
 	white_attacks = setAttacked()
 	black_attacks = setAttacked("black")
 
+	white_castled = false
+	black_castled = false
+	white_king_moved = false
+	black_king_moved = false
+	a1_rook_moved = false
+	h1_rook_moved = false
+	a8_rook_moved = false
+	h8_rook_moved = false
+	white_OO = false
+	white_OOO = false
+	black_OO = false
+	black_OOO = false
+
 	return Bitboard(white, P, R, N, B, Q, K, black,
 		p, r, n, b, q, k, free, taken,
-		white_attacks, black_attacks)
+		white_attacks, black_attacks,
+		white_castled, black_castled,
+		white_king_moved, black_king_moved,
+		a1_rook_moved, h1_rook_moved,
+		a8_rook_moved, h8_rook_moved,
+		white_OO, white_OOO, black_OO, black_OOO)
 end
 
 

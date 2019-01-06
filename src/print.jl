@@ -53,7 +53,7 @@ function prettyPrint(board::Bitboard)
 		@printf(Crayon(reset=true), "%s | ", ranks[i])
 		for j = 1:8
 			if free[i,j]
-				@printf("⋅ ") # \cdot chatacter
+				@printf(Crayon(reset=true), "⋅ ") # \cdot chatacter
 			else
 				if black[i,j]
 					if p[i,j]
