@@ -50,6 +50,7 @@ function getKingValid(board::Bitboard, lu_tabs::LookUpTables,
 		# update valid squares with opposite color pieces
 		king_valid .= king_valid .| (.~pieces .& shifted_king)
 
+		# don't go on attacked squares
 		king_valid .= king_valid .& .~opponent_attacks
 	end
 
