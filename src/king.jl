@@ -9,11 +9,13 @@ function getKingValid(board::Bitboard, lu_tabs::LookUpTables,
 	if color == "white"
 		king = board.K
 		pieces = board.white
+		opponent_attacks = board.black_attacks
 		short_castling = board.white_OO
 		long_castling = board.white_OOO
 	elseif color == "black"
 		king = board.k
 		pieces = board.black
+		opponent_attacks = board.white_attacks
 		short_castling = board.black_OO
 		long_castling = board.black_OOO
 	end
@@ -47,6 +49,8 @@ function getKingValid(board::Bitboard, lu_tabs::LookUpTables,
 
 		# update valid squares with opposite color pieces
 		king_valid .= king_valid .| (.~pieces .& shifted_king)
+
+		king_valid .= king_valid .& .~opponent_attacks
 	end
 
 	# add castling
