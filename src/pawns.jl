@@ -118,6 +118,7 @@ function movePawn(board::Bitboard, source::Int64, target::Int64,
 	return board
 end
 
+
 function promotePawn(board::Bitboard, target::Int64, color::String="white",
 	new_piece::String="Q")
 

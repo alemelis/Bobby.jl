@@ -30,6 +30,7 @@ function getNightsValid(board::Bitboard, lu_tabs::LookUpTables,
 	return nights_valid .& .~pieces
 end
 
+
 function moveNight(board::Bitboard, source::Int64, target::Int64,
 	color::String="white")
 
