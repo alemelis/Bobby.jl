@@ -1,11 +1,11 @@
-function play()
+function play(player_color="white")
 	b = buildBoard()
 	l = buildLookUpTables()
 	color = "white"
 	opponent_color = "black"
 
 	while true
-		Bobby.prettyPrint(b)
+		Bobby.prettyPrint(b, player_color)
 		println("$color to move, enter source square and press enter")
 		source = readline()
 		if source == "q"
