@@ -27,7 +27,7 @@ end
 Print a colorful board with pieces in algebraic notation
 (capitalised for white and lower cased for black).
 """
-function prettyPrint(board::Bitboard)
+function prettyPrint(board::Bitboard, player_color::String="white")
 	
 	ranks = ["8", "7", "6", "5", "4", "3", "2", "1"]
 	
@@ -57,9 +57,16 @@ function prettyPrint(board::Bitboard)
 	labels = ["pawn", "knight", "bishop", "rook", "queen", "king"]
 
 	@printf("\n  o-----------------o\n")
-	for i = 1:8
+	
+	if player_color == "white"
+		idxs = 1:8
+	else
+		idxs = 8:-1:1
+	end
+
+	for i in idxs
 		@printf(Crayon(reset=true), "%s | ", ranks[i])
-		for j = 1:8
+		for j in idxs
 			if free[i,j]
 				@printf(Crayon(reset=true), "⋅ ") # \cdot chatacter
 			else
@@ -111,5 +118,10 @@ function prettyPrint(board::Bitboard)
 		end
 	end
 	@printf(Crayon(reset=true), "  o-----------------o\n")
-	@printf("    a b c d e f g h\n")
+
+	if player_color == "white"
+		@printf("    a b c d e f g h\n")
+	else
+		@printf("    h g f e d c b a\n")
+	end
 end
