@@ -25,7 +25,7 @@ function play()
 			@printf(Crayon(reset=true), "\n")
 			continue
 		end
-		
+
 		if checkCheck(b, opponent_color)
 			if checkMate(b, l, opponent_color)
 				@printf(Crayon(bold=true, foreground=:red), "\n%s ",
@@ -45,12 +45,14 @@ function play()
 	end
 end
 
+
 function changeColor(color::String, opponent_color::String)
 	tmp_color = opponent_color
 	opponent_color = color
 	color = tmp_color
 	return color, opponent_color
 end
+
 
 function move(board::Bitboard, lu_tabs::LookUpTables, source::String,
 	target::String,	color::String="white")
@@ -92,15 +94,34 @@ function move(board::Bitboard, lu_tabs::LookUpTables, source::String,
 		tmp_b = deepcopy(board)
 		tmp_b = movers[lowercase(s_piece_type)](tmp_b, s, t, color)
 
-	
+		if checkPromotion(s_piece_type, target)
+			promotion = "promote"
+		else
+			promotion = ""
+		end
+
 		board = updateAttacked(tmp_b, lu_tabs, color)
 		board = updateCastling(board)
 
-		return board, ""
+		return board, promotion
 	catch e
 		return board, e
 	end
 end
+
+
+function checkPromotion(s_piece_type::Char, target::String)
+	if lowercase(s_piece_type) != 'p'
+		return false
+	else
+		if target[2] == '8'
+			return true
+		else
+			return false
+		end
+	end
+end
+
 
 function checkSource(source_idx::Int64, board::Bitboard)
 	if board.free[source_idx]
@@ -108,11 +129,13 @@ function checkSource(source_idx::Int64, board::Bitboard)
 	end
 end
 
+
 function checkTarget(target_idx::Int64, valid_moves::BitArray{1})
 	if !valid_moves[target_idx]
 		throw(DomainError("target square not available"))
 	end
 end
+
 
 function checkColor(s_piece_type::Char, color::String="white")
 	if color == "white"
@@ -125,6 +148,7 @@ function checkColor(s_piece_type::Char, color::String="white")
 		end
 	end
 end
+
 
 function pgn2int(square::String)
 	if length(square) != 2
@@ -150,6 +174,7 @@ function pgn2int(square::String)
 
 	return f + (8 - rank)*8
 end
+
 
 function int2piece(board::Bitboard, idx::Int64)
 	if board.free[idx]

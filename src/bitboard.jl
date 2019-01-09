@@ -261,6 +261,7 @@ function setTaken(free::BitArray{1})
 	return taken
 end
 
+
 function setAttacked(color::String="white")
 	attacked = falses(64)
 	if color == "white"
@@ -274,6 +275,7 @@ function setAttacked(color::String="white")
 	end
 	return attacked
 end
+
 
 struct LookUpTables
 	clear_rank :: BitArray{2}

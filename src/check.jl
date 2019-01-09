@@ -10,6 +10,7 @@ function checkCheck(board::Bitboard, color::String="white")
 	return any(king .& attacked)
 end
 
+
 function checkMate(board::Bitboard, lu_tabs::LookUpTables,
 	color::String="white")
 
