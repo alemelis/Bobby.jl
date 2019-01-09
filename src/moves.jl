@@ -98,3 +98,20 @@ function updateAttacked(board::Bitboard, lu_tabs::LookUpTables,
 
 	return board
 end
+
+
+function countAllValidMoves(board::Bitboard, lu_tabs::LookUpTables, color::String="white")
+	validators = Dict()
+	validators['k'] = getKingValid
+	validators['p'] = getPawnsValid
+	validators['q'] = getQueenValid
+	validators['b'] = getBishopsValid
+	validators['r'] = getRooksValid
+	validators['n'] = getNightsValid
+	valids_count = 0
+	for piece in keys(validators)
+		valid_moves = validators[piece](board, lu_tabs, color)
+		valids_count += sum(Int.(valid_moves))
+	end
+	return valids_count
+end
