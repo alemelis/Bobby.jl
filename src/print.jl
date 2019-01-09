@@ -48,6 +48,14 @@ function prettyPrint(board::Bitboard)
 	white = transpose(reshape(board.white, 8, :))
 	black = transpose(reshape(board.black, 8, :))
 
+	pieces = Dict("pawn"=>"o",
+		"rook"=>"π",
+		"knight"=>"η",
+		"bishop"=>"Δ",
+		"queen"=>"Ψ",
+		"king"=>"➕")
+	labels = ["pawn", "knight", "bishop", "rook", "queen", "king"]
+
 	@printf("\n  o-----------------o\n")
 	for i = 1:8
 		@printf(Crayon(reset=true), "%s | ", ranks[i])
@@ -57,34 +65,34 @@ function prettyPrint(board::Bitboard)
 			else
 				if black[i,j]
 					if p[i,j]
-						c = "p"
+						c = pieces["pawn"]
 					elseif r[i,j]
-						c = "r"
+						c = pieces["rook"]
 					elseif n[i,j]
-						c = "n"
+						c = pieces["knight"]
 					elseif b[i,j]
-						c = "b"
+						c = pieces["bishop"]
 					elseif q[i,j]
-						c = "q"
+						c = pieces["queen"]
 					elseif k[i,j]
-						c = "k"
+						c = pieces["king"]
 					else
 						error("Black piece not found")
 					end
 					color = :cyan
 				else
 					if P[i,j]
-						c = "P"
+						c = pieces["pawn"]
 					elseif R[i,j]
-						c = "R"
+						c = pieces["rook"]
 					elseif N[i,j]
-						c = "N"
+						c = pieces["knight"]
 					elseif B[i,j]
-						c = "B"
+						c = pieces["bishop"]
 					elseif Q[i,j]
-						c = "Q"
+						c = pieces["queen"]
 					elseif K[i,j]
-						c = "K"
+						c = pieces["king"]
 					else
 						error("White piece not found")
 					end
@@ -93,7 +101,14 @@ function prettyPrint(board::Bitboard)
 				@printf(Crayon(bold=true, foreground=color), "%s ", c)
 			end
 		end
-		@printf(Crayon(reset=true), "|\n")
+		
+		if i > 1 && i < 8
+			label = labels[i-1]
+			piece = pieces[label]
+			@printf(Crayon(reset=true), "| %s %s \n", piece, label)
+		else
+			@printf(Crayon(reset=true), "|\n")
+		end
 	end
 	@printf(Crayon(reset=true), "  o-----------------o\n")
 	@printf("    a b c d e f g h\n")
