@@ -1,14 +1,4 @@
 # Bobby.jl
-```
-______       _     _       _      _ _ 
-| ___ \     | |   | |    _(_)_   (_) |
-| |_/ / ___ | |__ | |__ (_) (_)   _| |
-| ___ \/ _ \| '_ \| '_ \| | | |  | | |
-| |_/ / (_) | |_) | |_) | |_| |  | | |
-\____/ \___/|_.__/|_.__/ \__, |o | |_|
-                          __/ | _/ |  
-                         |___/ |__/   
-```
 A mediocre chess engine written in Julia
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
