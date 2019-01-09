@@ -1,4 +1,14 @@
 # Bobby.jl
+```
+______       _     _       _      _ _ 
+| ___ \     | |   | |    _(_)_   (_) |
+| |_/ / ___ | |__ | |__ (_) (_)   _| |
+| ___ \/ _ \| '_ \| '_ \| | | |  | | |
+| |_/ / (_) | |_) | |_) | |_| |  | | |
+\____/ \___/|_.__/|_.__/ \__, |. | |_|
+                          __/ | _/ |  
+                         |___/ |__/   
+```
 A mediocre chess engine written in Julia
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -23,14 +33,14 @@ julia> using Bobby
 julia> Bobby.play()
 
   o-----------------o
-8 | r n b q k b n r |
-7 | p p p p p p p p |
-6 | ⋅ ⋅ ⋅ ⋅ ⋅ ⋅ ⋅ ⋅ |
-5 | ⋅ ⋅ ⋅ ⋅ ⋅ ⋅ ⋅ ⋅ |
-4 | ⋅ ⋅ ⋅ ⋅ ⋅ ⋅ ⋅ ⋅ |
-3 | ⋅ ⋅ ⋅ ⋅ ⋅ ⋅ ⋅ ⋅ |
-2 | P P P P P P P P |
-1 | R N B Q K B N R |
+8 | π η Δ Ψ ➕ Δ η π |
+7 | o o o o o o o o | o pawn 
+6 | ⋅ ⋅ ⋅ ⋅ ⋅ ⋅ ⋅ ⋅ | η knight 
+5 | ⋅ ⋅ ⋅ ⋅ ⋅ ⋅ ⋅ ⋅ | Δ bishop 
+4 | ⋅ ⋅ ⋅ ⋅ ⋅ ⋅ ⋅ ⋅ | π rook 
+3 | ⋅ ⋅ ⋅ ⋅ ⋅ ⋅ ⋅ ⋅ | Ψ queen 
+2 | o o o o o o o o | ➕ king 
+1 | π η Δ Ψ ➕ Δ η π |
   o-----------------o
     a b c d e f g h
 white to move, enter source square and press enter
