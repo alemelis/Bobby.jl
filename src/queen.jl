@@ -105,7 +105,7 @@ function getQueenValidList(board::Bitboard, lu_tabs::LookUpTables,
 
     queen_no = sum.(Int.(queen))
 
-    queen_valid = []
+    queen_valid = Set()
 
     if queen_no == 0
         return queen_valid
@@ -140,12 +140,10 @@ function getQueenValidList(board::Bitboard, lu_tabs::LookUpTables,
             qi = (i-1)*8 + j
             if queen[qi]
                 queen_valids = falses(64)
-
                 same_arr = same[j:8:64]
                 other_arr = other[j:8:64]
                 queen_valids[j:8:64] .|= Bobby.slidePiece(same_arr,
                         other_arr, i)
-
                 for k = 1:64
                     if queen_valids[k]
                         if validateQueenMove(board, lu_tabs, qi, k,
@@ -162,23 +160,22 @@ function getQueenValidList(board::Bitboard, lu_tabs::LookUpTables,
     for i = 1:8:64
         queen_arr = queen[i:i+7]
         for l = 1:8
-            qi = i + l - 11
             if queen_arr[l]
                 same_arr = same[i:i+7]
                 other_arr = other[i:i+7]
-                queen_valids = falses(64)
                 for j = 1:8
+                    qi = i + j - 1
                     if queen_arr[j]
-                        queen_valids[i:i+7] .|= Bobby.slidePiece(same_arr,
+                        queen_valids = falses(64)
+                        queen_valids[i:i+7] = Bobby.slidePiece(same_arr,
                             other_arr, j)
-                    end
-                end
-
-                for k = 1:64
-                    if queen_valids[k]
-                        if validateQueenMove(board, lu_tabs, qi, k,
-                            color)
-                            push!(queen_valid, (qi, k))
+                        for k = 1:64
+                            if queen_valids[k]
+                                if validateQueenMove(board, lu_tabs, qi, k,
+                                    color)
+                                    push!(queen_valid, (qi, k))
+                                end
+                            end
                         end
                     end
                 end

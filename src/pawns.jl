@@ -12,7 +12,7 @@ function getPawnsValidList(board::Bitboard, lu_tabs::LookUpTables,
     end
 
     taken = board.taken
-    pawns_valid = []
+    pawns_valid = Set()
 
     for i = 1:64
         if pawns[i]
@@ -36,7 +36,7 @@ function getPawnsValidList(board::Bitboard, lu_tabs::LookUpTables,
 
     pawns_attack = getPawnsAttackTakenList(board, lu_tabs, color)
     
-    return pawns_valid
+    return union(pawns_valid, pawns_attack)
 end
 
 
@@ -136,7 +136,7 @@ function getPawnsAttackTakenList(board::Bitboard, lu_tabs::LookUpTables,
         i2 = 8
     end
 
-    pawns_attack = []
+    pawns_attack = Set()
     for i = 1:64
         if pawns[i] && lu_tabs.clear_file[i,1] && other[i + i1]
             if validatePawnMove(board, lu_tabs, i, i + i1, color)

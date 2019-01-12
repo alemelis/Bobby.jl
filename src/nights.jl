@@ -50,7 +50,7 @@ function getNightsValidList(board::Bitboard, lu_tabs::LookUpTables,
         pieces = board.black
     end
 
-    nights_valid = []
+    nights_valid = Set()
     increments = [-10, -17, -15, -6, 10, 17, 15, 6]
     for i = 1:64
         for j = 1:8

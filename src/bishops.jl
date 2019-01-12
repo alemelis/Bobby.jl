@@ -79,7 +79,7 @@ function getBishopsValidList(board::Bitboard, lu_tabs::LookUpTables,
     bishops_no = sum.(Int.(bishops))
     bishops_seen = 0
 
-    bishop_valid = []
+    bishop_valid = Set()
 
     if bishops_no == 0
         return bishop_valid
