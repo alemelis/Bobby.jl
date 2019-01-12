@@ -111,9 +111,12 @@ function getQueenValidList(board::Bitboard, lu_tabs::LookUpTables,
         return queen_valid
     end
 
+    queen_seen = 0
+
     for s in zip(lu_tabs.starts, lu_tabs.steps, lu_tabs.ends)
         for i = s[1]:s[2]:s[3]
             if queen[i]
+                queen_seen += 1
                 queen_valids = falses(64)
                 queen_arr = queen[s[1]:s[2]:s[3]]
                 for j = 1:length(queen_arr)
@@ -130,15 +133,21 @@ function getQueenValidList(board::Bitboard, lu_tabs::LookUpTables,
                         end
                     end
                 end
+                if queen_seen == queen_no
+                    @goto a
+                end
             end
         end
     end
+    @label a
 
     # files
+    queen_seen = 0
     for j = 1:8
         for i = 1:8
             qi = (i-1)*8 + j
             if queen[qi]
+                queen_seen += 1
                 queen_valids = falses(64)
                 same_arr = same[j:8:64]
                 other_arr = other[j:8:64]
@@ -153,14 +162,20 @@ function getQueenValidList(board::Bitboard, lu_tabs::LookUpTables,
                     end
                 end
             end
+            if queen_seen == queen_no
+                @goto b
+            end
         end
     end
+    @label b
 
     #ranks
+    queen_seen = 0
     for i = 1:8:64
         queen_arr = queen[i:i+7]
         for l = 1:8
             if queen_arr[l]
+                queen_seen += 1
                 same_arr = same[i:i+7]
                 other_arr = other[i:i+7]
                 for j = 1:8
@@ -179,6 +194,9 @@ function getQueenValidList(board::Bitboard, lu_tabs::LookUpTables,
                         end
                     end
                 end
+            end
+            if queen_seen == queen_no
+                return queen_valid
             end
         end
     end

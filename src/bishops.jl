@@ -88,6 +88,7 @@ function getBishopsValidList(board::Bitboard, lu_tabs::LookUpTables,
     for s in zip(lu_tabs.starts, lu_tabs.steps, lu_tabs.ends)
         for i = s[1]:s[2]:s[3]
             if bishops[i]
+                bishops_seen += 1
                 bishops_valids = falses(64)
                 bishops_arr = bishops[s[1]:s[2]:s[3]]
                 for j = 1:length(bishops_arr)
@@ -103,6 +104,9 @@ function getBishopsValidList(board::Bitboard, lu_tabs::LookUpTables,
                             end
                         end
                     end
+                end
+                if bishops_seen == bishops_no
+                    return bishop_valid
                 end
             end
         end

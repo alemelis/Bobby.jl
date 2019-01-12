@@ -50,20 +50,34 @@ function getNightsValidList(board::Bitboard, lu_tabs::LookUpTables,
         pieces = board.black
     end
 
+    nights_no = sum.(Int.(nights))
+    nights_seen = 0
+
     nights_valid = Set()
+
+    if nights_no == 0
+        return nights_valid
+    end
+
     increments = [-10, -17, -15, -6, 10, 17, 15, 6]
     for i = 1:64
-        for j = 1:8
-            if nights[i] && lu_tabs.clear_night_files[i,j]
-                if i + increments[j] >= 1 && i + increments[j] <= 64
-                    if ~pieces[i + increments[j]]
-                        if validateNightMove(board, lu_tabs, i,
-                            i + increments[j], color)
-                            push!(nights_valid, (i, i + increments[j]))
+        if nights[i]
+            nights_seen += 1
+            for j = 1:8
+                if lu_tabs.clear_night_files[i,j]
+                    if i + increments[j] >= 1 && i + increments[j] <= 64
+                        if ~pieces[i + increments[j]]
+                            if validateNightMove(board, lu_tabs, i,
+                                i + increments[j], color)
+                                push!(nights_valid, (i, i + increments[j]))
+                            end
                         end
                     end
                 end
             end
+        end
+        if nights_seen == nights_no
+            return nights_valid
         end
     end
     return nights_valid

@@ -254,6 +254,7 @@ function int2piece(board::Bitboard, idx::Int64)
     end
 end
 
+
 function playPC(player_color="white")
     b = Bobby.buildBoard()
     l = Bobby.buildLookUpTables()

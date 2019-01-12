@@ -14,8 +14,16 @@ function getPawnsValidList(board::Bitboard, lu_tabs::LookUpTables,
     taken = board.taken
     pawns_valid = Set()
 
+    pawns_no = sum.(Int.(pawns))
+    pawns_seen = 0
+
+    if pawns_no == 0
+        return pawns_valid
+    end
+
     for i = 1:64
         if pawns[i]
+            pawns_seen += 1
             front_square = i + increment
             if ~taken[front_square]
                 if validatePawnMove(board, lu_tabs, i, front_square, color)
@@ -25,14 +33,19 @@ function getPawnsValidList(board::Bitboard, lu_tabs::LookUpTables,
                     (increment > 0 && pawns[i] .& lu_tabs.mask_rank[i,7])
                     double_square = front_square + increment
                     if ~taken[double_square]
-                        if validatePawnMove(board, lu_tabs, i, double_square, color)
+                        if validatePawnMove(board, lu_tabs, i, double_square,
+                            color)
                             push!(pawns_valid, (i, double_square))
                         end
                     end
                 end
             end
         end
+        if pawns_seen == pawns_no
+            @goto a
+        end
     end
+    @label a
 
     pawns_attack = getPawnsAttackTakenList(board, lu_tabs, color)
     

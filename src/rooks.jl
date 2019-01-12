@@ -99,11 +99,19 @@ function getRooksValidList(board::Bitboard, lu_tabs::LookUpTables,
 
     rook_valid = Set()
 
+    rooks_no = sum.(Int.(rooks))
+    rooks_seen = 0
+
+    if rooks_no == 0
+        return rook_valid
+    end
+
     #files
     for j = 1:8
         for i = 1:8
             ri = (i-1)*8 + j
             if rooks[ri]
+                rooks_seen += 1
                 rook_valids = falses(64)
                 same_arr = same[j:8:64]
                 other_arr = other[j:8:64]
@@ -118,14 +126,20 @@ function getRooksValidList(board::Bitboard, lu_tabs::LookUpTables,
                     end
                 end
             end
+            if rooks_seen == rooks_no
+                @goto a
+            end
         end
     end
-
+    @label a
+    
     #ranks
+    rooks_seen = 0
     for i = 1:8:64
         rook_arr = rooks[i:i+7]
         for l = 1:8
             if rook_arr[l]
+                rooks_seen += 1
                 same_arr = same[i:i+7]
                 other_arr = other[i:i+7]
                 for j = 1:8
@@ -144,6 +158,9 @@ function getRooksValidList(board::Bitboard, lu_tabs::LookUpTables,
                         end
                     end
                 end
+            end
+            if rooks_seen == rooks_no
+                return rook_valid
             end
         end
     end
