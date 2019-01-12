@@ -48,15 +48,21 @@ function prettyPrint(board::Bitboard, player_color::String="white")
 	white = transpose(reshape(board.white, 8, :))
 	black = transpose(reshape(board.black, 8, :))
 
-	pieces = Dict("pawn"=>"o",
-		"rook"=>"π",
-		"knight"=>"η",
-		"bishop"=>"Δ",
-		"queen"=>"Ψ",
-		"king"=>"➕")
+	pieces = Dict("pawn"=>" o",
+		"rook"=>" Π",
+		"knight"=>" ζ",
+		"bishop"=>" Δ",
+		"queen"=>" Ψ",
+		"king"=>" +")
+	# pieces = Dict("pawn"=>" o",
+	# 	"rook"=>" R",
+	# 	"knight"=>" N",
+	# 	"bishop"=>" B",
+	# 	"queen"=>" Q",
+	# 	"king"=>" K")
 	labels = ["pawn", "knight", "bishop", "rook", "queen", "king"]
 
-	@printf("\n  o-----------------o\n")
+	@printf("\n  o-------------------------o\n")
 	
 	if player_color == "white"
 		idxs = 1:8
@@ -64,11 +70,18 @@ function prettyPrint(board::Bitboard, player_color::String="white")
 		idxs = 8:-1:1
 	end
 
+	bgc = "w"
 	for i in idxs
 		@printf(Crayon(reset=true), "%s | ", ranks[i])
 		for j in idxs
 			if free[i,j]
-				@printf(Crayon(reset=true), "⋅ ") # \cdot chatacter
+				if bgc == "w"
+					@printf(Crayon(reset=true, background=:dark_gray), "   ") # \cdot chatacter
+					bgc = "b"
+				else
+					@printf(Crayon(reset=true, background=:default), "   ") # \cdot chatacter
+					bgc = "w"
+				end
 			else
 				if black[i,j]
 					if p[i,j]
@@ -86,7 +99,7 @@ function prettyPrint(board::Bitboard, player_color::String="white")
 					else
 						error("Black piece not found")
 					end
-					color = :cyan
+					color = :light_magenta
 				else
 					if P[i,j]
 						c = pieces["pawn"]
@@ -103,9 +116,16 @@ function prettyPrint(board::Bitboard, player_color::String="white")
 					else
 						error("White piece not found")
 					end
-					color = :light_gray
+					color = :light_cyan
 				end
-				@printf(Crayon(bold=true, foreground=color), "%s ", c)
+				if bgc == "w"
+					@printf(Crayon(bold=true, foreground=color, background=:dark_gray), "%s ", c)
+					bgc = "b"
+				else
+					@printf(Crayon(bold=true, foreground=color, background=:default), "%s ", c)
+					bgc = "w"
+				end
+				
 			end
 		end
 		
@@ -116,12 +136,17 @@ function prettyPrint(board::Bitboard, player_color::String="white")
 		else
 			@printf(Crayon(reset=true), "|\n")
 		end
+		if bgc == "w"
+			bgc = "b"
+		else
+			bgc = "w"
+		end
 	end
-	@printf(Crayon(reset=true), "  o-----------------o\n")
+	@printf(Crayon(reset=true), "  o-------------------------o\n")
 
 	if player_color == "white"
-		@printf("    a b c d e f g h\n")
+		@printf("     a  b  c  d  e  f  g  h\n")
 	else
-		@printf("    h g f e d c b a\n")
+		@printf("     h  g  f  e  d  c  b  a\n")
 	end
 end
