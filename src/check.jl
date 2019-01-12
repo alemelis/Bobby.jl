@@ -20,10 +20,15 @@ function checkMate(board::Bitboard, lu_tabs::LookUpTables,
         king = board.k
     end
 
-    if sum(Int.(getKingValid(board, lu_tabs, color))) == 0
-        return true
-    else
+    if sum(Int.(getKingValid(board, lu_tabs, color))) != 0
         return false
+    else
+        moves = getAllMoves(board, lu_tabs, color)
+        if length(moves) == 0
+            return true
+        else
+            return false
+        end
     end
 end
 
