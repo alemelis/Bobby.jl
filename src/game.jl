@@ -54,6 +54,14 @@ function changeColor(color::String, opponent_color::String)
 end
 
 
+function changeColor(color::String)
+    if color == "white"
+        return "black"
+    else
+        return "white"
+    end
+end
+
 function move(board::Bitboard, lu_tabs::LookUpTables, source::String,
     target::String, color::String="white")
     
@@ -107,6 +115,46 @@ function move(board::Bitboard, lu_tabs::LookUpTables, source::String,
     catch e
         return board, e
     end
+end
+
+
+function move(board::Bitboard, lu_tabs::LookUpTables, s::Int64,
+    t::Int64, color::String="white")
+
+    if color == "white"
+        if board.K[s]
+            board = moveKing(board, s, t, color)
+        elseif board.P[s]
+            board = movePawn(board, s, t, color)
+        elseif board.R[s]
+            board = moveRook(board, s, t, color)
+        elseif board.N[s]
+            board = moveNight(board, s, t, color)
+        elseif board.Q[s]
+            board = moveQueen(board, s, t, color)
+        else
+            board = moveBishop(board, s, t, color)
+        end
+    else
+        if board.k[s]
+            board = moveKing(board, s, t, color)
+        elseif board.p[s]
+            board = movePawn(board, s, t, color)
+        elseif board.r[s]
+            board = moveRook(board, s, t, color)
+        elseif board.n[s]
+            board = moveNight(board, s, t, color)
+        elseif board.q[s]
+            board = moveQueen(board, s, t, color)
+        else
+            board = moveBishop(board, s, t, color)
+        end
+    end
+
+    board = updateAttacked(board, lu_tabs, color)
+    board = updateCastling(board)
+
+    return board, ""
 end
 
 
@@ -203,5 +251,93 @@ function int2piece(board::Bitboard, idx::Int64)
         return 'n'
     elseif board.r[idx]
         return 'r'
+    end
+end
+
+function playPC(player_color="white")
+    b = Bobby.buildBoard()
+    l = Bobby.buildLookUpTables()
+
+    color = "white"
+    opponent_color = "black"
+
+    while true
+        Bobby.prettyPrint(b, player_color)
+
+        good_moves = getAllMoves(b, l, color)
+
+        println("$color to move, enter source square and press enter")
+        source = readline()
+        if source == "q"
+            break
+        end
+        println("enter target square and press enter")
+        target = readline()
+
+        try
+            s = pgn2int(source)
+            t = pgn2int(target)
+
+            if ~((s, t) in good_moves)
+                @printf(Crayon(bold=true, foreground=:yellow), "\nInvalid move! Try again ")
+                @printf(Crayon(reset=true), "\n")
+                continue
+            end
+        catch er
+            @printf(Crayon(bold=true, foreground=:yellow), "\n%s ", er)
+            @printf(Crayon(reset=true), "\n")
+            continue
+        end
+
+        b, e = move(b, l, source, target, color)
+
+        if checkCheck(b, opponent_color)
+            if checkMate(b, l, opponent_color)
+                @printf(Crayon(bold=true, foreground=:red), "\n%s ",
+                    "check mate!")
+                @printf(Crayon(reset=true), "\n")
+                Bobby.prettyPrint(b)
+                break
+            else
+                @printf(Crayon(bold=true, foreground=:red), "\n%s ",
+                    "$opponent_color is in check!")
+                @printf(Crayon(reset=true), "\n")
+            end
+        end
+
+        color, opponent_color = changeColor(color, opponent_color)
+
+        good_moves = getAllMoves(b, l, color)
+        if length(good_moves) == 0
+            println("!!!!!")
+        end
+
+        ri = rand(1:length(good_moves))
+        i = 1
+        for m in good_moves
+            if i == ri
+                move(b, l, m[1], m[2], color)
+                break
+            else
+                i += 1
+            end
+        end
+
+        if checkCheck(b, opponent_color)
+            if checkMate(b, l, opponent_color)
+                @printf(Crayon(bold=true, foreground=:red), "\n%s ",
+                    "check mate!")
+                @printf(Crayon(reset=true), "\n")
+                Bobby.prettyPrint(b)
+                break
+            else
+                @printf(Crayon(bold=true, foreground=:red), "\n%s ",
+                    "$opponent_color is in check!")
+                @printf(Crayon(reset=true), "\n")
+            end
+        end
+
+        color, opponent_color = changeColor(color, opponent_color)
+        Bobby.prettyPrint(b, player_color)
     end
 end
