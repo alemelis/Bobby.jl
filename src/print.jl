@@ -76,10 +76,10 @@ function prettyPrint(board::Bitboard, player_color::String="white")
 		for j in idxs
 			if free[i,j]
 				if bgc == "w"
-					@printf(Crayon(reset=true, background=:dark_gray), "   ") # \cdot chatacter
+					@printf(Crayon(reset=true, background=:dark_gray), "   ")
 					bgc = "b"
 				else
-					@printf(Crayon(reset=true, background=:default), "   ") # \cdot chatacter
+					@printf(Crayon(reset=true, background=:default), "   ")
 					bgc = "w"
 				end
 			else
@@ -119,10 +119,12 @@ function prettyPrint(board::Bitboard, player_color::String="white")
 					color = :light_cyan
 				end
 				if bgc == "w"
-					@printf(Crayon(bold=true, foreground=color, background=:dark_gray), "%s ", c)
+					@printf(Crayon(bold=true, foreground=color,
+						background=:dark_gray), "%s ", c)
 					bgc = "b"
 				else
-					@printf(Crayon(bold=true, foreground=color, background=:default), "%s ", c)
+					@printf(Crayon(bold=true, foreground=color,
+						background=:default), "%s ", c)
 					bgc = "w"
 				end
 				
