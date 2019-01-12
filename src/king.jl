@@ -152,3 +152,36 @@ function updateCastling(board::Bitboard)
 
     return board
 end
+
+
+function getKingValidList(board::Bitboard, lu_tabs::LookUpTables,
+    color::String="white")
+
+    king_valids = getKingValid(board, lu_tabs, color)
+
+    king_valid = Set()
+
+    if color == "white"
+        ki = findmax(board.K)[2]
+    else
+        ki = findmax(board.k)[2]
+    end
+
+    for i = 1:64
+        if king_valids[i]
+            if validateKingMove(board, lu_tabs, ki, i, color)
+                push!(king_valid, (ki, i))
+            end
+        end
+    end
+
+    return king_valid
+end
+
+
+function validateKingMove(board, lu_tabs, source, target, color)
+    tmp_b = deepcopy(board)
+    tmp_b = moveKing(tmp_b, source, target, color)
+
+    return  ~willBeInCheck(tmp_b, lu_tabs, color)
+end
