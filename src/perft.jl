@@ -18,10 +18,11 @@ mutable struct PerftTree
 end
 
 
-function perft(board, lu_tabs, depth)
+function perft(board, lu_tabs, depth, color::String="white")
     pt = PerftTree(zeros(depth), zeros(depth), zeros(depth))
-    pt = explore(pt, board, lu_tabs, depth, 1, "white")
-    return pt
+    pt = explore(pt, board, lu_tabs, depth, 1, color)
+    println(pt)
+    println(sum(pt.nodes))
 end
 
 function explore(pt::PerftTree, board::Bitboard, lu_tabs::LookUpTables, 

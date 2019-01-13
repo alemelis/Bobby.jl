@@ -19,6 +19,8 @@ function moveSourceTargetWhite(board::Bitboard, source::Int64, target::Int64)
         elseif board.q[target]
             board.q[target] = false
         elseif board.k[target]
+            prettyPrint(board)
+            println(source, " ", target)
             throw(DomainError("black king in target square"))
         end
     end

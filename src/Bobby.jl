@@ -17,5 +17,6 @@ module Bobby
     include("magic.jl")
     include("check.jl")
     include("game.jl")
-
+    include("parser.jl")
+    
 end

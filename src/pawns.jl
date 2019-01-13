@@ -140,23 +140,25 @@ function getPawnsAttackTakenList(board::Bitboard, lu_tabs::LookUpTables,
     if color == "white"
         pawns = board.P
         other = board.black
+        other_king = board.k
         i1 = -9 #upward
         i2 = -7
     elseif color == "black"
         pawns = board.p
         other = board.white
+        other_king = board.K
         i1 = 8 #downward
         i2 = 8
     end
 
     pawns_attack = Set()
     for i = 1:64
-        if pawns[i] && lu_tabs.clear_file[i,1] && other[i + i1]
+        if pawns[i] && lu_tabs.clear_file[i,1] && other[i + i1] && ~other_king[i + i1]
             if validatePawnMove(board, lu_tabs, i, i + i1, color)
                 push!(pawns_attack, (i, i + i1))
             end
         end
-        if pawns[i] && lu_tabs.clear_file[i,8] && other[i + i2]
+        if pawns[i] && lu_tabs.clear_file[i,8] && other[i + i2] && ~other_king[i + i2]
             if validatePawnMove(board, lu_tabs, i, i + i2, color)
                 push!(pawns_attack, (i, i + i2))
             end
