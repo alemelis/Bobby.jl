@@ -153,30 +153,134 @@ function updateCastling(board::Bitboard)
     return board
 end
 
-
-function getKingValidList(board::Bitboard, lu_tabs::LookUpTables,
+function getKingValido(board::Bitboard, lu_tabs::LookUpTables,
     color::String="white")
 
-    king_valids = getKingValid(board, lu_tabs, color)
-
-    king_valid = Set()
-
     if color == "white"
-        ki = findmax(board.K)[2]
-    else
-        ki = findmax(board.k)[2]
+        king = board.K
+        pieces = board.white
+        opponent_attacks = board.black_attacks
+        short_castling = board.white_OO
+        long_castling = board.white_OOO
+        other = board.black
+    elseif color == "black"
+        king = board.k
+        pieces = board.black
+        opponent_attacks = board.white_attacks
+        short_castling = board.black_OO
+        long_castling = board.black_OOO
+        other = board.white
     end
 
+    # no valid squares have been found yet
+    king_valid = Set() #falses(64)
+
+    # generate possible moves without considering opposite color pieces
+    shifts = [9, 8, 7, 1, -1, -9, -8, -7]
+
     for i = 1:64
-        if king_valids[i]
-            if validateKingMove(board, lu_tabs, ki, i, color)
-                push!(king_valid, (ki, i))
+        if king[i]
+            for j = 1:8
+                shift = shifts[j]
+                if (i + shift > 64 || i + shift < 1) || pieces[i + shift] || 
+                    opponent_attacks[i+ shift]
+                    continue
+                elseif lu_tabs.mask_file[i,1]
+                    if shift in [-9, -1, 7]
+                        continue
+                    else
+                        king_valid = maskKingRank(pieces, opponent_attacks,
+                            lu_tabs, i, shift, king_valid)
+                    end
+                elseif lu_tabs.mask_file[i,8]
+                    if shift in [-7, 1, 9]
+                        continue
+                    else
+                        king_valid = maskKingRank(pieces, opponent_attacks,
+                            lu_tabs, i, shift, king_valid)
+                    end
+                else
+                    king_valid = maskKingRank(pieces, opponent_attacks,
+                        lu_tabs, i, shift, king_valid)
+                end
             end
+            break
+        end
+    end
+
+    # add castling
+    if color == "white"
+        if short_castling
+            push!(king_valid, (61, 63))
+        end
+        if long_castling
+            push!(king_valid, (61, 59))
+        end
+    else
+        if short_castling
+            push!(king_valid, (5, 7))
+        end
+        if long_castling
+            push!(king_valid, (5, 3))
         end
     end
 
     return king_valid
 end
+
+function maskKingRank(pieces, opponent_attacks, lu_tabs, i, shift, king_valid)
+    if lu_tabs.mask_rank[i,1]
+        if shift in [7, 8, 9]
+            return king_valid
+        else
+            push!(king_valid, (i, i + shift))
+            return king_valid
+        end
+    elseif lu_tabs.mask_rank[i,8]
+        if shift in [-9, -8, -7]
+            return king_valid
+        else
+            push!(king_valid, (i, i + shift))
+            return king_valid
+        end
+    else
+        push!(king_valid, (i, i + shift))
+        return king_valid
+    end
+    # return king_valid
+end
+
+function getKingValidList(board::Bitboard, lu_tabs::LookUpTables,
+    color::String="white")
+
+    king_valid = getKingValido(board, lu_tabs, color)
+
+    return king_valid
+end
+
+# function getKingValidList(board::Bitboard, lu_tabs::LookUpTables,
+#     color::String="white")
+
+#     king_valids = getKingValid(board, lu_tabs, color)
+
+#     king_valid = Set()
+
+#     if color == "white"
+#         ki = findmax(board.K)[2]
+#     else
+#         ki = findmax(board.k)[2]
+#     end
+
+#     for i = 1:64
+#         if king_valids[i]
+#             if validateKingMove(board, lu_tabs, ki, i, color)
+#                 push!(king_valid, (ki, i))
+#             end
+#         end
+#     end
+
+#     return king_valid
+# end
 
 
 function validateKingMove(board, lu_tabs, source, target, color)
