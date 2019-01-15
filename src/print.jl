@@ -1,7 +1,67 @@
 """
+    ugly_print(i::UInt64)
+
+Print any UInt64 bitboard in shape 8x8 (transposed) to REPL for debuggin
+purposes.
+"""
+function ugly_print(i::UInt64)
+    bit_array = uint_to_bitarray(i)
+    uglyPrint(bit_array)
+end
+
+
+"""
+    binary_string_to_bitarray(s::String)
+
+Convert a binary string to BitArray format for plotting purposes.
+
+Example:
+--------
+
+    julia> Bobby.binary_string_to_bitarray(
+        "0000000000000000000000000000000000000000000000000000000000000001")
+    64-element BitArray{1}:
+     false
+         ⋮
+      true
+"""
+function binary_string_to_bitarray(s::String)
+    bit_array = falses(64)
+    for i = 1:64
+        if s[i] == '1'
+            bit_array[i] = true
+        end
+    end
+
+    return bit_array
+end
+
+
+"""
+    uint_to_bitarray(i::UInt64)
+
+Convert a UInt64 to BitArray format for plotting purposes.
+
+Example:
+--------
+
+    julia> Bobby.uint_to_bitarray(0x000000000000ffff)
+    64-element BitArray{1}:
+     false
+         ⋮
+      true
+"""
+function uint_to_bitarray(i::UInt64)
+    bs = uint_to_binary_string(i)
+    return binary_string_to_bitarray(bs)
+end
+
+
+"""
     uglyPrint(b::BitArray)
 
-Print any bitboard in shape 8x8 (transposed) to REPL for debuggin purposes.
+Print any BitArray bitboard in shape 8x8 (transposed) to REPL for debuggin
+purposes.
 """
 function uglyPrint(b::BitArray)
 
@@ -27,7 +87,7 @@ end
 Print a colorful board with pieces in algebraic notation
 (capitalised for white and lower cased for black).
 """
-function prettyPrint(board::Bitboard, player_color::String="white")
+function prettyPrint(board::Bitboard_, player_color::String="white")
     
     ranks = ["8", "7", "6", "5", "4", "3", "2", "1"]
     

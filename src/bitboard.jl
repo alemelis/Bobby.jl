@@ -1,9 +1,163 @@
 """
+    generate_pgn_square_to_int()
+
+Generate a dictionary containing all the board squares as UInt64. Squares are
+hashed through their pgn-notation name.
+
+Example:
+--------
+
+    julia> Bobby.generate_pgn_square_to_uint()
+    Dict{String,UInt64} with 64 entries:
+      "d7" => 0x0010000000000000
+      "e4" => 0x0000000008000000
+      ⋮    => ⋮
+"""
+function generate_pgn_square_to_uint()
+    pgn_squares = Dict{String,UInt64}()
+
+    i = 0
+    for rank in 8:-1:1
+        for file in 1:8
+           square = "0"^i * "1" * "0"^(63 - i)
+           square_int = binary_string_to_int(square)
+           pgn_coordinate = string(Char(Int('a')+(file - 1))) * string(rank)
+           push!(pgn_squares, pgn_coordinate=>square_int)
+           i += 1
+        end
+    end
+
+    return pgn_squares
+end
+
+
+"""
+    generate_pgn_square_to_int()
+
+Generate a dictionary containing all the board squares as Int64. Squares are
+hashed through their pgn-notation name.
+
+Example:
+--------
+
+    julia> squares = Bobby.generate_pgn_square_to_int()
+    Dict{String,Int64} with 64 entries:
+      "d7" => 11
+      "a5" => 24
+      ⋮    => ⋮
+"""
+function generate_pgn_square_to_int()
+    pgn_squares = Dict{String,Int64}()
+
+    i = 1
+    for rank in 8:-1:1
+        for file in 1:8
+           pgn_coordinate = string(Char(Int('a')+(file - 1))) * string(rank)
+           push!(pgn_squares, pgn_coordinate=>i)
+           i += 1
+        end
+    end
+
+    return pgn_squares
+end
+
+
+"""
+    generate_int_to_uint()
+
+Generate a dictionary pointing squares index to their UInt representation.
+
+Example:
+--------
+
+    julia> Bobby.generate_int_to_uint()
+    Dict{Int64,UInt64} with 64 entries:
+      2  => 0x4000000000000000
+      11 => 0x0020000000000000
+      ⋮  => ⋮
+"""
+function generate_int_to_uint()
+    squares_int_uint = Dict{Int64,UInt64}()
+
+    pgn_squares_int = generate_pgn_square_to_int()
+    pgn_squares_uint = generate_pgn_square_to_uint()
+
+    for k in keys(pgn_squares_int)
+        push!(squares_int_uint, pgn_squares_int[k]=>pgn_squares_uint[k])
+    end
+
+    return squares_int_uint
+end
+
+
+"""
+    Bitboard
+
+Data structure for the chess board.
+"""
+mutable struct Bitboard
+    white :: UInt64 # all white pieces
+    P :: UInt64
+    R :: UInt64
+    N :: UInt64
+    B :: UInt64
+    Q :: UInt64
+    K :: UInt64
+
+    black :: UInt64 # all black pieces
+    p :: UInt64
+    r :: UInt64
+    n :: UInt64
+    b :: UInt64
+    q :: UInt64
+    k :: UInt64
+
+    free :: UInt64  # all free squares
+    taken :: UInt64 # all pieces
+
+    white_attacks :: UInt64 # attacked squares
+    black_attacks :: UInt64
+
+    white_castled :: Bool
+    black_castled :: Bool
+    white_king_moved :: Bool
+    black_king_moved :: Bool
+    a1_rook_moved :: Bool
+    h1_rook_moved :: Bool
+    a8_rook_moved :: Bool
+    h8_rook_moved :: Bool
+    white_OO :: Bool
+    white_OOO :: Bool
+    black_OO :: Bool
+    black_OOO :: Bool
+end
+
+
+"""
+    set_board()
+
+Set board in starting position.
+"""
+function set_board()
+    return fen_to_bitboard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR")
+end
+
+
+
+
+
+
+
+
+
+# ------
+
+"""
     Bitboard
 
 Bitboard mutable structure.
 """
-mutable struct Bitboard
+mutable struct Bitboard_
     white :: BitArray{1} # all white pieces
     P :: BitArray{1}
     R :: BitArray{1}
