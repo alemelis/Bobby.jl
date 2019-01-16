@@ -16,7 +16,7 @@ end
 
 
 """
-    int_to_binary_string(i::UInt64)
+    uint_to_binary_string(i::UInt64)
 
 Convert an UInt64 to a 64-characters long string.
 
