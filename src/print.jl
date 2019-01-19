@@ -1,12 +1,20 @@
 """
     ugly_print(i::UInt64)
 
-Print any UInt64 bitboard in shape 8x8 (transposed) to REPL for debuggin
+Print any UInt64 bitboard in shape 8x8 (transposed) to REPL for debugging
 purposes.
 """
 function ugly_print(i::UInt64)
     bit_array = uint_to_bitarray(i)
     uglyPrint(bit_array)
+end
+
+function ugly_print(pieces_array::Array{UInt64,1})
+    pieces_uint = UInt64(0)
+    for piece in pieces_array
+        c |= p
+    end
+    ugly_print(pieces_uint)
 end
 
 
@@ -81,8 +89,10 @@ function uglyPrint(b::BitArray)
 end
 
 
+#-------------
+
 """
-    prettyPrint(board::Bitboard)
+    prettyPrint(board::Bitboard_)
 
 Print a colorful board with pieces in algebraic notation
 (capitalised for white and lower cased for black).

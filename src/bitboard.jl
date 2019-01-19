@@ -97,19 +97,19 @@ Data structure for the chess board.
 """
 mutable struct Bitboard
     white :: UInt64 # all white pieces
-    P :: UInt64
-    R :: UInt64
-    N :: UInt64
-    B :: UInt64
-    Q :: UInt64
+    P :: Array{UInt64,1}
+    R :: Array{UInt64,1}
+    N :: Array{UInt64,1}
+    B :: Array{UInt64,1}
+    Q :: Array{UInt64,1}
     K :: UInt64
 
     black :: UInt64 # all black pieces
-    p :: UInt64
-    r :: UInt64
-    n :: UInt64
-    b :: UInt64
-    q :: UInt64
+    p :: Array{UInt64,1}
+    r :: Array{UInt64,1}
+    n :: Array{UInt64,1}
+    b :: Array{UInt64,1}
+    q :: Array{UInt64,1}
     k :: UInt64
 
     free :: UInt64  # all free squares

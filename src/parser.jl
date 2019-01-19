@@ -72,20 +72,20 @@ end
 
 function fen_to_bitboard(fen::String, squares::Dict{Int64,UInt64})
     white = UInt64(0)
-    R = UInt64(0)
-    N = UInt64(0)
-    B = UInt64(0)
-    Q = UInt64(0)
+    R = zeros(UInt64, 0)
+    N = zeros(UInt64, 0)
+    B = zeros(UInt64, 0)
+    Q = zeros(UInt64, 0)
     K = UInt64(0)
-    P = UInt64(0)
+    P = zeros(UInt64, 0)
 
     black = UInt64(0)
-    r = UInt64(0)
-    n = UInt64(0)
-    b = UInt64(0)
-    q = UInt64(0)
+    r = zeros(UInt64, 0)
+    n = zeros(UInt64, 0)
+    b = zeros(UInt64, 0)
+    q = zeros(UInt64, 0)
     k = UInt64(0)
-    p = UInt64(0)
+    p = zeros(UInt64, 0)
 
     white_attacks = UInt64(0)
     black_attacks = UInt64(0)
@@ -103,6 +103,8 @@ function fen_to_bitboard(fen::String, squares::Dict{Int64,UInt64})
     black_OO = false
     black_OOO = false
 
+    int_to_uint = generate_int_to_uint()
+
     square_i = 1
     fen_i = 1
     while true
@@ -117,33 +119,33 @@ function fen_to_bitboard(fen::String, squares::Dict{Int64,UInt64})
                 # white
                 white |= squares[square_i]
                 if c == 'R'
-                    R |= squares[square_i]
+                    push!(R, int_to_uint[square_i])
                 elseif c == 'N'
-                    N |= squares[square_i]
+                    push!(N, int_to_uint[square_i])
                 elseif c == 'B'
-                    B |= squares[square_i]
+                    push!(B, int_to_uint[square_i])
                 elseif c == 'Q'
-                    Q |= squares[square_i]
+                    push!(Q, int_to_uint[square_i])
                 elseif c == 'K'
                     K |= squares[square_i]
                 elseif c == 'P'
-                    P |= squares[square_i]
+                    push!(P, int_to_uint[square_i])
                 end
             else
                 # black
                 black |= squares[square_i]
                 if c == 'r'
-                    r |= squares[square_i]
+                    push!(r, int_to_uint[square_i])
                 elseif c == 'n'
-                    n |= squares[square_i]
+                    push!(n, int_to_uint[square_i])
                 elseif c == 'b'
-                    b |= squares[square_i]
+                    push!(b, int_to_uint[square_i])
                 elseif c == 'q'
-                    q |= squares[square_i]
+                    push!(q, int_to_uint[square_i])
                 elseif c == 'k'
                     k |= squares[square_i]
                 elseif c == 'p'
-                    p |= squares[square_i]
+                    push!(p, int_to_uint[square_i])
                 end
             end
             square_i += 1
