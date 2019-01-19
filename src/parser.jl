@@ -48,6 +48,44 @@ end
 
 
 """
+    uint_array_to_uint(uint_array::Array{UInt64,1})
+
+Convert an array on UInt64s to a single UInt64 through | operator.
+
+Example:
+--------
+
+    julia> Bobby.uint_array_to_uint(b.p)
+    0x00ff000000000000
+"""
+function uint_array_to_uint(pieces_array::Array{UInt64,1})
+    pieces_uint = UInt64(0)
+    for piece in pieces_array
+        pieces_uint |= piece
+    end
+    return pieces_uint
+end
+
+
+"""
+    uint_array_to_bitarray(pieces_array::Array{UInt64,1})
+
+Convert an UInt64 to BitArray.
+
+Example:
+--------
+    julia> Bobby.uint_array_to_bitarray(b.p)
+    64-element BitArray{1}:
+     false
+         ⋮
+     false
+"""
+function uint_array_to_bitarray(pieces_array::Array{UInt64,1})
+    return uint_to_bitarray(uint_array_to_uint(pieces_array))
+end
+
+
+"""
     fen_to_bitboard(fen::String)
 
 Populate a Bitboard starting from a board position given in FEN notation.
