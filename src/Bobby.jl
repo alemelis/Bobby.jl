@@ -3,7 +3,6 @@ module Bobby
     export Bitboard
     using Printf
     using Crayons
-    using HDF5
 
     include("bitboard.jl")
     include("print.jl")
