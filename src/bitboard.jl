@@ -50,14 +50,6 @@ function set_board()
     return fen_to_bitboard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR")
 end
 
-
-
-
-
-
-
-
-
 # ------
 
 """
