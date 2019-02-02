@@ -14,18 +14,11 @@ Example:
      0x0000200000000000
      0x0000800000000000
 """
-function generate_night_valid(source_square::UInt64)
-    # knights lookup tables
-    clear_files = [0x3f3f3f3f3f3f3f3f, 0x7f7f7f7f7f7f7f7f,
-                   0xfefefefefefefefe, 0xfcfcfcfcfcfcfcfc,
-                   0xfcfcfcfcfcfcfcfc, 0xfefefefefefefefe,
-                   0x7f7f7f7f7f7f7f7f, 0x3f3f3f3f3f3f3f3f]
-    jumps = [-10, -17, -15, -6, 10, 17, 15, 6]
-
+function gen_night_valid(source_square::UInt64)
     target_squares = zeros(UInt64, 0)
-    for cj in zip(clear_files, jumps)
+    for cj in zip(NIGHT_CLEAR_FILES, NIGHT_JUMPS)
         candidate_square = (source_square & cj[1]) >> cj[2]
-        if candidate_square != 0x0000000000000000
+        if candidate_square != EMPTY
             push!(target_squares, candidate_square)
         end
     end
@@ -49,11 +42,11 @@ Example:
       0x0040000000000000 => UInt64[0x1000000000000000, 0x0000100000000000,…
     ⋮  => ⋮
 """
-function generate_all_night_moves()
-    int_to_uint = generate_int_to_uint()
+function gen_all_night_moves()
+    int_to_uint = gen_int_to_uint_dict()
     night_moves = Dict{UInt64, Array{UInt64,1}}()
     for i in 1:64
-        night_moves[int_to_uint[i]] = generate_night_valid(int_to_uint[i])
+        night_moves[int_to_uint[i]] = gen_night_valid(int_to_uint[i])
     end
     return night_moves
 end

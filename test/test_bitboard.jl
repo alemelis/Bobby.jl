@@ -1,17 +1,4 @@
 @testset "bitboard" begin
-
-    squares_uint = Bobby.generate_pgn_square_to_uint()
-    @test haskey(squares_uint, "e2")
-    @test squares_uint["e2"] == 0x0000000000000800
-
-    squares_int = Bobby.generate_pgn_square_to_int()
-    @test haskey(squares_int, "e2")
-    @test squares_int["a8"] == 1
-
-    squares_int_uint = Bobby.generate_int_to_uint()
-    @test haskey(squares_int_uint, 1)
-    @test squares_int_uint[2] == 0x4000000000000000
-
     #--------------
 #     white_pawns = Bobby.setPawns()
 #     @test all(white_pawns[57:end] .== false)

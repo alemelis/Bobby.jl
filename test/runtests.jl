@@ -5,9 +5,13 @@ using Bobby
     include("test_parser.jl")
 end
 
-@testset "bitboard.jl" begin
-    include("test_bitboard.jl")
+@testset "converters.jl" begin
+    include("test_converters.jl")
 end
+
+# @testset "bitboard.jl" begin
+#     include("test_bitboard.jl")
+# end
 
 # @testset "moves.jl" begin
 #     include("test_moves.jl")

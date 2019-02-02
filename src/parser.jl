@@ -1,146 +1,4 @@
 """
-    binary_string_to_int(binary_string::String)
-
-Convert a 64-characters long string representing a binary number into an Int64.
-
-Example:
---------
-
-    julia> Bobby.binary_string_to_int(
-    "0000000000000000000000000000000000000000000000000000000000000001")
-    0x0000000000000001
-"""
-function binary_string_to_int(binary_string::String)
-    return parse(UInt64, binary_string; base=2)
-end
-
-
-"""
-    uint_to_binary_string(i::UInt64)
-
-Convert an UInt64 to a 64-characters long string.
-
-Example:
---------
-
-    julia> Bobby.uint_to_binary_string(0x0000000000000001)
-    "0000000000000000000000000000000000000000000000000000000000000001"
-"""
-function uint_to_binary_string(i::UInt64)
-    return bitstring(i)
-end
-
-
-"""
-    int_to_binary_string(i::Int64)
-
-Convert an Int64 to a 64-characters long string.
-
-Example:
---------
-
-    julia> Bobby.int_to_binary_string(1)
-    "0000000000000000000000000000000000000000000000000000000000000001"
-"""
-function int_to_binary_string(i::Int64)
-    return bitstring(i)
-end
-
-
-"""
-    uint_array_to_uint(uint_array::Array{UInt64,1})
-
-Convert an array on UInt64s to a single UInt64 through | operator.
-
-Example:
---------
-
-    julia> Bobby.uint_array_to_uint(b.p)
-    0x00ff000000000000
-"""
-function uint_array_to_uint(pieces_array::Array{UInt64,1})
-    pieces_uint = UInt64(0)
-    for piece in pieces_array
-        pieces_uint |= piece
-    end
-    return pieces_uint
-end
-
-
-"""
-    uint_array_to_bitarray(pieces_array::Array{UInt64,1})
-
-Convert an UInt64 to BitArray.
-
-Example:
---------
-    julia> Bobby.uint_array_to_bitarray(b.p)
-    64-element BitArray{1}:
-     false
-         ⋮
-     false
-"""
-function uint_array_to_bitarray(pieces_array::Array{UInt64,1})
-    return uint_to_bitarray(uint_array_to_uint(pieces_array))
-end
-
-
-"""
-    bitarray_to_binary_string(bit_array::BitArray{1})
-
-Convert a BitArray to a 64-characters long string.
-
-Example:
---------
-    julia> Bobby.bitarray_to_binary_string(l.clear_night_files[:,1])
-    "0011111100111111001111110011111100111111001111110011111100111111"
-"""
-function bitarray_to_binary_string(bit_array::BitArray{1})
-    binary_string = ""
-    for i in 1:length(bit_array)
-        if bit_array[i]
-            binary_string *= "1"
-        else
-            binary_string *= "0"
-        end
-    end
-    return binary_string
-end
-
-
-"""
-    binary_string_to_uint(binary_string::String)
-
-Convert a 64-characters long string representing a binary number into an UInt64.
-
-Example:
---------
-
-    julia> Bobby.binary_string_to_uint(
-    "0011111100111111001111110011111100111111001111110011111100111111")
-    0x3f3f3f3f3f3f3f3f
-"""
-function binary_string_to_uint(binary_string::String)
-    return UInt(binary_string_to_int(binary_string))
-end
-
-
-"""
-    bitarray_to_uint(bit_array::BitArray{1})
-
-Convert a BitArray to a UInt64.
-
-Example:
---------
-    julia> Bobby.bitarray_to_uint(l.clear_file[:,1])
-    0x7f7f7f7f7f7f7f7f
-"""
-function bitarray_to_uint(bit_array::BitArray{1})
-    return binary_string_to_uint(bitarray_to_binary_string(bit_array))
-end
-
-
-"""
     fen_to_bitboard(fen::String)
 
 Populate a Bitboard starting from a board position given in FEN notation.
@@ -159,7 +17,7 @@ Example:
         false, false, false, false, false, false)
 """
 function fen_to_bitboard(fen::String)
-    squares = generate_int_to_uint()
+    squares = gen_int_to_uint_dict()
     return fen_to_bitboard(fen, squares)
 end
 
@@ -196,7 +54,7 @@ function fen_to_bitboard(fen::String, squares::Dict{Int64,UInt64})
     black_OO = false
     black_OOO = false
 
-    int_to_uint = generate_int_to_uint()
+    int_to_uint = gen_int_to_uint_dict()
 
     square_i = 1
     fen_i = 1

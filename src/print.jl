@@ -5,60 +5,13 @@ Print any UInt64 bitboard in shape 8x8 (transposed) to REPL for debugging
 purposes.
 """
 function ugly_print(i::UInt64)
-    bit_array = uint_to_bitarray(i)
+    bit_array = cvt_to_bitarray(i)
     uglyPrint(bit_array)
 end
 
 function ugly_print(pieces_array::Array{UInt64,1})
-    pieces_uint = uint_array_to_uint(pieces_array)
+    pieces_uint = cvt_to_uint(pieces_array)
     ugly_print(pieces_uint)
-end
-
-
-"""
-    binary_string_to_bitarray(s::String)
-
-Convert a binary string to BitArray format for plotting purposes.
-
-Example:
---------
-
-    julia> Bobby.binary_string_to_bitarray(
-        "0000000000000000000000000000000000000000000000000000000000000001")
-    64-element BitArray{1}:
-     false
-         ⋮
-      true
-"""
-function binary_string_to_bitarray(s::String)
-    bit_array = falses(64)
-    for i = 1:64
-        if s[i] == '1'
-            bit_array[i] = true
-        end
-    end
-
-    return bit_array
-end
-
-
-"""
-    uint_to_bitarray(i::UInt64)
-
-Convert a UInt64 to BitArray format for plotting purposes.
-
-Example:
---------
-
-    julia> Bobby.uint_to_bitarray(0x000000000000ffff)
-    64-element BitArray{1}:
-     false
-         ⋮
-      true
-"""
-function uint_to_bitarray(i::UInt64)
-    bs = uint_to_binary_string(i)
-    return binary_string_to_bitarray(bs)
 end
 
 
@@ -94,23 +47,23 @@ Print the bitboard.
 function pretty_print(board::Bitboard, player_color::String="white")
     ranks = ["8", "7", "6", "5", "4", "3", "2", "1"]
     
-    free = transpose(reshape(uint_to_bitarray(board.free), 8, :))
-    taken = transpose(reshape(uint_to_bitarray(board.taken), 8, :))
+    free = transpose(reshape(cvt_to_bitarray(board.free), 8, :))
+    taken = transpose(reshape(cvt_to_bitarray(board.taken), 8, :))
 
-    p = transpose(reshape(uint_array_to_bitarray(board.p), 8, :))
-    r = transpose(reshape(uint_array_to_bitarray(board.r), 8, :))
-    n = transpose(reshape(uint_array_to_bitarray(board.n), 8, :))
-    b = transpose(reshape(uint_array_to_bitarray(board.b), 8, :))
-    q = transpose(reshape(uint_array_to_bitarray(board.q), 8, :))
-    k = transpose(reshape(uint_to_bitarray(board.k), 8, :))
-    P = transpose(reshape(uint_array_to_bitarray(board.P), 8, :))
-    R = transpose(reshape(uint_array_to_bitarray(board.R), 8, :))
-    N = transpose(reshape(uint_array_to_bitarray(board.N), 8, :))
-    B = transpose(reshape(uint_array_to_bitarray(board.B), 8, :))
-    Q = transpose(reshape(uint_array_to_bitarray(board.Q), 8, :))
-    K = transpose(reshape(uint_to_bitarray(board.K), 8, :))
-    white = transpose(reshape(uint_to_bitarray(board.white), 8, :))
-    black = transpose(reshape(uint_to_bitarray(board.black), 8, :))
+    p = transpose(reshape(cvt_to_bitarray(board.p), 8, :))
+    r = transpose(reshape(cvt_to_bitarray(board.r), 8, :))
+    n = transpose(reshape(cvt_to_bitarray(board.n), 8, :))
+    b = transpose(reshape(cvt_to_bitarray(board.b), 8, :))
+    q = transpose(reshape(cvt_to_bitarray(board.q), 8, :))
+    k = transpose(reshape(cvt_to_bitarray(board.k), 8, :))
+    P = transpose(reshape(cvt_to_bitarray(board.P), 8, :))
+    R = transpose(reshape(cvt_to_bitarray(board.R), 8, :))
+    N = transpose(reshape(cvt_to_bitarray(board.N), 8, :))
+    B = transpose(reshape(cvt_to_bitarray(board.B), 8, :))
+    Q = transpose(reshape(cvt_to_bitarray(board.Q), 8, :))
+    K = transpose(reshape(cvt_to_bitarray(board.K), 8, :))
+    white = transpose(reshape(cvt_to_bitarray(board.white), 8, :))
+    black = transpose(reshape(cvt_to_bitarray(board.black), 8, :))
     
     pieces = Dict("pawn"=>" o",
         "rook"=>" Π",
