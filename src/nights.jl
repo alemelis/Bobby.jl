@@ -63,7 +63,10 @@ function get_current_nights_valid(board::Bitboard, color::String="white")
     if isempty(nights)
         return Set()
     end
+#   return get_current_nights_valid(nights, same_color)
+# end
 
+# function get_current_nights_valid(nights::Array{UInt64,1}, same_color::UInt64)
     nights_valid = Set()
     for source in nights
         targets = NIGHT_MOVES[source]
@@ -72,7 +75,7 @@ function get_current_nights_valid(board::Bitboard, color::String="white")
 
                 #TODO: check check, pin, etc...
 
-                push!(nights_valid, (source, t))
+                push!(nights_valid, (source, target))
             end
         end
     end
