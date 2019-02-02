@@ -34,6 +34,7 @@ function cvt_to_uint(pieces_array::Array{UInt64,1})
     return pieces_uint
 end
 
+
 function cvt_to_uint(binary_string::String)
     return UInt(cvt_to_int(binary_string))
 end
@@ -86,6 +87,7 @@ function gen_pgn_square_to_uint_dict()
 
     return pgn_squares
 end
+const PGN2UINT = gen_pgn_square_to_uint_dict()
 
 
 # julia> squares = Bobby.generate_pgn_square_to_int()
@@ -107,6 +109,7 @@ function gen_pgn_square_to_int_dict()
 
     return pgn_squares
 end
+const PGN2INT = gen_pgn_square_to_int_dict()
 
 
 # julia> Bobby.generate_int_to_uint()
@@ -117,12 +120,10 @@ end
 function gen_int_to_uint_dict()
     squares_int_uint = Dict{Int64,UInt64}()
 
-    pgn_squares_int = gen_pgn_square_to_int_dict()
-    pgn_squares_uint = gen_pgn_square_to_uint_dict()
-
-    for k in keys(pgn_squares_int)
-        push!(squares_int_uint, pgn_squares_int[k]=>pgn_squares_uint[k])
+    for k in keys(PGN2INT)
+        push!(squares_int_uint, PGN2INT[k]=>PGN2UINT[k])
     end
 
     return squares_int_uint
 end
+const INT2UINT = gen_int_to_uint_dict()

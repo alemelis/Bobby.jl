@@ -5,7 +5,9 @@ module Bobby
     using Crayons
 
     include("constants.jl")
+    include("converters.jl")
     include("bitboard.jl")
+    include("parser.jl")
     include("print.jl")
     include("moves.jl")
     include("pawns.jl")
@@ -18,7 +20,5 @@ module Bobby
     include("magic.jl")
     include("check.jl")
     include("game.jl")
-    include("parser.jl")
-    include("converters.jl")
-    
+
 end

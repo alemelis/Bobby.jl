@@ -1,6 +1,6 @@
 
 """
-    generate_night_valid(source_square::UInt64)
+    get_night_valid(source_square::UInt64)
 
 Given an initial position (as UInt64), return all the squares where a knight
 may land. To be used to build hash-tables.
@@ -8,13 +8,13 @@ may land. To be used to build hash-tables.
 Example:
 --------
 
-    julia> nv = Bobby.generate_night_valid(b.n[1])
+    julia> nv = Bobby.get_night_valid(b.n[1])
     3-element Array{UInt64,1}:
      0x0010000000000000
      0x0000200000000000
      0x0000800000000000
 """
-function gen_night_valid(source_square::UInt64)
+function get_night_valid(source_square::UInt64)
     target_squares = zeros(UInt64, 0)
     for cj in zip(NIGHT_CLEAR_FILES, NIGHT_JUMPS)
         candidate_square = (source_square & cj[1]) >> cj[2]
@@ -22,13 +22,12 @@ function gen_night_valid(source_square::UInt64)
             push!(target_squares, candidate_square)
         end
     end
-
     return target_squares
 end
 
 
 """
-    generate_all_night_moves()
+    gen_all_night_valid_moves()
 
 Return a dictionary with all possible moves for a knight. Keys are UInt64
 representing the knight position.
@@ -36,20 +35,20 @@ representing the knight position.
 Example:
 --------
 
-    julia> Bobby.generate_all_night_moves()
+    julia> Bobby.gen_all_night_valid_moves()
     Dict{UInt64,Array{UInt64,1}} with 64 entries:
       0x0000002000000000 => UInt64[0x0000800000000000, 0x0040000000000000,…
       0x0040000000000000 => UInt64[0x1000000000000000, 0x0000100000000000,…
     ⋮  => ⋮
 """
-function gen_all_night_moves()
-    int_to_uint = gen_int_to_uint_dict()
+function gen_all_night_valid_moves()
     night_moves = Dict{UInt64, Array{UInt64,1}}()
     for i in 1:64
-        night_moves[int_to_uint[i]] = gen_night_valid(int_to_uint[i])
+        night_moves[INT2UINT[i]] = get_night_valid(INT2UINT[i])
     end
     return night_moves
 end
+const NIGHT_MOVES = gen_all_night_valid_moves()
 
 #----
 
