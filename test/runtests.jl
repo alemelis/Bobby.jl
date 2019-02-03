@@ -9,6 +9,10 @@ end
     include("test_converters.jl")
 end
 
+@testset "nights.jl" begin
+	include("test_nights.jl")
+end
+
 # @testset "bitboard.jl" begin
 #     include("test_bitboard.jl")
 # end

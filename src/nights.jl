@@ -71,7 +71,7 @@ function get_current_nights_valid(board::Bitboard, color::String="white")
     for source in nights
         targets = NIGHT_MOVES[source]
         for target in targets
-            if target & same_color != EMPTY # do not take same color pieces
+            if target & same_color == EMPTY # do not take same color pieces
 
                 #TODO: check check, pin, etc...
 
