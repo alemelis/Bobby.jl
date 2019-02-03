@@ -17,11 +17,6 @@ Example:
         false, false, false, false, false, false)
 """
 function fen_to_bitboard(fen::String)
-    squares = gen_int_to_uint_dict()
-    return fen_to_bitboard(fen, squares)
-end
-
-function fen_to_bitboard(fen::String, squares::Dict{Int64,UInt64})
     white = UInt64(0)
     R = zeros(UInt64, 0)
     N = zeros(UInt64, 0)
@@ -68,7 +63,7 @@ function fen_to_bitboard(fen::String, squares::Dict{Int64,UInt64})
         else
             if isuppercase(c)
                 # white
-                white |= squares[square_i]
+                white |= INT2UINT[square_i]
                 if c == 'R'
                     push!(R, int_to_uint[square_i])
                 elseif c == 'N'
@@ -78,13 +73,13 @@ function fen_to_bitboard(fen::String, squares::Dict{Int64,UInt64})
                 elseif c == 'Q'
                     push!(Q, int_to_uint[square_i])
                 elseif c == 'K'
-                    K |= squares[square_i]
+                    K |= INT2UINT[square_i]
                 elseif c == 'P'
                     push!(P, int_to_uint[square_i])
                 end
             else
                 # black
-                black |= squares[square_i]
+                black |= INT2UINT[square_i]
                 if c == 'r'
                     push!(r, int_to_uint[square_i])
                 elseif c == 'n'
@@ -94,7 +89,7 @@ function fen_to_bitboard(fen::String, squares::Dict{Int64,UInt64})
                 elseif c == 'q'
                     push!(q, int_to_uint[square_i])
                 elseif c == 'k'
-                    k |= squares[square_i]
+                    k |= INT2UINT[square_i]
                 elseif c == 'p'
                     push!(p, int_to_uint[square_i])
                 end
