@@ -40,6 +40,11 @@ function cvt_to_uint(binary_string::String)
 end
 
 
+function cvt_to_uint(i::Int64)
+    return UInt(i)
+end
+
+
 function cvt_to_uint(bit_array::BitArray{1})
     return cvt_to_uint(cvt_to_binary_string(bit_array))
 end
