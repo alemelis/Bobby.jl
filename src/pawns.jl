@@ -1,3 +1,135 @@
+function gen_white_pawn_one_step_valid(source_square::UInt64)
+    target_squares = zeros(UInt64, 0)
+    push!(target_squares, source_square << 8)
+    return target_squares
+end
+
+
+function gen_all_white_pawn_one_step_valid_moves()
+    pawn_moves = Dict{UInt64, Array{UInt64,1}}()
+
+    for i in 1:8
+        pawn_moves[INT2UINT[i]] = EMPTY
+    end
+
+    for i in 9:56
+        pawn_moves[INT2UINT[i]] = gen_white_pawn_one_step_valid(INT2UINT[i])
+    end
+
+    for i in 57:64
+        pawn_moves[INT2UINT[i]] = EMPTY
+    end
+
+    return pawn_moves
+end
+const WHITE_PAWN_ONESTEP_MOVES = gen_all_white_pawn_one_step_valid_moves()
+
+
+function gen_white_pawn_two_steps_valid(source_square::UInt64)
+    target_squares = zeros(UInt64, 0)
+    push!(target_squares, source_square << 16)
+    return target_squares
+end
+
+
+function gen_all_white_pawn_two_steps_valid_moves()
+    pawn_moves = Dict{UInt64, Array{UInt64,1}}()
+
+    for i in 1:48
+        pawn_moves[INT2UINT[i]] = EMPTY
+    end
+
+    for i in 49:56
+        pawn_moves[INT2UINT[i]] = gen_white_pawn_two_steps_valid(INT2UINT[i])
+    end
+
+    for i in 57:64
+        pawn_moves[INT2UINT[i]] = EMPTY
+    end
+
+    return pawn_moves
+end
+const WHITE_PAWN_TWOSTEPS_MOVES = gen_all_white_pawn_two_steps_valid_moves()
+
+
+function gen_white_pawn_attacked_valid(source_square::UInt64)
+    target_squares = zeros(UInt64, 0)
+
+    push!(target_squares, (source_square & CLEAR_FILE_A) << 9)
+    push!(target_squares, (source_square & CLEAR_FILE_H) << 7)
+
+    return target_squares
+end
+
+
+function gen_all_white_pawn_valid_attack()
+    pawn_moves = Dict{UInt64, Array{UInt64,1}}()
+    for i in 1:64
+        pawn_moves[INT2UINT[i]] = gen_white_pawn_attacked_valid(INT2UINT[i])
+    end
+    return pawn_moves
+end
+const WHITE_PAWN_ATTACK = gen_all_white_pawn_valid_attack()
+
+# function get_current_pawns_valid(board::Bitboard, color::String="white")
+#     if color == "white"
+#         pawns = board.P
+#         same_color = board.white
+#     else
+#         pawns = board.p
+#         same_color = board.black
+#     end
+
+#     if isempty(pawns)
+#         return Set()
+#     end
+
+#     for source in pawns
+#         one_step = 
+#         for target in targets
+#             if target & same_color == EMPTY # do not take same color pieces
+
+#                 #TODO: check check, pin, etc...
+
+#                 push!(pawns_valid, (source, target))
+#             end
+#         end
+#     end
+#     return pawns_valid
+# end
+
+# # function get_current_nights_valid(nights::Array{UInt64,1}, same_color::UInt64)
+#     nights_valid = Set()
+#     for source in nights
+#         targets = NIGHT_MOVES[source]
+#         for target in targets
+#             if target & same_color == EMPTY # do not take same color pieces
+
+#                 #TODO: check check, pin, etc...
+
+#                 push!(nights_valid, (source, target))
+#             end
+#         end
+#     end
+#     return nights_valid
+# end
+
+# # check attacking squares
+# if increment == -8
+#     pawns_lx_atk = (pawns .& lu_tabs.clear_file[:,1]) << 9
+#     pawns_rx_atk = (pawns .& lu_tabs.clear_file[:,8]) << 7
+# elseif increment == 8
+#     pawns_lx_atk = (pawns .& lu_tabs.clear_file[:,8]) >> 9
+#     pawns_rx_atk = (pawns .& lu_tabs.clear_file[:,1]) >> 7
+# end
+# pawns_attack = pawns_lx_atk .& other
+# pawns_attack .|= pawns_rx_atk .& other
+
+# return pawns_attack
+
+
+#-----
+
 function getPawnsValidList(board::Bitboard, lu_tabs::LookUpTables,
     color::String="white")
 

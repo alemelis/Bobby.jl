@@ -1,8 +1,3 @@
-function cvt_to_int(binary_string::String)
-	return parse(UInt64, binary_string; base=2)
-end
-
-
 function cvt_to_binary_string(i::Int64)
 	return bitstring(i)
 end
@@ -10,6 +5,15 @@ end
 
 function cvt_to_binary_string(ui::UInt64)
 	return bitstring(ui)
+end
+
+
+function cvt_to_int(binary_string::String)
+    return parse(UInt64, binary_string; base=2)
+end
+
+function cvt_to_int(ui::UInt64)
+    return cvt_to_int(cvt_to_binary_string(ui))
 end
 
 
