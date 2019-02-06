@@ -9,7 +9,7 @@ function gen_all_white_pawn_one_step_valid_moves()
     pawn_moves = Dict{UInt64, Array{UInt64,1}}()
 
     for i in 1:8
-        pawn_moves[INT2UINT[i]] = EMPTY
+        pawn_moves[INT2UINT[i]] = [EMPTY]
     end
 
     for i in 9:56
@@ -17,7 +17,7 @@ function gen_all_white_pawn_one_step_valid_moves()
     end
 
     for i in 57:64
-        pawn_moves[INT2UINT[i]] = EMPTY
+        pawn_moves[INT2UINT[i]] = [EMPTY]
     end
 
     return pawn_moves
@@ -36,7 +36,7 @@ function gen_all_white_pawn_two_steps_valid_moves()
     pawn_moves = Dict{UInt64, Array{UInt64,1}}()
 
     for i in 1:48
-        pawn_moves[INT2UINT[i]] = EMPTY
+        pawn_moves[INT2UINT[i]] = [EMPTY]
     end
 
     for i in 49:56
@@ -44,7 +44,7 @@ function gen_all_white_pawn_two_steps_valid_moves()
     end
 
     for i in 57:64
-        pawn_moves[INT2UINT[i]] = EMPTY
+        pawn_moves[INT2UINT[i]] = [EMPTY]
     end
 
     return pawn_moves
