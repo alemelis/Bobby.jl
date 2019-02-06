@@ -1,3 +1,4 @@
+# https://web.archive.org/web/20180109042730/http://www.rivalchess.com/magic-bitboards/
 function gen_rook_mask(i::Int64)
     pgn = INT2PGN[i]
 
