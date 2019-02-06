@@ -28,9 +28,11 @@
     @test haskey(squares_uint, "e2")
     @test squares_uint["e2"] == 0x0000000000000800
 
-    squares_int = Bobby.gen_pgn_square_to_int_dict()
+    squares_int, squares_pgn = Bobby.gen_pgn_square_to_int_dict()
     @test haskey(squares_int, "e2")
+    @test haskey(squares_pgn, 1)
     @test squares_int["a8"] == 1
+    @test squares_pgn[1] == "a8"
 
     squares_int_uint = Bobby.gen_int_to_uint_dict()
     @test haskey(squares_int_uint, 1)

@@ -17,6 +17,10 @@ end
 	include("test_king.jl")
 end
 
+@testset "rooks.jl" begin
+	include("test_rooks.jl")
+end
+
 # @testset "bitboard.jl" begin
 #     include("test_bitboard.jl")
 # end
