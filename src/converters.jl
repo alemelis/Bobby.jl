@@ -106,19 +106,21 @@ const PGN2UINT = gen_pgn_square_to_uint_dict()
 #   ⋮    => ⋮
 function gen_pgn_square_to_int_dict()
     pgn_squares = Dict{String,Int64}()
+    int_squares = Dict{Int64,String}()
 
     i = 1
     for rank in 8:-1:1
         for file in 1:8
            pgn_coordinate = string(Char(Int('a')+(file - 1))) * string(rank)
            push!(pgn_squares, pgn_coordinate=>i)
+           push!(int_squares, i=>pgn_coordinate)
            i += 1
         end
     end
 
-    return pgn_squares
+    return pgn_squares, int_squares
 end
-const PGN2INT = gen_pgn_square_to_int_dict()
+const PGN2INT, INT2PGN = gen_pgn_square_to_int_dict()
 
 
 # julia> Bobby.generate_int_to_uint()
