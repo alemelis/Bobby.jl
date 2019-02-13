@@ -1,6 +1,8 @@
-function gen_rank_attacks()
+function gen_rank_attacks_from_file_th(f::Int64=1)
     rank_attacks = Dict{UInt64, Array{UInt64,1}}()
 
+    # argument f indicates the current file
+    # the function loops over
     # all ranks but only the first file so far
     for i in 1:8
         ui = PGN2UINT[INT2PGN[1+8*(i-1)]]
@@ -11,13 +13,15 @@ function gen_rank_attacks()
             rank_occupancy_mask_string *= ("0"^8)^(8-i)
 
             rank_occupancy_mask = cvt_to_uint(rank_occupancy_mask_string)
-            push!(rank_attacks, rank_occupancy_mask => slide_rank(
-                rank_occupancy_mask, ui, MASK_RANKS[i]))
+            sr = slide_rank(rank_occupancy_mask, ui, MASK_RANKS[i])
+            if ~isempty(sr)
+                push!(rank_attacks, rank_occupancy_mask => sr)
+            end
         end
     end
     return rank_attacks
 end
-RANK_ATTACKS = gen_rank_attacks()
+RANK_ATTACKS_FILE_1 = gen_rank_attacks_from_file_th()
 
 
 function slide_rank(rank_occupancy_mask::UInt64, ui::UInt64, rank_mask::UInt64)
