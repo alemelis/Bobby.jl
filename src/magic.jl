@@ -1,28 +1,39 @@
-function gen_rank_attacks_from_file_th(f::Int64=1)
+function gen_rank_attacks_from_file_x(file::Int64=1)
     rank_attacks = Dict{UInt64, Array{UInt64,1}}()
 
-    # argument f indicates the current file
-    # the function loops over
-    # all ranks but only the first file so far
     for i in 1:8
-        ui = PGN2UINT[INT2PGN[1+8*(i-1)]]
+        pgn = INT2PGN[1+8*(i-1)]
+        rank = parse(Int64, pgn[2])
+        ui = PGN2UINT[pgn]
+        
         for n in 0:2^6-1
-
             rank_occupancy_mask_string = ("0"^8)^(i-1)*"0"
-            rank_occupancy_mask_string *= reverse(bitstring(UInt64(n))[58:end])
+            pieces = reverse(bitstring(UInt64(n))[58:end])
+            if file in [2, 3, 4, 5, 6, 7]
+                new_pieces = ""
+                for j in 1:6
+                    if j == file-1
+                        new_pieces *= "0"
+                    else
+                        new_pieces *= pieces[j]
+                    end
+                end
+                rank_occupancy_mask_string *= new_pieces
+            else
+                rank_occupancy_mask_string *= pieces
+            end
             rank_occupancy_mask_string *= ("0"^8)^(8-i)
 
             rank_occupancy_mask = cvt_to_uint(rank_occupancy_mask_string)
-            sr = slide_rank(rank_occupancy_mask, ui, MASK_RANKS[i])
+            sr = slide_rank(rank_occupancy_mask, ui >> (file-1), MASK_RANKS[rank])
             if ~isempty(sr)
-                push!(rank_attacks, rank_occupancy_mask => sr)
+                rank_attacks[rank_occupancy_mask] = sr
             end
         end
     end
     return rank_attacks
 end
-RANK_ATTACKS_FILE_1 = gen_rank_attacks_from_file_th()
-
+RANK_ATTACKS_FILE_A = gen_rank_attacks_from_file_x()
 
 function slide_rank(rank_occupancy_mask::UInt64, ui::UInt64, rank_mask::UInt64)
     direction = 1
@@ -45,6 +56,8 @@ function slide_rank(rank_occupancy_mask::UInt64, ui::UInt64, rank_mask::UInt64)
     end
 end
 # TODO: check for borders
+
+#----
 
 """
     slidePiece(piece_valid::BitArray{1}, same_color::BitArray{1},
