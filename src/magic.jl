@@ -28,11 +28,11 @@ function slide_rank(rank_occupancy_mask::UInt64, ui::UInt64, shift::Int64)
     rank_occupancy_mask = rank_occupancy_mask >> shift
     while true
         if ((ui >> increment) & MASK_RANK_1) != EMPTY
-            if rank_occupancy_mask & ((ui >> increment) & MASK_RANK_1) == EMPTY
+            if rank_occupancy_mask & ((ui >> increment) & MASK_RANK_1) == EMPTY && ((ui >> increment) & CLEAR_FILE_A & CLEAR_FILE_H) != EMPTY
                 push!(moves, (ui >> increment) << shift)
                 increment += direction
             else
-                push!(edges, (ui >> increment)<< shift)
+                push!(edges, (ui >> increment) << shift)
 
                 if direction == 1
                     direction = -1
@@ -59,6 +59,27 @@ function rank_attack(board::UInt64, ui::UInt64)
             occupancy_rank = ROOK_MASKS[ui] & MASK_RANKS[i] & board
             shift = RANK_SHIFTS[i]
             mvs, edgs = slide_rank(occupancy_rank, ui, shift)
+            return mvs, edgs
+        end
+    end
+end
+
+function file_attack(board::UInt64, ui::UInt64)
+    for i in 1:8 # A to H
+        if MASK_FILES[i] & ui != EMPTY
+            occupancy_file = transpose_uint(ROOK_MASKS[ui]&MASK_FILES[i]&board)
+
+            shift = FILE_SHIFTS[i]
+            mvs, edgs = slide_rank(occupancy_file, transpose_uint(ui), shift)
+            
+            for k in 1:length(mvs)
+                mvs[k] = transpose_uint(mvs[k])
+            end
+            
+            for k in 1:length(edgs)
+                edgs[k] = transpose_uint(edgs[k])
+            end
+            
             return mvs, edgs
         end
     end
