@@ -36,6 +36,54 @@ function gen_rook_masks()
 end
 const ROOK_MASKS = gen_rook_masks()
 
+function get_rooks_valid(board::Bitboard, color::String="white")
+
+    if color == "white"
+        rooks = cvt_to_bitarray(board.R)
+        same = cvt_to_bitarray(board.white)
+        other = cvt_to_bitarray(board.black)
+    elseif color == "black"
+        rooks = cvt_to_bitarray(board.r)
+        same = cvt_to_bitarray(board.black)
+        other = cvt_to_bitarray(board.white)
+    end
+
+    rooks_valid = falses(64)
+
+    #files
+    for j = 1:8
+        rooks_arr = rooks[j:8:64]
+        if any(rooks_arr)
+            same_arr = same[j:8:64]
+            other_arr = other[j:8:64]
+            for i = 1:8
+                if rooks_arr[i]
+                    rooks_valid[j:8:64] .|= Bobby.slidePiece(same_arr,
+                        other_arr, i)
+                end
+            end
+        end
+    end
+
+    #ranks
+    for i = 1:8:64
+        rooks_arr = rooks[i:i+7]
+        if any(rooks_arr)
+            same_arr = same[i:i+7]
+            other_arr = other[i:i+7]
+            for j = 1:8
+                if rooks_arr[j]
+                    rooks_valid[i:i+7] .|= Bobby.slidePiece(same_arr,
+                        other_arr, j)
+                end
+            end
+        end
+    end
+
+    return rooks_valid
+end
+
+
 # ------
 
 function getRooksValid(board::Bitboard, lu_tabs::LookUpTables,
