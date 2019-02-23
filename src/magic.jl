@@ -28,7 +28,9 @@ function slide_rank(rank_occupancy_mask::UInt64, ui::UInt64, shift::Int64)
     rank_occupancy_mask = rank_occupancy_mask >> shift
     while true
         if ((ui >> increment) & MASK_RANK_1) != EMPTY
-            if rank_occupancy_mask & ((ui >> increment) & MASK_RANK_1) == EMPTY && ((ui >> increment) & CLEAR_FILE_A & CLEAR_FILE_H) != EMPTY
+            if (rank_occupancy_mask & ((ui >> increment) & MASK_RANK_1) == EMPTY 
+                && ((ui >> increment) & CLEAR_FILE_A & CLEAR_FILE_H) != EMPTY)
+            
                 push!(moves, (ui >> increment) << shift)
                 increment += direction
             else
@@ -64,6 +66,7 @@ function rank_attack(board::UInt64, ui::UInt64)
     end
 end
 
+
 function file_attack(board::UInt64, ui::UInt64)
     for i in 1:8 # A to H
         if MASK_FILES[i] & ui != EMPTY
@@ -83,6 +86,21 @@ function file_attack(board::UInt64, ui::UInt64)
             return mvs, edgs
         end
     end
+end
+
+
+function orthogonal_attack(board::UInt64, ui::UInt64)
+    rank_moves, rank_edges = rank_attack(board, ui)
+    file_moves, file_edges = file_attack(board, ui)
+
+    for m in file_moves
+        push!(rank_moves, m)
+    end
+    for e in file_edges
+        push!(rank_edges, e)
+    end
+    return rank_moves, rank_edges
+
 end
 
 #----
