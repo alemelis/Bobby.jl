@@ -33,6 +33,10 @@ end
 	include("test_queen.jl")
 end
 
+@testset "pawns.jl" begin
+	include("test_pawns.jl")
+end
+
 # @testset "check.jl" begin
 #     include("test_check.jl")
 # end

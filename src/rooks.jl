@@ -64,6 +64,34 @@ function get_rooks_valid(board::Bitboard, color::String="white")
     return rook_moves
 end
 
+function get_rooks_valid_list(board::Bitboard, color::String="white")
+    if color == "white"
+        rooks = board.R
+        same = board.white
+        other = board.black
+    elseif color == "black"
+        rooks = board.r
+        same = board.black
+        other = board.white
+    end
+
+    occupancy = same | other
+
+    rook_moves = Set()
+    for rook in rooks
+        moves, edges = orthogonal_attack(occupancy, rook)
+        for move in moves
+            push!(rook_moves, (rook, move))
+        end
+        for edge in edges
+            if edge & same == EMPTY
+                push!(rook_moves, (rook, edge))
+            end
+        end
+    end
+    return rook_moves
+end
+
 # ------
 
 function get_rooks_valid_(board::Bitboard, color::String="white")

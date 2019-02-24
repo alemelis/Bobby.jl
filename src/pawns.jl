@@ -1,75 +1,152 @@
-function gen_white_pawn_one_step_valid(source_square::UInt64)
-    target_squares = zeros(UInt64, 0)
-    push!(target_squares, source_square << 8)
-    return target_squares
+function gen_pawn_one_step_valid(source_square::UInt64,
+    color::String="white")
+
+    if color == "white"
+        return source_square << 8
+    else
+        return source_square >> 8
+    end
 end
 
 
-function gen_all_white_pawn_one_step_valid_moves()
-    pawn_moves = Dict{UInt64, Array{UInt64,1}}()
+function gen_all_pawns_one_step_valid_moves(color::String="white")
+    pawn_moves = Dict{UInt64, UInt64}()
 
     for i in 1:8
-        pawn_moves[INT2UINT[i]] = [EMPTY]
+        pawn_moves[INT2UINT[i]] = EMPTY
     end
 
     for i in 9:56
-        pawn_moves[INT2UINT[i]] = gen_white_pawn_one_step_valid(INT2UINT[i])
+        pawn_moves[INT2UINT[i]] = gen_pawn_one_step_valid(INT2UINT[i],
+            color)
     end
 
     for i in 57:64
-        pawn_moves[INT2UINT[i]] = [EMPTY]
+        pawn_moves[INT2UINT[i]] = EMPTY
     end
 
     return pawn_moves
 end
-const WHITE_PAWN_ONESTEP_MOVES = gen_all_white_pawn_one_step_valid_moves()
+const WHITE_PAWN_ONESTEP_MOVES = gen_all_pawns_one_step_valid_moves()
+const BLACK_PAWN_ONESTEP_MOVES = gen_all_pawns_one_step_valid_moves(
+    "black")
 
 
-function gen_white_pawn_two_steps_valid(source_square::UInt64)
-    target_squares = zeros(UInt64, 0)
-    push!(target_squares, source_square << 16)
-    return target_squares
+function gen_pawn_two_steps_valid(source_square::UInt64,
+    color::String="white")
+
+    if color == "white"
+        return source_square << 16
+    else
+        return source_square >> 16
+    end
 end
 
 
-function gen_all_white_pawn_two_steps_valid_moves()
-    pawn_moves = Dict{UInt64, Array{UInt64,1}}()
+function gen_all_pawns_two_steps_valid_moves(color::String="white")
+    pawn_moves = Dict{UInt64, UInt64}()
 
-    for i in 1:48
-        pawn_moves[INT2UINT[i]] = [EMPTY]
-    end
+    if color == "white"
+        for i in 1:48
+            pawn_moves[INT2UINT[i]] = EMPTY
+        end
 
-    for i in 49:56
-        pawn_moves[INT2UINT[i]] = gen_white_pawn_two_steps_valid(INT2UINT[i])
-    end
+        for i in 49:56
+            pawn_moves[INT2UINT[i]] = gen_pawn_two_steps_valid(
+                INT2UINT[i])
+        end
 
-    for i in 57:64
-        pawn_moves[INT2UINT[i]] = [EMPTY]
+        for i in 57:64
+            pawn_moves[INT2UINT[i]] = EMPTY
+        end
+    else
+        for i in 1:8
+            pawn_moves[INT2UINT[i]] = EMPTY
+        end
+
+        for i in 9:16
+            pawn_moves[INT2UINT[i]] = gen_pawn_two_steps_valid(
+                INT2UINT[i], color)
+        end
+
+        for i in 17:64
+            pawn_moves[INT2UINT[i]] = EMPTY
+        end
     end
 
     return pawn_moves
 end
-const WHITE_PAWN_TWOSTEPS_MOVES = gen_all_white_pawn_two_steps_valid_moves()
+const WHITE_PAWN_TWOSTEPS_MOVES = gen_all_pawns_two_steps_valid_moves()
+const BLACK_PAWN_TWOSTEPS_MOVES = gen_all_pawns_two_steps_valid_moves(
+    "black")
 
 
-function gen_white_pawn_attacked_valid(source_square::UInt64)
+function gen_pawn_attacked_valid(source_square::UInt64,
+    color::String="white")
+
     target_squares = zeros(UInt64, 0)
 
-    push!(target_squares, (source_square & CLEAR_FILE_A) << 9)
-    push!(target_squares, (source_square & CLEAR_FILE_H) << 7)
+    if color == "white"
+        push!(target_squares, (source_square & CLEAR_FILE_A) << 9)
+        push!(target_squares, (source_square & CLEAR_FILE_H) << 7)
+    else
+        push!(target_squares, (source_square & CLEAR_FILE_A) >> 9)
+        push!(target_squares, (source_square & CLEAR_FILE_H) >> 7)
+    end
 
     return target_squares
 end
 
 
-function gen_all_white_pawn_valid_attack()
+function gen_all_pawns_valid_attack(color::String="white")
     pawn_moves = Dict{UInt64, Array{UInt64,1}}()
     for i in 1:64
-        pawn_moves[INT2UINT[i]] = gen_white_pawn_attacked_valid(INT2UINT[i])
+        pawn_moves[INT2UINT[i]] = gen_pawn_attacked_valid(INT2UINT[i], color)
     end
     return pawn_moves
 end
-const WHITE_PAWN_ATTACK = gen_all_white_pawn_valid_attack()
+const WHITE_PAWN_ATTACK = gen_all_pawns_valid_attack()
+const BLACK_PAWN_ATTACK = gen_all_pawns_valid_attack("black")
+
+
+function get_pawns_valid_list(board::Bitboard, color::String="white")
+    if color == "white"
+        same = board.white
+        other = board.black
+        pieces = board.P
+        one_step = WHITE_PAWN_ONESTEP_MOVES
+        two_step = WHITE_PAWN_TWOSTEPS_MOVES
+        attacks = WHITE_PAWN_ATTACK
+    else
+        same = board.black
+        other = board.white
+        pieces = board.p
+        one_step = BLACK_PAWN_ONESTEP_MOVES
+        two_step = BLACK_PAWN_TWOSTEPS_MOVES
+        attacks = BLACK_PAWN_ATTACK
+    end
+
+    piece_moves = Set()
+
+    for piece in pieces
+        move = one_step[piece]
+        if move & same == EMPTY && move & other == EMPTY && move != EMPTY
+            push!(piece_moves, (piece, move))
+            if (two_step[piece] & same == EMPTY && 
+                two_step[piece] & other == EMPTY && 
+                two_step[piece] != EMPTY)
+                push!(piece_moves, (piece, two_step[piece]))
+            end
+            for attack in attacks[piece]
+                if other & attack != EMPTY
+                    push!(piece_moves, (piece, attack))
+                end
+            end
+        end
+    end
+    return piece_moves
+end
+
 
 # function get_current_pawns_valid(board::Bitboard, color::String="white")
 #     if color == "white"

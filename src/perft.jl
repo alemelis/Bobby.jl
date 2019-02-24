@@ -1,3 +1,15 @@
+function get_all_valid_moves(board::Bitboard, color::String="white")
+    valid_moves = get_non_sliding_pieces_valid_list(board, "king", color)
+    union!(valid_moves, get_non_sliding_pieces_valid_list(board, "night",
+        color))
+    union!(valid_moves, get_pawns_valid_list(board, color))
+    union!(valid_moves, get_sliding_pieces_valid_list(board, "queen", color))
+    union!(valid_moves, get_sliding_pieces_valid_list(board, "rook", color))
+    return union!(valid_moves, get_sliding_pieces_valid_list(board, "bishop",
+        color))
+end
+
+
 function getAllMoves(board::Bitboard, lu_tabs::LookUpTables,
     color::String="white")
 

@@ -14,6 +14,13 @@ function ugly_print(pieces_array::Array{UInt64,1})
     ugly_print(pieces_uint)
 end
 
+function ugly_print(valid_moves::Set{Any})
+    pieces = EMPTY
+    for move in valid_moves
+        pieces |= move[2]
+    end
+    ugly_print(pieces)
+end
 
 """
     uglyPrint(b::BitArray)

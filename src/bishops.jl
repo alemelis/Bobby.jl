@@ -25,6 +25,12 @@ function get_bishops_valid(board::Bitboard, color::String="white")
     return bishop_moves
 end
 
+
+
+
+
+#-----
+
 """
     getBishopsValid(board::Bitboard, color::String="white")
 

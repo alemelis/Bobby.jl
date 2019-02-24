@@ -1,3 +1,92 @@
+function get_sliding_pieces_valid_list(board::Bitboard, piece_type::String,
+    color::String="white")
+
+    if color == "white"
+        same = board.white
+        other = board.black
+        if piece_type == "queen"
+            pieces = board.Q
+            attack_fun = star_attack
+        elseif piece_type == "rook"
+            pieces = board.R
+            attack_fun = orthogonal_attack
+        elseif piece_type == "bishop"
+            pieces = board.B
+            attack_fun = cross_attack
+        end
+    else
+        same = board.black
+        other = board.white
+        if piece_type == "queen"
+            pieces = board.q
+            attack_fun = star_attack
+        elseif piece_type == "rook"
+            pieces = board.r
+            attack_fun = orthogonal_attack
+        elseif piece_type == "bishop"
+            pieces = board.b
+            attack_fun = cross_attack
+        end
+    end
+
+    occupancy = same | other
+
+    piece_moves = Set()
+    for piece in pieces
+        moves, edges = attack_fun(occupancy, piece)
+        for move in moves
+            push!(piece_moves, (piece, move))
+        end
+        for edge in edges
+            if edge & same == EMPTY
+                push!(piece_moves, (piece, edge))
+            end
+        end
+    end
+    return piece_moves
+end
+
+
+function get_non_sliding_pieces_valid_list(board::Bitboard, piece_type::String,
+    color::String="white")
+
+    if color == "white"
+        same = board.white
+        other = board.black
+        if piece_type == "king"
+            pieces = board.K
+            piece_dict = KING_MOVES
+        elseif piece_type == "night"
+            pieces = board.N
+            piece_dict = NIGHT_MOVES
+        end
+    else
+        same = board.black
+        other = board.white
+        if piece_type == "king"
+            pieces = board.k
+            piece_dict = KING_MOVES
+        elseif piece_type == "night"
+            pieces = board.n
+            piece_dict = NIGHT_MOVES
+        end
+    end
+
+    piece_moves = Set()
+
+    for piece in pieces
+        moves = piece_dict[piece]
+        for move in moves
+            if move & same == EMPTY
+                push!(piece_moves, (piece, move))
+            end
+        end
+    end
+    return piece_moves
+end
+
+#---
+
 function moveSourceTargetWhite(board::Bitboard, source::Int64, target::Int64)
     board.free[source] = true
     board.free[target] = false
