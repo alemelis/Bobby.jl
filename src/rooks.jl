@@ -64,7 +64,8 @@ function get_rooks_valid(board::Bitboard, color::String="white")
     return rook_moves
 end
 
-#
+# ------
+
 function get_rooks_valid_(board::Bitboard, color::String="white")
 
     if color == "white"
@@ -113,7 +114,6 @@ function get_rooks_valid_(board::Bitboard, color::String="white")
 end
 
 
-# ------
 
 function getRooksValid(board::Bitboard, lu_tabs::LookUpTables,
     color::String="white")
