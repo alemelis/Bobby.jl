@@ -36,7 +36,36 @@ function gen_rook_masks()
 end
 const ROOK_MASKS = gen_rook_masks()
 
+
 function get_rooks_valid(board::Bitboard, color::String="white")
+    if color == "white"
+        rooks = board.R
+        same = board.white
+        other = board.black
+    elseif color == "black"
+        rooks = board.r
+        same = board.black
+        other = board.white
+    end
+
+    occupancy = same | other
+
+    rook_moves = zeros(UInt64, 0)
+    rook_edges = zeros(UInt64, 0)
+    for rook in rooks
+        moves, edges = orthogonal_attack(occupancy, rook)
+        append!(rook_moves, moves)
+        for edge in edges
+            if edge & same == EMPTY
+                append!(rook_moves, edge)
+            end
+        end
+    end
+    return rook_moves
+end
+
+#
+function get_rooks_valid_(board::Bitboard, color::String="white")
 
     if color == "white"
         rooks = cvt_to_bitarray(board.R)
