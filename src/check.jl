@@ -1,3 +1,51 @@
+function check_check(board::Bitboard, color::String="white")
+    if color == "white"
+        king = board.K
+        attacked = board.black_attacks
+    elseif color == "black"
+        king = board.k
+        attacked = board.white_attacks
+    end
+
+    if king & attacked != EMPTY
+        return true
+    else
+        return false
+    end
+end
+
+function check_mate(board::Bitboard, color::String="white")
+    if color == "white"
+        king = board.K
+    elseif color == "black"
+        king = board.k
+    end
+
+    if length(get_current_king_valid(board, color)) != 0
+        return false
+    else
+        if length(get_all_valid_moves(board, color)) == 0
+            return true
+        else
+            return false
+        end
+    end
+end
+
+function will_be_in_check(board::Bitboard, source::UInt64,
+    target::UInt64, color::String="white")
+
+    tmpb = deepcopy(board)
+    tmpb = move_piece(tmpb, source, target, color)
+    if check_check(tmpb, color)
+        return true
+    else
+        return false
+    end
+end
+
+#----
+
 function checkCheck(board::Bitboard, color::String="white")
     if color == "white"
         king = board.K

@@ -131,15 +131,21 @@ function get_pawns_valid_list(board::Bitboard, color::String="white")
     for piece in pieces
         move = one_step[piece]
         if move & same == EMPTY && move & other == EMPTY && move != EMPTY
-            push!(piece_moves, (piece, move))
+            if ~will_be_in_check(board, piece, move, color)
+                push!(piece_moves, (piece, move))
+            end
             if (two_step[piece] & same == EMPTY && 
                 two_step[piece] & other == EMPTY && 
                 two_step[piece] != EMPTY)
-                push!(piece_moves, (piece, two_step[piece]))
+                if ~will_be_in_check(board, piece, two_step[piece], color)
+                    push!(piece_moves, (piece, two_step[piece]))
+                end
             end
             for attack in attacks[piece]
                 if other & attack != EMPTY
-                    push!(piece_moves, (piece, attack))
+                    if ~will_be_in_check(board, piece, attack, color)
+                        push!(piece_moves, (piece, attack))
+                    end
                 end
             end
         end

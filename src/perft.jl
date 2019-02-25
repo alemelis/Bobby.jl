@@ -1,15 +1,3 @@
-function get_all_valid_moves(board::Bitboard, color::String="white")
-    valid_moves = get_non_sliding_pieces_valid_list(board, "king", color)
-    union!(valid_moves, get_non_sliding_pieces_valid_list(board, "night",
-        color))
-    union!(valid_moves, get_pawns_valid_list(board, color))
-    union!(valid_moves, get_sliding_pieces_valid_list(board, "queen", color))
-    union!(valid_moves, get_sliding_pieces_valid_list(board, "rook", color))
-    return union!(valid_moves, get_sliding_pieces_valid_list(board, "bishop",
-        color))
-end
-
-
 function getAllMoves(board::Bitboard, lu_tabs::LookUpTables,
     color::String="white")
 
@@ -29,12 +17,50 @@ mutable struct PerftTree
     mates :: Array{Int64, 1}
 end
 
+function perft(board, depth, color::String="white")
+    pt = PerftTree(zeros(depth), zeros(depth), zeros(depth))
+    pt = explore(pt, board, depth, 1, color)
+    println(pt)
+    println(sum(pt.nodes))
+end
+
 
 function perft(board, lu_tabs, depth, color::String="white")
     pt = PerftTree(zeros(depth), zeros(depth), zeros(depth))
     pt = explore(pt, board, lu_tabs, depth, 1, color)
     println(pt)
     println(sum(pt.nodes))
+end
+
+function explore(pt::PerftTree, board::Bitboard, 
+    max_depth::Int64, depth::Int64, color::String="white")
+
+    if depth > max_depth
+        return pt
+    end
+    
+    moves = get_all_valid_moves(board, color)
+    if length(moves) == 0
+        return pt
+    end
+    pt.nodes[depth] += length(moves)
+
+    new_color = changeColor(color)
+    for m in moves
+        tmp_b = deepcopy(board)
+        new_board = move_piece(tmp_b, m[1], m[2], color)
+        if check_check(new_board, new_color)
+            pt.checks[depth] += 1
+            if check_mate(new_board, new_color)
+                pt.mates[depth] += 1
+                continue
+            end
+        end
+
+        pt = explore(pt, new_board, max_depth, depth+1, new_color)
+    end
+
+    return pt
 end
 
 function explore(pt::PerftTree, board::Bitboard, lu_tabs::LookUpTables, 

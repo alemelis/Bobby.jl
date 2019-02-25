@@ -30,9 +30,11 @@ function get_current_king_valid(board::Bitboard, color::String="white")
     if color == "white"
         king = board.K
         same_color = board.white
+        enemy_attack = board.black_attacks
     else
         king = board.k
         same_color = board.black
+        enemy_attack = board.white_attacks
     end
 
     king_valid = Set()
@@ -40,10 +42,9 @@ function get_current_king_valid(board::Bitboard, color::String="white")
     targets = KING_MOVES[king]
     for target in targets
         if target & same_color == EMPTY
-
-            #TODO: check check, pin, etc...
-
-            push!(king_valid, (source, target))
+            if target & enemy_attack == EMPTY
+                push!(king_valid, (source, target))
+            end
         end
     end
     return king_valid
