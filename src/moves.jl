@@ -1,105 +1,116 @@
-function get_sliding_pieces_valid_list(board::Bitboard, piece_type::String,
+function validate_move(board::Bitboard, move::Tuple{UInt64,UInt64},
     color::String="white")
+    
+    tmp_b = deepcopy(board)
+    tmp_b = move_piece(tmp_b, move[1], move[2], color)
 
-    if color == "white"
-        same = board.white
-        other = board.black
-        if piece_type == "queen"
-            pieces = board.Q
-            attack_fun = star_attack
-        elseif piece_type == "rook"
-            pieces = board.R
-            attack_fun = orthogonal_attack
-        elseif piece_type == "bishop"
-            pieces = board.B
-            attack_fun = cross_attack
-        end
-    else
-        same = board.black
-        other = board.white
-        if piece_type == "queen"
-            pieces = board.q
-            attack_fun = star_attack
-        elseif piece_type == "rook"
-            pieces = board.r
-            attack_fun = orthogonal_attack
-        elseif piece_type == "bishop"
-            pieces = board.b
-            attack_fun = cross_attack
-        end
-    end
-
-    occupancy = same | other
-
-    piece_moves = Set()
-    for piece in pieces
-        moves, edges = attack_fun(occupancy, piece)
-        for move in moves
-            if ~will_be_in_check(board, piece, move, color)
-                push!(piece_moves, (piece, move))
-            end
-        end
-        for edge in edges
-            if edge & same == EMPTY
-                if ~will_be_in_check(board, piece, edge, color)
-                    push!(piece_moves, (piece, edge))
-                end
-            end
-        end
-    end
-    return piece_moves
+    return ~check_check(tmp_b, color)
 end
 
-
-function get_non_sliding_pieces_valid_list(board::Bitboard, piece_type::String,
-    color::String="white")
-
-    if color == "white"
-        same = board.white
-        other = board.black
-        if piece_type == "king"
-            pieces = board.K
-            piece_dict = KING_MOVES
-        elseif piece_type == "night"
-            pieces = board.N
-            piece_dict = NIGHT_MOVES
-        end
-    else
-        same = board.black
-        other = board.white
-        if piece_type == "king"
-            pieces = board.k
-            piece_dict = KING_MOVES
-        elseif piece_type == "night"
-            pieces = board.n
-            piece_dict = NIGHT_MOVES
-        end
-    end
-
-    piece_moves = Set()
-
-    for piece in pieces
-        moves = piece_dict[piece]
-        for move in moves
-            if move & same == EMPTY
-                if ~will_be_in_check(board, piece, move, color)
-                    push!(piece_moves, (piece, move))
-                end
-            end
-        end
-    end
-    return piece_moves
+function get_all_moves(board::Bitboard, color::String="white")
+    valid_moves = get_non_sliding_pieces_list(board, "king", color)
+    union!(valid_moves, get_non_sliding_pieces_list(board, "night", color))
+    union!(valid_moves, get_pawns_list(board, color))
+    union!(valid_moves, get_sliding_pieces_list(board, "queen", color))
+    union!(valid_moves, get_sliding_pieces_list(board, "rook", color))
+    return union!(valid_moves, get_sliding_pieces_list(board, "bishop", color))
 end
 
 function get_all_valid_moves(board::Bitboard, color::String="white")
-    valid_moves = get_non_sliding_pieces_valid_list(board, "king", color)
-    union!(valid_moves, get_non_sliding_pieces_valid_list(board, "night",
-        color))
-    union!(valid_moves, get_pawns_valid_list(board, color))
-    union!(valid_moves, get_sliding_pieces_valid_list(board, "queen", color))
-    union!(valid_moves, get_sliding_pieces_valid_list(board, "rook", color))
-    return union!(valid_moves, get_sliding_pieces_valid_list(board, "bishop",
-        color))
+    moves = get_all_moves(board, color)
+    valid_moves = Set()
+    for move in moves
+        if validate_move(board, move, color)
+            push!(valid_moves, move)
+        end
+    end
+    return valid_moves
+end
+
+function get_non_sliding_pieces_list(board::Bitboard, piece_type::String,
+    color::String="white")
+
+    if color == "white"
+        same = board.white
+        other_king = board.k
+        if piece_type == "king"
+            pieces = board.K
+        else
+            pieces = board.N
+        end
+    else
+        same = board.black
+        other_king = board.K
+        if piece_type == "king"
+            pieces = board.k
+        else
+            pieces = board.n
+        end
+    end
+
+    if piece_type == "king"
+        piece_dict = KING_MOVES
+    else
+        piece_dict = NIGHT_MOVES
+    end
+
+    piece_moves = Set()
+    for piece in pieces
+        for move in piece_dict[piece]
+            if move & same == EMPTY && move & other_king == EMPTY
+                push!(piece_moves, (piece, move))
+            end
+        end
+    end
+    return piece_moves
+end
+
+function get_sliding_pieces_list(board::Bitboard, piece_type::String,
+    color::String="white")
+
+    if color == "white"
+        same = board.white
+        other_king = board.k
+        if piece_type == "queen"
+            pieces = board.Q
+        elseif piece_type == "rook"
+            pieces = board.R
+        else
+            pieces = board.B
+        end
+    else
+        same = board.black
+        other_king = board.K
+        if piece_type == "queen"
+            pieces = board.q
+        elseif piece_type == "rook"
+            pieces = board.r
+        else
+            pieces = board.b
+        end
+    end
+
+    if piece_type == "queen"
+        attack_fun = star_attack
+    elseif piece_type == "rook"
+        attack_fun = orthogonal_attack
+    else
+        attack_fun = cross_attack
+    end
+
+    piece_moves = Set()
+    for piece in pieces
+        moves, edges = attack_fun(board.taken, piece)
+        for move in moves
+            push!(piece_moves, (piece, move))
+        end
+        for edge in edges
+            if edge & same == EMPTY && edge & other_king == EMPTY
+                push!(piece_moves, (piece, edge))
+            end
+        end
+    end
+    return piece_moves
 end
 
 function get_attacked(board::Bitboard, color::String="white")
@@ -119,7 +130,7 @@ function get_attacked(board::Bitboard, color::String="white")
             end
         end
         for queen in board.Q
-            moves, edges = star_attack(board.white | board.black, queen)
+            moves, edges = star_attack(board.taken, queen)
             for move in moves
                 attacked |= move
             end
@@ -128,7 +139,7 @@ function get_attacked(board::Bitboard, color::String="white")
             end
         end
         for rook in board.R
-            moves, edges = orthogonal_attack(board.white | board.black, rook)
+            moves, edges = orthogonal_attack(board.taken, rook)
             for move in moves
                 attacked |= move
             end
@@ -137,7 +148,7 @@ function get_attacked(board::Bitboard, color::String="white")
             end
         end
         for bishop in board.B
-            moves, edges = cross_attack(board.white | board.black, bishop)
+            moves, edges = cross_attack(board.taken, bishop)
             for move in moves
                 attacked |= move
             end
@@ -156,12 +167,12 @@ function get_attacked(board::Bitboard, color::String="white")
             end
         end
         for pawn in board.p
-            for target in WHITE_PAWN_ATTACK[pawn]
+            for target in BLACK_PAWN_ATTACK[pawn]
                 attacked |= target
             end
         end
         for queen in board.q
-            moves, edges = star_attack(board.white | board.black, queen)
+            moves, edges = star_attack(board.taken, queen)
             for move in moves
                 attacked |= move
             end
@@ -170,7 +181,7 @@ function get_attacked(board::Bitboard, color::String="white")
             end
         end
         for rook in board.r
-            moves, edges = orthogonal_attack(board.white | board.black, rook)
+            moves, edges = orthogonal_attack(board.taken, rook)
             for move in moves
                 attacked |= move
             end
@@ -179,7 +190,7 @@ function get_attacked(board::Bitboard, color::String="white")
             end
         end
         for bishop in board.b
-            moves, edges = cross_attack(board.white | board.black, bishop)
+            moves, edges = cross_attack(board.taken, bishop)
             for move in moves
                 attacked |= move
             end
@@ -191,18 +202,15 @@ function get_attacked(board::Bitboard, color::String="white")
     end
 end
 
-function update_attacked(board::Bitboard, color::String="white")
-    if color == "white"
-        board.white_attacks = get_attacked(board, color)
-    else
-        board.black_attacks = get_attacked(board, color)
-    end
+function update_attacked(board::Bitboard)
+    board.white_attacks = get_attacked(board, "white")
+    board.black_attacks = get_attacked(board, "black")
     return board
 end
 
 function move_white_piece(board::Bitboard, source::UInt64, target::UInt64)
-    board.free |= source
-    board.free = xor(board.free, target)
+    board.free |= source # +
+    board.free = xor(board.free, target) # -
     board.taken |= target
     board.taken = xor(board.taken, source)
     board.white |= target
@@ -223,8 +231,7 @@ function move_white_piece(board::Bitboard, source::UInt64, target::UInt64)
     elseif source in board.Q
         filter!(e -> e != source, board.Q)
         push!(board.Q, target)
-    elseif source in board.K
-        board.K = xor(board.K, source)
+    elseif source == board.K
         board.K = target
     elseif source in board.N
         filter!(e -> e != source, board.N)
@@ -236,7 +243,8 @@ function move_white_piece(board::Bitboard, source::UInt64, target::UInt64)
         filter!(e -> e != source, board.B)
         push!(board.B, target)
     end
-    return board
+
+    return update_attacked(board)
 end
 
 function move_black_piece(board::Bitboard, source::UInt64, target::UInt64)
@@ -245,7 +253,7 @@ function move_black_piece(board::Bitboard, source::UInt64, target::UInt64)
     board.taken |= target
     board.taken = xor(board.taken, source)
     board.black |= target
-    board.black = xor(board.white, source)
+    board.black = xor(board.black, source)
 
     if board.white & target != EMPTY
         board.white = xor(board.white, target)
@@ -275,7 +283,7 @@ function move_black_piece(board::Bitboard, source::UInt64, target::UInt64)
         filter!(e -> e != source, board.b)
         push!(board.b, target)
     end
-    return board
+    return update_attacked(board)
 end
 
 function move_piece(board::Bitboard, source::UInt64, target::UInt64, color::String="white")
@@ -284,127 +292,4 @@ function move_piece(board::Bitboard, source::UInt64, target::UInt64, color::Stri
     else
         return move_black_piece(board, source, target)
     end
-end
-#---
-
-function moveSourceTargetWhite(board::Bitboard, source::Int64, target::Int64)
-    board.free[source] = true
-    board.free[target] = false
-    board.taken[source] = false
-    board.taken[target] = true
-    board.white[source] = false
-    board.white[target] = true
-
-    if board.black[target]
-        board.black[target] = false
-        if board.p[target]
-            board.p[target] = false
-        elseif board.r[target]
-            board.r[target] = false
-        elseif board.n[target]
-            board.n[target] = false
-        elseif board.b[target]
-            board.b[target] = false
-        elseif board.q[target]
-            board.q[target] = false
-        elseif board.k[target]
-            prettyPrint(board)
-            println(source, " ", target)
-            throw(DomainError("black king in target square"))
-        end
-    end
-    return board
-end
-
-
-function moveSourceTargetBlack(board::Bitboard, source::Int64, target::Int64)
-    board.free[source] = true
-    board.free[target] = false
-    board.taken[source] = false
-    board.taken[target] = true
-    board.black[source] = false
-    board.black[target] = true
-
-    if board.white[target]
-        board.white[target] = false
-        if board.P[target]
-            board.P[target] = false
-        elseif board.R[target]
-            board.R[target] = false
-        elseif board.N[target]
-            board.N[target] = false
-        elseif board.B[target]
-            board.B[target] = false
-        elseif board.Q[target]
-            board.Q[target] = false
-        elseif board.K[target]
-            throw(DomainError("white king in target square"))
-        end
-    end
-    return board
-end
-
-
-function getAttacked(board::Bitboard, lu_tabs::LookUpTables,
-    color::String="white")
-
-    attacked = falses(64)
-    attacked .|= getPawnsAttackGeneric(board, lu_tabs, color)
-    attacked .|= getKingValid(board, lu_tabs, color)
-    attacked .|= getNightsValid(board, lu_tabs, color)
-    attacked .|= getQueenValid(board, lu_tabs, color)
-    attacked .|= getBishopsValid(board, lu_tabs, color)
-    attacked .|= getRooksValid(board, lu_tabs, color)
-
-    return attacked
-end
-
-
-function updateAttacked(board::Bitboard, lu_tabs::LookUpTables,
-    color::String="white")
-
-    if color == "white"
-        opponent_color = "black"
-    else
-        opponent_color = "white"
-    end
-
-    opponent_attacked = getAttacked(board, lu_tabs, opponent_color)
-    if opponent_color == "white"
-        board.white_attacks = opponent_attacked
-    else
-        board.black_attacks = opponent_attacked
-    end
-
-    if checkCheck(board, color)
-        throw(ErrorException("invalid move! $color would be in check!"))
-    end
-
-    attacked = getAttacked(board, lu_tabs, color)
-    if color == "white"
-        board.white_attacks = attacked
-    else
-        board.black_attacks = attacked
-    end
-
-    return board
-end
-
-
-function countAllValidMoves(board::Bitboard, lu_tabs::LookUpTables,
-    color::String="white")
-
-    validators = Dict()
-    validators['k'] = getKingValid
-    validators['p'] = getPawnsValid
-    validators['q'] = getQueenValid
-    validators['b'] = getBishopsValid
-    validators['r'] = getRooksValid
-    validators['n'] = getNightsValid
-    valids_count = 0
-    for piece in keys(validators)
-        valid_moves = validators[piece](board, lu_tabs, color)
-        valids_count += sum(Int.(valid_moves))
-    end
-    return valids_count
 end

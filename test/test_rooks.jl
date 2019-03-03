@@ -58,30 +58,30 @@
           0,0,0,0,0,0,0,0]
     @test all(Int.(Bobby.cvt_to_bitarray(rook_occupancy)) .== ro)
 
-    bb = Bobby.fen_to_bitboard("8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8")
-    rv = [0,0,0,0,0,0,0,0,
-          0,0,0,0,0,0,0,0,
-          0,0,0,0,0,0,0,0,
-          0,0,0,0,0,0,0,0,
-          1,0,1,1,1,1,0,0,
-          0,1,0,0,0,0,0,0,
-          0,1,0,0,0,0,0,0,
-          0,1,0,0,0,0,0,0]
-    rvw = Bobby.get_rooks_valid(bb)
-    @test all(Int.(Bobby.cvt_to_bitarray(rvw)) .== rv)
-    rvl = Bobby.get_sliding_pieces_valid_list(bb, "rook")
-    @test length(rvl) == 8
+    # bb = Bobby.fen_to_bitboard("8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8")
+    # rv = [0,0,0,0,0,0,0,0,
+    #       0,0,0,0,0,0,0,0,
+    #       0,0,0,0,0,0,0,0,
+    #       0,0,0,0,0,0,0,0,
+    #       1,0,1,1,1,1,0,0,
+    #       0,1,0,0,0,0,0,0,
+    #       0,1,0,0,0,0,0,0,
+    #       0,1,0,0,0,0,0,0]
+    # rvw = Bobby.get_rooks_valid(bb)
+    # @test all(Int.(Bobby.cvt_to_bitarray(rvw)) .== rv)
+    # rvl = Bobby.get_sliding_pieces_valid_list(bb, "rook")
+    # @test length(rvl) == 8
 
-    rv = [0,0,0,0,0,0,0,1,
-          0,0,0,0,0,0,0,1,
-          0,0,0,0,0,0,0,1,
-          0,1,1,1,1,1,1,0,
-          0,0,0,0,0,0,0,0,
-          0,0,0,0,0,0,0,0,
-          0,0,0,0,0,0,0,0,
-          0,0,0,0,0,0,0,0]
-    rvb = Bobby.get_rooks_valid(bb, "black")
-    @test all(Int.(Bobby.cvt_to_bitarray(rvb)) .== rv)
-    rvl = Bobby.get_sliding_pieces_valid_list(bb, "rook", "black")
-    @test length(rvl) == 9
+    # rv = [0,0,0,0,0,0,0,1,
+    #       0,0,0,0,0,0,0,1,
+    #       0,0,0,0,0,0,0,1,
+    #       0,1,1,1,1,1,1,0,
+    #       0,0,0,0,0,0,0,0,
+    #       0,0,0,0,0,0,0,0,
+    #       0,0,0,0,0,0,0,0,
+    #       0,0,0,0,0,0,0,0]
+    # rvb = Bobby.get_rooks_valid(bb, "black")
+    # @test all(Int.(Bobby.cvt_to_bitarray(rvb)) .== rv)
+    # rvl = Bobby.get_sliding_pieces_valid_list(bb, "rook", "black")
+    # @test length(rvl) == 9
 end
