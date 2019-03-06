@@ -27,10 +27,10 @@ function explore(pt::PerftTree, board::Bitboard,
     end
     pt.nodes[depth] += length(moves)
 
-    new_color = changeColor(color)
+    new_color = change_color(color)
     for m in moves
         tmp_b = deepcopy(board)
-        tmp_b = move_piece(tmp_b, m[1], m[2], color)
+        tmp_b = move_piece(tmp_b, m.source, m.target, color)
         if check_check(tmp_b, new_color)
             pt.checks[depth] += 1
             if check_mate(tmp_b, new_color)
@@ -44,6 +44,7 @@ function explore(pt::PerftTree, board::Bitboard,
         end
 
         pt = explore(pt, tmp_b, max_depth, depth+1, new_color)
+        # board = unmove_piece(board, m, color)
     end
 
     return pt
