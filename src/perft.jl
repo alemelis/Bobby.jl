@@ -29,22 +29,23 @@ function explore(pt::PerftTree, board::Bitboard,
 
     new_color = change_color(color)
     for m in moves
-        tmp_b = deepcopy(board)
-        tmp_b = move_piece(tmp_b, m.source, m.target, color)
-        if check_check(tmp_b, new_color)
+        # tmp_b = deepcopy(board)
+        board = move_piece(board, m.source, m.target, color)
+        if check_check(board, new_color)
             pt.checks[depth] += 1
-            if check_mate(tmp_b, new_color)
+            if check_mate(board, new_color)
                 pt.mates[depth] += 1
+                board = unmove_piece(board, m, color)
                 continue
             end
         end
         
-        if count_total_pieces(tmp_b) < total_pieces
+        if count_total_pieces(board) < total_pieces
             pt.captures[depth] += 1
         end
 
-        pt = explore(pt, tmp_b, max_depth, depth+1, new_color)
-        # board = unmove_piece(board, m, color)
+        pt = explore(pt, board, max_depth, depth+1, new_color)
+        board = unmove_piece(board, m, color)
     end
 
     return pt

@@ -8,10 +8,11 @@ end
 
 function validate_move(board::Bitboard, move::Move, color::String="white")
     
-    tmp_b = deepcopy(board)
-    tmp_b = move_piece(tmp_b, move.source, move.target, color)
-
-    return ~check_check(tmp_b, color)
+    # tmp_b = deepcopy(board)
+    board = move_piece(board, move.source, move.target, color)
+    in_check = check_check(board, color)
+    board = unmove_piece(board, move, color)
+    return ~in_check
 end
 
 function get_all_moves(board::Bitboard, color::String="white")
