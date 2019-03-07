@@ -359,9 +359,9 @@ function move_piece(board::Bitboard, move::Move, color::String="white")
         board = move_black_piece(board, move.source, move.target)
     end
     # board = update_attacked(board)
-    if check_check_raytrace(board, change_color(color))
-        move.check = true
-    end
+    # if check_check_raytrace(board, change_color(color))
+    #     move.check = true
+    # end
     return board
 end
 
