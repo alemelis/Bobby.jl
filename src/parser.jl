@@ -114,7 +114,7 @@ function fen_to_bitboard(fen::String)
                 white_king_moved, black_king_moved,
                 a1_rook_moved, h1_rook_moved,
                 a8_rook_moved, h8_rook_moved,
-                white_OO, white_OOO, black_OO, black_OOO) 
+                white_OO, white_OOO, black_OO, black_OOO, false, false) 
         end
     end
 end

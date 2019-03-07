@@ -23,21 +23,21 @@ function explore(pt::PerftTree, board::Bitboard,
     total_pieces = count_total_pieces(board)
     moves = get_all_valid_moves(board, color)
     if length(moves) == 0
+        pt.mates[depth] += 1
         return pt
     end
     pt.nodes[depth] += length(moves)
 
     new_color = change_color(color)
     for m in moves
-        # tmp_b = deepcopy(board)
-        board = move_piece(board, m.source, m.target, color)
-        if check_check(board, new_color)
+        board = move_piece(board, m, color)
+        if m.check
             pt.checks[depth] += 1
-            if check_mate(board, new_color)
-                pt.mates[depth] += 1
-                board = unmove_piece(board, m, color)
-                continue
-            end
+            # if check_mate(board, new_color)
+            #     pt.mates[depth] += 1
+            #     board = unmove_piece(board, m, color)
+            #     continue
+            # end
         end
         
         if count_total_pieces(board) < total_pieces

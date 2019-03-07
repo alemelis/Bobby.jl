@@ -4,13 +4,12 @@ mutable struct Move
     piece_type :: String
     capture_type :: String
     promotion_type :: String
+    check :: Bool
 end
 
 function validate_move(board::Bitboard, move::Move, color::String="white")
-    
-    # tmp_b = deepcopy(board)
-    board = move_piece(board, move.source, move.target, color)
-    in_check = check_check(board, color)
+    board = move_piece(board, move, color)
+    in_check = check_check_raytrace(board, color)
     board = unmove_piece(board, move, color)
     return ~in_check
 end
@@ -72,11 +71,12 @@ function get_non_sliding_pieces_list(board::Bitboard, piece_type::String,
             if move & other_king == EMPTY
                 if move & same == EMPTY && move & other == EMPTY
                     push!(piece_moves, Move(piece, move,
-                                            piece_type, "none", "none"))
+                                            piece_type, "none", "none", false))
                 elseif move & same == EMPTY && move & other != EMPTY
                     taken_piece = find_piece_type(board, move, opponent_color)
                     push!(piece_moves, Move(piece, move,
-                                            piece_type, taken_piece, "none"))
+                                            piece_type, taken_piece,
+                                            "none", false))
                 end
             end
         end
@@ -161,17 +161,18 @@ function get_sliding_pieces_list(board::Bitboard, piece_type::String,
     for piece in pieces
         moves, edges = attack_fun(board.taken, piece)
         for move in moves
-            push!(piece_moves, Move(piece, move, piece_type, "none", "none"))
+            push!(piece_moves, Move(piece, move, piece_type,
+                "none", "none", false))
         end
         for edge in edges
             if edge & other_king == EMPTY
                 if edge & same == EMPTY && edge & other == EMPTY
                     push!(piece_moves, Move(piece, edge, piece_type,
-                                            "none", "none"))
+                                            "none", "none", false))
                 elseif edge & same == EMPTY && edge & other != EMPTY
                     taken_piece = find_piece_type(board, edge, opponent_color)
                     push!(piece_moves, Move(piece, edge, piece_type,
-                                            taken_piece, "none"))
+                                            taken_piece, "none", false))
                 end
             end
         end
@@ -309,7 +310,6 @@ function move_white_piece(board::Bitboard, source::UInt64, target::UInt64)
         filter!(e -> e != source, board.B)
         push!(board.B, target)
     end
-
     return board
 end
 
@@ -352,13 +352,17 @@ function move_black_piece(board::Bitboard, source::UInt64, target::UInt64)
     return board
 end
 
-function move_piece(board::Bitboard, source::UInt64, target::UInt64, color::String="white")
+function move_piece(board::Bitboard, move::Move, color::String="white")
     if color == "white"
-        board = move_white_piece(board, source, target)
+        board = move_white_piece(board, move.source, move.target)
     else
-        board = move_black_piece(board, source, target)
+        board = move_black_piece(board, move.source, move.target)
     end
-    return update_attacked(board)
+    # board = update_attacked(board)
+    if check_check_raytrace(board, change_color(color))
+        move.check = true
+    end
+    return board
 end
 
 function unmove_piece(board::Bitboard, move::Move, color::String="white")
@@ -399,5 +403,6 @@ function unmove_piece(board::Bitboard, move::Move, color::String="white")
             board.free = xor(board.free, move.target)
         end
     end
-    return update_attacked(board)
+    # return update_attacked(board)
+    return board
 end

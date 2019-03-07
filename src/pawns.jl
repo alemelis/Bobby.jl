@@ -133,12 +133,12 @@ function get_pawns_list(board::Bitboard, color::String="white")
         move = one_step[piece]
         if move & same == EMPTY && move & other == EMPTY && move != EMPTY
             push!(piece_moves, Move(piece, move,
-                                    "pawn", "none", "none"))
+                                    "pawn", "none", "none", false))
             if (two_steps[piece] & same == EMPTY && 
                 two_steps[piece] & other == EMPTY && 
                 two_steps[piece] != EMPTY)
                 push!(piece_moves, Move(piece, two_steps[piece],
-                                        "pawn", "none", "none"))
+                                        "pawn", "none", "none", false))
             end
             for attack in attacks[piece]
                 if attack & same == EMPTY &&
@@ -147,7 +147,7 @@ function get_pawns_list(board::Bitboard, color::String="white")
                    attack != EMPTY
                     taken_piece = find_piece_type(board, attack, opponent_color)
                     push!(piece_moves, Move(piece, attack,
-                                            "pawn", taken_piece, "none"))
+                                            "pawn", taken_piece, "none", false))
                 end
             end
         end

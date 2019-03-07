@@ -6,6 +6,7 @@ function change_color(color::String)
     end
 end
 
+#=
 function play(player_color="white")
     b = buildBoard()
     l = buildLookUpTables()
@@ -344,3 +345,4 @@ function playPC(player_color="white")
         Bobby.prettyPrint(b, player_color)
     end
 end
+=#
