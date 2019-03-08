@@ -86,11 +86,19 @@ function gen_pawn_attacked_valid(source_square::UInt64,
     target_squares = zeros(UInt64, 0)
 
     if color == "white"
-        push!(target_squares, (source_square & CLEAR_FILE_A) << 9)
-        push!(target_squares, (source_square & CLEAR_FILE_H) << 7)
+        if source_square & CLEAR_FILE_A != EMPTY
+            push!(target_squares, source_square << 9)
+        end
+        if source_square & CLEAR_FILE_H != EMPTY
+            push!(target_squares, source_square << 7)
+        end
     else
-        push!(target_squares, (source_square & CLEAR_FILE_A) >> 9)
-        push!(target_squares, (source_square & CLEAR_FILE_H) >> 7)
+        if source_square & CLEAR_FILE_H != EMPTY
+            push!(target_squares, source_square >> 9)
+        end
+        if source_square & CLEAR_FILE_A != EMPTY
+            push!(target_squares, source_square >> 7)
+        end
     end
 
     return target_squares
@@ -143,7 +151,6 @@ function get_pawns_list(board::Bitboard, color::String="white")
             for attack in attacks[piece]
                 if attack & same == EMPTY &&
                    attack & other != EMPTY &&
-                   attack & other_king == EMPTY &&
                    attack != EMPTY
                     taken_piece = find_piece_type(board, attack, opponent_color)
                     push!(piece_moves, Move(piece, attack,

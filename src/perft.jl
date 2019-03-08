@@ -10,25 +10,38 @@ function perft(board, depth, color::String="white")
     pt = explore(pt, board, depth, 1, color)
     # println(pt)
     # println(sum(pt.nodes))
+    print_perftree(pt)
+end
+
+function print_perftree(pt::PerftTree)
+    println("Nodes    ", pt.nodes)
+    println("Captures ", pt.captures)
+    println("Checks   ", pt.checks)
+    println("Mates    ", pt.mates)
 end
 
 
 function explore(pt::PerftTree, board::Bitboard, 
     max_depth::Int64, depth::Int64, color::String="white")
-
-    if depth > max_depth
-        return pt
-    end
     
     if check_check_raytrace(board, color)
-        pt.checks[depth] += 1
+        pt.checks[depth-1] += 1
+        # Bobby.pretty_print(board)
     end
     total_pieces = count_total_pieces(board)
     moves = get_all_valid_moves(board, color)
+    # for move in moves
+    #     println(move.piece_type)#, " ", cvt_to_int(move.source), " ", cvt_to_int(move.target))
+    # end
     if length(moves) == 0 # ?????????????????????????? stalemate
         pt.mates[depth-1] += 1
         return pt
     end
+
+    if depth > max_depth
+        return pt
+    end
+
     pt.nodes[depth] += length(moves)
 
     new_color = change_color(color)
