@@ -138,3 +138,14 @@ function gen_int_to_uint_dict()
     return squares_int_uint
 end
 const INT2UINT = gen_int_to_uint_dict()
+
+
+function gen_uint_to_pgn_dict()
+    uint_pgn = Dict{UInt64,String}()
+
+    for k in keys(INT2PGN)
+        push!(uint_pgn, INT2UINT[k] => INT2PGN[k])
+    end
+    return uint_pgn
+end
+const UINT2PGN = gen_uint_to_pgn_dict()
