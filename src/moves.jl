@@ -4,7 +4,6 @@ mutable struct Move
     piece_type :: String
     capture_type :: String
     promotion_type :: String
-    check :: Bool
 end
 
 function validate_move(board::Bitboard, move::Move, color::String="white")
@@ -71,12 +70,12 @@ function get_non_sliding_pieces_list(board::Bitboard, piece_type::String,
             if move & other_king == EMPTY
                 if move & same == EMPTY && move & other == EMPTY
                     push!(piece_moves, Move(piece, move,
-                                            piece_type, "none", "none", false))
+                                            piece_type, "none", "none"))
                 elseif move & same == EMPTY && move & other != EMPTY
                     taken_piece = find_piece_type(board, move, opponent_color)
                     push!(piece_moves, Move(piece, move,
                                             piece_type, taken_piece,
-                                            "none", false))
+                                            "none"))
                 end
             end
         end
@@ -162,17 +161,17 @@ function get_sliding_pieces_list(board::Bitboard, piece_type::String,
         moves, edges = attack_fun(board.taken, piece)
         for move in moves
             push!(piece_moves, Move(piece, move, piece_type,
-                "none", "none", false))
+                "none", "none"))
         end
         for edge in edges
             if edge & other_king == EMPTY
                 if edge & same == EMPTY && edge & other == EMPTY
                     push!(piece_moves, Move(piece, edge, piece_type,
-                                            "none", "none", false))
+                                            "none", "none"))
                 elseif edge & same == EMPTY && edge & other != EMPTY
                     taken_piece = find_piece_type(board, edge, opponent_color)
                     push!(piece_moves, Move(piece, edge, piece_type,
-                                            taken_piece, "none", false))
+                                            taken_piece, "none"))
                 end
             end
         end
@@ -358,12 +357,93 @@ function move_piece(board::Bitboard, move::Move, color::String="white")
     else
         board = move_black_piece(board, move.source, move.target)
     end
-    # board = update_attacked(board)
-    # if check_check_raytrace(board, change_color(color))
-    #     move.check = true
-    # end
     return board
 end
+
+function move(board::Bitboard, source::String, target::String)
+
+    s = PGN2UINT[source]
+    t = PGN2UINT[target]
+
+    if s & board.white != EMPTY
+        color = "white"
+
+        if s in board.P
+            piece_type = "pawn"
+        elseif s in board.Q
+            piece_type = "queen"
+        elseif s in board.N
+            piece_type = "night"
+        elseif s in board.B
+            piece_type = "bishop"
+        elseif s in board.R
+            piece_type = "rook"
+        elseif s == board.K
+            piece_type = "king"
+        end
+
+        if t & board.white != EMPTY
+            throw(ArgumentError("Invalid target UCI string: same color piece"))
+        elseif t & board.black != EMPTY
+            if t in board.p
+                capture_type = "pawn"
+            elseif t in board.q
+                capture_type = "queen"
+            elseif t in board.n
+                capture_type = "night"
+            elseif t in board.b
+                capture_type = "bishop"
+            elseif t in board.r
+                capture_type = "rook"
+            end
+        else
+            capture_type = "none"
+        end
+
+
+    elseif s & board.black != EMPTY
+        color = "black"
+
+        if s in board.p
+            piece_type = "pawn"
+        elseif s in board.q
+            piece_type = "queen"
+        elseif s in board.n
+            piece_type = "night"
+        elseif s in board.b
+            piece_type = "bishop"
+        elseif s in board.r
+            piece_type = "rook"
+        elseif s == board.k
+            piece_type = "king"
+        end
+
+        if t & board.black != EMPTY
+            throw(ArgumentError("Invalid target UCI string: same color piece"))
+        elseif t & board.white != EMPTY
+            if t in board.P
+                capture_type = "pawn"
+            elseif t in board.Q
+                capture_type = "queen"
+            elseif t in board.N
+                capture_type = "night"
+            elseif t in board.B
+                capture_type = "bishop"
+            elseif t in board.R
+                capture_type = "rook"
+            end
+        else
+            capture_type = "none"
+        end
+    else
+        throw(ArgumentError("Invalid source UCI string: no piece to move"))
+    end
+
+    move = Move(s, t, piece_type, capture_type, "none")
+
+    return move_piece(board, move, color)
+end
+
 
 function unmove_piece(board::Bitboard, move::Move, color::String="white")
     if color == "white"
