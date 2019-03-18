@@ -53,55 +53,7 @@ l = Bobby.buildLookUpTables()
     @test all(Int.(kv) .== king8)
 end
 
-@testset "knights" begin
-    # test white knigth
-    b = Bobby.buildBoard()
-    b.N = falses(64)
-    b.N[34] = true
-    b.black = falses(64)
-    b.white = Bool.([0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,
-    0,1,0,1,0,0,0,0,
-    0,0,0,0,0,0,0,0,
-    1,0,0,0,0,0,0,0,
-    0,0,0,1,0,0,0,0])
-    n33 = [0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,
-    1,0,1,0,0,0,0,0,
-    0,0,0,1,0,0,0,0,
-    0,0,0,0,0,0,0,0,
-    0,0,0,1,0,0,0,0,
-    0,0,1,0,0,0,0,0,
-    0,0,0,0,0,0,0,0]
-    n = Bobby.getNightsValid(b, l)
-    @test all(Int.(n) .== n33)
 
-    # test black knight
-    b = Bobby.buildBoard()
-    b.n = falses(64)
-    b.n[36] = true
-    b.white = falses(64)
-    b.black = Bool.([0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,
-    0,0,1,0,0,0,0,0,
-    0,0,1,0,1,1,0,0,
-    0,0,0,1,0,1,0,0,
-    0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0])
-    n36 = [0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,
-    0,0,0,0,1,0,0,0,
-    0,1,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,
-    0,1,0,0,0,1,0,0,
-    0,0,1,0,1,0,0,0,
-    0,0,0,0,0,0,0,0]
-    n = Bobby.getNightsValid(b, l, "black")
-    @test all(Int.(n) .== n36)
-end
 
 @testset "rooks" begin
     b = Bobby.buildBoard()

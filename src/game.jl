@@ -1,3 +1,12 @@
+function change_color(color::String)
+    if color == "white"
+        return "black"
+    else
+        return "white"
+    end
+end
+
+#=
 function play(player_color="white")
     b = buildBoard()
     l = buildLookUpTables()
@@ -54,13 +63,7 @@ function changeColor(color::String, opponent_color::String)
 end
 
 
-function changeColor(color::String)
-    if color == "white"
-        return "black"
-    else
-        return "white"
-    end
-end
+
 
 function move(board::Bitboard, lu_tabs::LookUpTables, source::String,
     target::String, color::String="white")
@@ -342,3 +345,4 @@ function playPC(player_color="white")
         Bobby.prettyPrint(b, player_color)
     end
 end
+=#
