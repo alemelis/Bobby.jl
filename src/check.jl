@@ -11,6 +11,7 @@ function check_check(board::Bitboard, color::String="white")
     return false
 end
 
+
 function check_check_raytrace(board::Bitboard, color::String="white")
     if color == "white"
         squares = NIGHT_MOVES[board.K]
@@ -86,6 +87,7 @@ function check_check_raytrace(board::Bitboard, color::String="white")
         return false
     end
 end
+
 
 function check_mate(board::Bitboard, color::String="white")
     if color == "white"

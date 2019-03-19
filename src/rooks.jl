@@ -36,6 +36,7 @@ function gen_rook_masks()
 end
 const ROOK_MASKS = gen_rook_masks()
 
+
 function slide_rank(rank_occupancy_mask::UInt64, ui::UInt64, shift::Int64)
     direction = 1
     increment = 1
@@ -165,6 +166,7 @@ function get_rooks_valid(board::Bitboard, color::String="white")
     end
     return rook_moves
 end
+
 
 function get_rooks_valid_list(board::Bitboard, color::String="white")
     if color == "white"

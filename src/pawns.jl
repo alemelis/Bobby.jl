@@ -28,8 +28,7 @@ function gen_all_pawns_one_step_valid_moves(color::String="white")
     return pawn_moves
 end
 const WHITE_PAWN_ONESTEP_MOVES = gen_all_pawns_one_step_valid_moves()
-const BLACK_PAWN_ONESTEP_MOVES = gen_all_pawns_one_step_valid_moves(
-    "black")
+const BLACK_PAWN_ONESTEP_MOVES = gen_all_pawns_one_step_valid_moves("black")
 
 
 function gen_pawn_two_steps_valid(source_square::UInt64,

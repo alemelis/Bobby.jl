@@ -49,6 +49,7 @@ function diagonal_attack(board::UInt64, ui::UInt64)
     end
 end
 
+
 function antidiagonal_attack(board::UInt64, ui::UInt64)
     for i in 1:15
         if ANTIDIAGONALS[i] & ui != EMPTY

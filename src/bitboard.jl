@@ -1,8 +1,3 @@
-"""
-    Bitboard
-
-Data structure for the chess board.
-"""
 mutable struct Bitboard
     white :: UInt64 # all white pieces
     P :: Array{UInt64,1}
@@ -40,11 +35,7 @@ mutable struct Bitboard
 end
 
 
-"""
-    set_board()
-
-Set board in starting position.
-"""
 function set_board()
-    return fen_to_bitboard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
+    return fen_to_bitboard(
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
 end

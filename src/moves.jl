@@ -6,12 +6,14 @@ mutable struct Move
     promotion_type :: String
 end
 
+
 function validate_move(board::Bitboard, move::Move, color::String="white")
     board = move_piece(board, move, color)
     in_check = check_check_raytrace(board, color)
     board = unmove_piece(board, move, color)
     return ~in_check
 end
+
 
 function get_all_moves(board::Bitboard, color::String="white")
     valid_moves = get_non_sliding_pieces_list(board, "king", color)
@@ -21,6 +23,7 @@ function get_all_moves(board::Bitboard, color::String="white")
     union!(valid_moves, get_sliding_pieces_list(board, "rook", color))
     return union!(valid_moves, get_sliding_pieces_list(board, "bishop", color))
 end
+
 
 function get_all_valid_moves(board::Bitboard, color::String="white")
     moves = get_all_moves(board, color)
@@ -32,6 +35,7 @@ function get_all_valid_moves(board::Bitboard, color::String="white")
     end
     return valid_moves
 end
+
 
 function get_non_sliding_pieces_list(board::Bitboard, piece_type::String,
     color::String="white")
@@ -83,6 +87,7 @@ function get_non_sliding_pieces_list(board::Bitboard, piece_type::String,
     return piece_moves
 end
 
+
 function find_piece_type(board::Bitboard, ui::UInt64, color::String)
     if color == "white"
         if ui == board.K
@@ -118,6 +123,7 @@ function find_piece_type(board::Bitboard, ui::UInt64, color::String)
         end
     end
 end
+
 
 function get_sliding_pieces_list(board::Bitboard, piece_type::String,
     color::String="white")
@@ -178,6 +184,7 @@ function get_sliding_pieces_list(board::Bitboard, piece_type::String,
     end
     return piece_moves
 end
+
 
 function get_attacked(board::Bitboard, color::String="white")
     attacked = EMPTY
@@ -268,11 +275,13 @@ function get_attacked(board::Bitboard, color::String="white")
     end
 end
 
+
 function update_attacked(board::Bitboard)
     board.white_attacks = get_attacked(board, "white")
     board.black_attacks = get_attacked(board, "black")
     return board
 end
+
 
 function move_white_piece(board::Bitboard, source::UInt64, target::UInt64)
     board.free |= source # +
@@ -311,6 +320,7 @@ function move_white_piece(board::Bitboard, source::UInt64, target::UInt64)
     end
     return board
 end
+
 
 function move_black_piece(board::Bitboard, source::UInt64, target::UInt64)
     board.free |= source
@@ -351,6 +361,7 @@ function move_black_piece(board::Bitboard, source::UInt64, target::UInt64)
     return board
 end
 
+
 function move_piece(board::Bitboard, move::Move, color::String="white")
     if color == "white"
         board = move_white_piece(board, move.source, move.target)
@@ -359,6 +370,7 @@ function move_piece(board::Bitboard, move::Move, color::String="white")
     end
     return board
 end
+
 
 function move(board::Bitboard, source::String, target::String)
 
@@ -399,8 +411,6 @@ function move(board::Bitboard, source::String, target::String)
         else
             capture_type = "none"
         end
-
-
     elseif s & board.black != EMPTY
         color = "black"
 

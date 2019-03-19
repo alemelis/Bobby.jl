@@ -6,13 +6,16 @@ mutable struct PerftTree
     divide :: Dict{String,Int64}
 end
 
+
 function perft(board, depth, color::String="white")
-    pt = PerftTree(zeros(depth), zeros(depth), zeros(depth), zeros(depth), Dict{String,Int64}())
+    pt = PerftTree(zeros(depth), zeros(depth), zeros(depth), zeros(depth),
+        Dict{String,Int64}())
     pt = explore(pt, board, depth, 1, color)
     # println(pt)
     # println(sum(pt.nodes))
     print_perftree(pt)
 end
+
 
 function print_perftree(pt::PerftTree)
     println("Nodes    ", pt.nodes)
@@ -85,6 +88,7 @@ function explore(pt::PerftTree, board::Bitboard,
 
     return pt
 end
+
 
 function count_total_pieces(board::Bitboard)
     total_pieces = 2

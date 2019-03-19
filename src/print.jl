@@ -1,18 +1,14 @@
-"""
-    ugly_print(i::UInt64)
-
-Print any UInt64 bitboard in shape 8x8 (transposed) to REPL for debugging
-purposes.
-"""
 function ugly_print(i::UInt64)
     bit_array = cvt_to_bitarray(i)
     uglyPrint(bit_array)
 end
 
+
 function ugly_print(pieces_array::Array{UInt64,1})
     pieces_uint = cvt_to_uint(pieces_array)
     ugly_print(pieces_uint)
 end
+
 
 function ugly_print(valid_moves::Set{Any})
     pieces = EMPTY
@@ -22,12 +18,7 @@ function ugly_print(valid_moves::Set{Any})
     ugly_print(pieces)
 end
 
-"""
-    uglyPrint(b::BitArray)
 
-Print any BitArray bitboard in shape 8x8 (transposed) to REPL for debuggin
-purposes.
-"""
 function uglyPrint(b::BitArray)
 
     r_b = Int.(transpose(reshape(b, 8, :)))
@@ -46,11 +37,6 @@ function uglyPrint(b::BitArray)
 end
 
 
-"""
-    pretty_print(b::Bitboard, player_color::String="white")
-
-Print the bitboard.
-"""
 function pretty_print(board::Bitboard, player_color::String="white")
     ranks = ["8", "7", "6", "5", "4", "3", "2", "1"]
     
