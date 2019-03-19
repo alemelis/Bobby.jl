@@ -18,6 +18,4 @@ module Bobby
     include("bishops.jl")
     include("perft.jl")
     include("check.jl")
-    include("game.jl")
-
 end
