@@ -9,10 +9,6 @@ end
     include("test_converters.jl")
 end
 
-@testset "magic.jl" begin
-    include("test_magic.jl")
-end
-
 @testset "nights.jl" begin
 	include("test_nights.jl")
 end
@@ -25,13 +21,13 @@ end
 	include("test_rooks.jl")
 end
 
-# @testset "bishops.jl" begin
-# 	include("test_bishops.jl")
-# end
+@testset "bishops.jl" begin
+	include("test_bishops.jl")
+end
 
-# @testset "queen.jl" begin
-# 	include("test_queen.jl")
-# end
+@testset "queen.jl" begin
+	include("test_queen.jl")
+end
 
 # @testset "pawns.jl" begin
 # 	include("test_pawns.jl")

@@ -1,3 +1,18 @@
+function star_attack(board::UInt64, ui::UInt64)
+    ortho_moves, ortho_edges = orthogonal_attack(board, ui)
+    cross_moves, cross_edges = cross_attack(board, ui)
+
+    for m in cross_moves
+        push!(ortho_moves, m)
+    end
+    for e in cross_edges
+        push!(ortho_edges, e)
+    end
+    return ortho_moves, ortho_edges
+
+end
+
+
 function get_queen_valid(board::Bitboard, color::String="white")
     if color == "white"
         queens = board.Q
@@ -22,6 +37,7 @@ function get_queen_valid(board::Bitboard, color::String="white")
     end
     return queen_moves
 end
+
 
 function get_queen_valid_list(board::Bitboard, color::String="white")
     if color == "white"
