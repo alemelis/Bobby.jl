@@ -115,6 +115,7 @@ end
 const WHITE_PAWN_ATTACK = gen_all_pawns_valid_attack()
 const BLACK_PAWN_ATTACK = gen_all_pawns_valid_attack("black")
 
+
 function get_pawns_list(board::Bitboard, color::String="white")
     if color == "white"
         same = board.white

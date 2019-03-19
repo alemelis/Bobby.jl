@@ -149,3 +149,12 @@ function gen_uint_to_pgn_dict()
     return uint_pgn
 end
 const UINT2PGN = gen_uint_to_pgn_dict()
+
+
+function change_color(color::String)
+    if color == "white"
+        return "black"
+    else
+        return "white"
+    end
+end

@@ -37,4 +37,8 @@
     squares_int_uint = Bobby.gen_int_to_uint_dict()
     @test haskey(squares_int_uint, 1)
     @test squares_int_uint[2] == 0x4000000000000000
+
+    color = "white"
+    c = Bobby.change_color(color)
+    @test c == "black"
 end

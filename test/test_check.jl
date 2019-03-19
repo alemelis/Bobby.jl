@@ -1,16 +1,8 @@
 @testset "check" begin
-    b = Bobby.buildBoard()
-    l = Bobby.buildLookUpTables()
+    b = Bobby.set_board()
 
-    @test !Bobby.checkCheck(b)
-    @test !Bobby.checkCheck(b, "black")
+    @test !Bobby.check_check(b)
+    @test !Bobby.check_check(b, "black")
 
-    b.K[20] = true
-    @test Bobby.checkCheck(b)
-
-    b.k[44] = true
-    @test Bobby.checkCheck(b, "black")
-
-    b, e = Bobby.move(b, l, "e2", "e3")
-    @test Bobby.checkMate(b, l) == false
+    @test Bobby.check_mate(b) == false
 end
