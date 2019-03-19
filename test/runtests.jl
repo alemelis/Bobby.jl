@@ -29,22 +29,14 @@ end
 	include("test_queen.jl")
 end
 
-# @testset "pawns.jl" begin
-# 	include("test_pawns.jl")
-# end
+@testset "pawns.jl" begin
+	include("test_pawns.jl")
+end
 
-# @testset "check.jl" begin
-#     include("test_check.jl")
-# end
-
-# @testset "game.jl" begin
-#     include("test_game.jl")
-# end
+@testset "check.jl" begin
+    include("test_check.jl")
+end
 
 # @testset "bitboard.jl" begin
 #     include("test_bitboard.jl")
-# end
-
-# @testset "moves.jl" begin
-#     include("test_moves.jl")
 # end
