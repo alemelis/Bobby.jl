@@ -25,17 +25,17 @@ end
 	include("test_rooks.jl")
 end
 
-@testset "bishops.jl" begin
-	include("test_bishops.jl")
-end
+# @testset "bishops.jl" begin
+# 	include("test_bishops.jl")
+# end
 
-@testset "queen.jl" begin
-	include("test_queen.jl")
-end
+# @testset "queen.jl" begin
+# 	include("test_queen.jl")
+# end
 
-@testset "pawns.jl" begin
-	include("test_pawns.jl")
-end
+# @testset "pawns.jl" begin
+# 	include("test_pawns.jl")
+# end
 
 # @testset "check.jl" begin
 #     include("test_check.jl")

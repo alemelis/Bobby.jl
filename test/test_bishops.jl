@@ -1,6 +1,5 @@
 @testset "bishops" begin
-    bb = Bobby.fen_to_bitboard(
-      "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R")
+    # bb = Bobby.set_board()
     
     # bv = [0,0,0,0,0,0,0,0,
     #       0,0,0,0,0,0,0,0,

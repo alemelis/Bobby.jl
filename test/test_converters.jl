@@ -9,7 +9,7 @@
     s = Bobby.cvt_to_binary_string(1)
     @test s == "0000000000000000000000000000000000000000000000000000000000000001"
 
-    b = Bobby.fen_to_bitboard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR")
+    b = Bobby.set_board()
     u = Bobby.cvt_to_uint(b.p)
     @test u == 0x00ff000000000000
 
