@@ -26,21 +26,17 @@ mutable struct Bitboard
     white_attacks :: UInt64 # attacked squares
     black_attacks :: UInt64
 
-    white_castled :: Bool
-    black_castled :: Bool
-    white_king_moved :: Bool
-    black_king_moved :: Bool
-    a1_rook_moved :: Bool
-    h1_rook_moved :: Bool
-    a8_rook_moved :: Bool
-    h8_rook_moved :: Bool
-    white_OO :: Bool
-    white_OOO :: Bool
-    black_OO :: Bool
-    black_OOO :: Bool
+    player_color :: String
 
-    white_in_check :: Bool
-    black_in_check :: Bool
+    white_can_castle_queenside :: Bool
+    white_can_castle_kingside  :: Bool
+    black_can_castle_queenside :: Bool
+    black_can_castle_kingside  :: Bool
+
+    enpassant_square :: UInt64
+
+    halfmove_clock :: Int64
+    fullmove_clock :: Int64 # start at 1, increment for each black move
 end
 
 
@@ -50,5 +46,5 @@ end
 Set board in starting position.
 """
 function set_board()
-    return fen_to_bitboard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR")
+    return fen_to_bitboard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
 end
