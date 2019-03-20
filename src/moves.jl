@@ -283,7 +283,9 @@ function update_attacked(board::Bitboard)
 end
 
 
-function move_white_piece(board::Bitboard, source::UInt64, target::UInt64)
+function move_white_piece(board::Bitboard, source::UInt64, target::UInt64,
+    promotion_type::String="none")
+
     board.free |= source # +
     board.free = xor(board.free, target) # -
     board.taken |= target
@@ -300,29 +302,44 @@ function move_white_piece(board::Bitboard, source::UInt64, target::UInt64)
         filter!(e -> e != target, board.r)
     end
 
-    if source in board.P
+    if promotion_type == "none"
+        if source in board.P
+            filter!(e -> e != source, board.P)
+            push!(board.P, target)
+        elseif source in board.Q
+            filter!(e -> e != source, board.Q)
+            push!(board.Q, target)
+        elseif source == board.K
+            board.K = target
+        elseif source in board.N
+            filter!(e -> e != source, board.N)
+            push!(board.N, target)
+        elseif source in board.R
+            filter!(e -> e != source, board.R)
+            push!(board.R, target)
+        elseif source in board.B
+            filter!(e -> e != source, board.B)
+            push!(board.B, target)
+        end
+    else
         filter!(e -> e != source, board.P)
-        push!(board.P, target)
-    elseif source in board.Q
-        filter!(e -> e != source, board.Q)
-        push!(board.Q, target)
-    elseif source == board.K
-        board.K = target
-    elseif source in board.N
-        filter!(e -> e != source, board.N)
-        push!(board.N, target)
-    elseif source in board.R
-        filter!(e -> e != source, board.R)
-        push!(board.R, target)
-    elseif source in board.B
-        filter!(e -> e != source, board.B)
-        push!(board.B, target)
+        if promotion_type == "queen"
+            push!(board.Q, target)
+        elseif promotion_type == "rook"
+            push!(board.R, target)
+        elseif promotion_type == "night"
+            push!(board.N, target)
+        elseif promotion_type == "bishop"
+            push!(board.B, target)
+        end
     end
     return board
 end
 
 
-function move_black_piece(board::Bitboard, source::UInt64, target::UInt64)
+function move_black_piece(board::Bitboard, source::UInt64, target::UInt64,
+    promotion_type::String="none")
+
     board.free |= source
     board.free = xor(board.free, target)
     board.taken |= target
@@ -339,24 +356,37 @@ function move_black_piece(board::Bitboard, source::UInt64, target::UInt64)
         filter!(e -> e != target, board.R)
     end
 
-    if source in board.p != EMPTY
+    if promotion_type == "none"
+        if source in board.p != EMPTY
+            filter!(e -> e != source, board.p)
+            push!(board.p, target)
+        elseif source in board.q
+            filter!(e -> e != source, board.q)
+            push!(board.q, target)
+        elseif source in board.k
+            board.k = xor(board.k, source)
+            board.k = target
+        elseif source in board.n
+            filter!(e -> e != source, board.n)
+            push!(board.n, target)
+        elseif source in board.r
+            filter!(e -> e != source, board.r)
+            push!(board.r, target)
+        elseif source in board.b
+            filter!(e -> e != source, board.b)
+            push!(board.b, target)
+        end
+    else
         filter!(e -> e != source, board.p)
-        push!(board.p, target)
-    elseif source in board.q
-        filter!(e -> e != source, board.q)
-        push!(board.q, target)
-    elseif source in board.k
-        board.k = xor(board.k, source)
-        board.k = target
-    elseif source in board.n
-        filter!(e -> e != source, board.n)
-        push!(board.n, target)
-    elseif source in board.r
-        filter!(e -> e != source, board.r)
-        push!(board.r, target)
-    elseif source in board.b
-        filter!(e -> e != source, board.b)
-        push!(board.b, target)
+        if promotion_type == "queen"
+            push!(board.q, target)
+        elseif promotion_type == "rook"
+            push!(board.r, target)
+        elseif promotion_type == "night"
+            push!(board.n, target)
+        elseif promotion_type == "bishop"
+            push!(board.b, target)
+        end
     end
     return board
 end
@@ -364,22 +394,25 @@ end
 
 function move_piece(board::Bitboard, move::Move, color::String="white")
     if color == "white"
-        board = move_white_piece(board, move.source, move.target)
+        board = move_white_piece(board, move.source, move.target,
+            move.promotion_type)
     else
-        board = move_black_piece(board, move.source, move.target)
+        board = move_black_piece(board, move.source, move.target,
+            move.promotion_type)
     end
     return board
 end
 
 
-function move(board::Bitboard, source::String, target::String)
+function move(board::Bitboard, source::String, target::String,
+    promotion_type::String="none")
 
     s = PGN2UINT[source]
     t = PGN2UINT[target]
 
     if s & board.white != EMPTY
         color = "white"
-
+        
         if s in board.P
             piece_type = "pawn"
         elseif s in board.Q
@@ -410,6 +443,13 @@ function move(board::Bitboard, source::String, target::String)
             end
         else
             capture_type = "none"
+        end
+
+        promotion_mask = MASK_RANK_8
+        if t & promotion_mask != EMPTY
+            if promotion_type == "none"
+                throw(ArgumentError("You should specify the promotion type"))
+            end
         end
     elseif s & board.black != EMPTY
         color = "black"
@@ -445,11 +485,18 @@ function move(board::Bitboard, source::String, target::String)
         else
             capture_type = "none"
         end
+
+        promotion_mask = MASK_RANK_1
+        if t & promotion_mask != EMPTY
+            if promotion_type == "none"
+                throw(ArgumentError("You should specify the promotion type"))
+            end
+        end
     else
         throw(ArgumentError("Invalid source UCI string: no piece to move"))
     end
 
-    move = Move(s, t, piece_type, capture_type, "none")
+    move = Move(s, t, piece_type, capture_type, promotion_type)
 
     return move_piece(board, move, color)
 end
@@ -457,6 +504,19 @@ end
 
 function unmove_piece(board::Bitboard, move::Move, color::String="white")
     if color == "white"
+        if move.promotion_type != "none"
+            new_piece_type = find_piece_type(board, move.target, "white")
+            if new_piece_type == "queen"
+                filter!(e -> e != move.target, board.Q)
+            elseif new_piece_type == "rook"
+                filter!(e -> e != move.target, board.R)
+            elseif new_piece_type == "night"
+                filter!(e -> e != move.target, board.N)
+            elseif new_piece_type == "bishop"
+                filter!(e -> e != move.target, board.B)
+            end
+            push!(board.P, move.target)
+        end
         board = move_white_piece(board, move.target, move.source)
         if move.capture_type != "none"
             if move.capture_type == "queen"
@@ -475,6 +535,19 @@ function unmove_piece(board::Bitboard, move::Move, color::String="white")
             board.free = xor(board.free, move.target)
         end
     else
+        if move.promotion_type != "none"
+            new_piece_type = find_piece_type(board, move.target, "black")
+            if new_piece_type == "queen"
+                filter!(e -> e != move.target, board.q)
+            elseif new_piece_type == "rook"
+                filter!(e -> e != move.target, board.r)
+            elseif new_piece_type == "night"
+                filter!(e -> e != move.target, board.n)
+            elseif new_piece_type == "bishop"
+                filter!(e -> e != move.target, board.b)
+            end
+            push!(board.p, move.target)
+        end
         board = move_black_piece(board, move.target, move.source)
         if move.capture_type != "none"
             if move.capture_type == "queen"

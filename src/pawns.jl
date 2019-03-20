@@ -125,6 +125,7 @@ function get_pawns_list(board::Bitboard, color::String="white")
         two_steps = WHITE_PAWN_TWOSTEPS_MOVES
         attacks = WHITE_PAWN_ATTACK
         opponent_color = "black"
+        promotion_rank = MASK_RANK_8
     else
         same = board.black
         other = board.white
@@ -134,14 +135,22 @@ function get_pawns_list(board::Bitboard, color::String="white")
         two_steps = BLACK_PAWN_TWOSTEPS_MOVES
         attacks = BLACK_PAWN_ATTACK
         opponent_color = "white"
+        promotion_rank = MASK_RANK_1
     end
 
     piece_moves = Set{Move}()
     for piece in pieces
         move = one_step[piece]
         if move & same == EMPTY && move & other == EMPTY && move != EMPTY
-            push!(piece_moves, Move(piece, move,
-                                    "pawn", "none", "none"))
+            if move & promotion_rank == EMPTY
+                push!(piece_moves, Move(piece, move,
+                                        "pawn", "none", "none"))
+            else
+                for new_piece in ["queen", "rook", "night", "bishop"]
+                    push!(piece_moves, Move(piece, move, "pawn",
+                                            "none", new_piece))
+                end
+            end
             if (two_steps[piece] & same == EMPTY && 
                 two_steps[piece] & other == EMPTY && 
                 two_steps[piece] != EMPTY)
@@ -150,11 +159,20 @@ function get_pawns_list(board::Bitboard, color::String="white")
             end
             for attack in attacks[piece]
                 if attack & same == EMPTY &&
-                   attack & other != EMPTY &&
-                   attack != EMPTY
+                    attack & other != EMPTY && 
+                    attack != EMPTY
+
                     taken_piece = find_piece_type(board, attack, opponent_color)
-                    push!(piece_moves, Move(piece, attack,
-                                            "pawn", taken_piece, "none"))
+                    if move & promotion_rank == EMPTY
+                        push!(piece_moves, Move(piece, attack,
+                                                "pawn", taken_piece, "none"))
+                    else
+                        for new_piece in ["queen", "rook", "night", "bishop"]
+                            push!(piece_moves, Move(piece, attack,
+                                                    "pawn", taken_piece,
+                                                    new_piece))
+                        end
+                    end
                 end
             end
         end
