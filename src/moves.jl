@@ -309,6 +309,7 @@ function move_white_piece(board::Bitboard, source::UInt64, target::UInt64,
         board.free |= board.enpassant_square >> 8
         board.taken = xor(board.taken, board.enpassant_square)
     end
+    board.enpassant_square = EMPTY
 
     if promotion_type == "none"
         if source in board.P
@@ -371,6 +372,7 @@ function move_black_piece(board::Bitboard, source::UInt64, target::UInt64,
         board.free |= board.enpassant_square << 8
         board.taken = xor(board.taken, board.enpassant_square)
     end
+    board.enpassant_square = EMPTY
 
     if promotion_type == "none"
         if source in board.p
@@ -560,6 +562,15 @@ function unmove_piece(board::Bitboard, move::Move, color::String="white")
             board.black |= move.target
             board.taken |= move.target
             board.free = xor(board.free, move.target)
+        else
+            if move.piece_type == "pawn"
+                if move.source == move.target >> 9 ||
+                    move.source == move.target >> 7
+                    board.enpassant_square = move.target
+                end
+            else
+                board.enpassant_square = EMPTY
+            end
         end
     else
         if move.promotion_type != "none"
@@ -591,8 +602,16 @@ function unmove_piece(board::Bitboard, move::Move, color::String="white")
             board.white |= move.target
             board.taken |= move.target
             board.free = xor(board.free, move.target)
+        else
+            if move.piece_type == "pawn"
+                if move.source == move.target << 9 ||
+                    move.source == move.target << 7
+                    board.enpassant_square = move.target
+                end
+            else
+                board.enpassant_square = EMPTY
+            end
         end
     end
-    # return update_attacked(board)
     return board
 end

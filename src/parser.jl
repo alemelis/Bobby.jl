@@ -113,8 +113,15 @@ function fen_to_bitboard(fen::String)
         enpassant_square = PGN2UINT[fen[4]]
     end 
     
-    halfmove_clock = parse(Int64, fen[5])
-    fullmove_clock = parse(Int64, fen[6])
+    if length(fen) >= 5
+        halfmove_clock = parse(Int64, fen[5])
+    else
+        halfmove_clock = 1
+        fullmove_clock = 0
+    end
+    if length(fen) == 6
+        fullmove_clock = parse(Int64, fen[6])
+    end
 
     return Bitboard(white, P, R, N, B, Q, K,
                     black, p, r, n, b, q, k,

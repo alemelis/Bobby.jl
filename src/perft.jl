@@ -5,6 +5,7 @@ mutable struct PerftTree
     captures :: Array{Int64,1}
     divide :: Dict{String,Int64}
     promotions :: Array{Int64,1}
+    # enpassants :: Array{Int64,1}
 end
 
 
@@ -22,6 +23,7 @@ end
 function print_perftree(pt::PerftTree)
     println("Nodes      ", pt.nodes)
     println("Captures   ", pt.captures)
+    # println("E.p.       ", pt.enpassants)
     println("Promotions ", pt.promotions)
     println("Checks     ", pt.checks)
     println("Mates      ", pt.mates)
@@ -70,33 +72,20 @@ function explore(pt::PerftTree, board::Bitboard,
     new_color = change_color(color)
     for m in moves
         board = move_piece(board, m, color)
-        # if m.check
-        #     pt.checks[depth] += 1
-            # if check_mate(board, new_color)
-            #     pt.mates[depth] += 1
-            #     board = unmove_piece(board, m, color)
-            #     continue
-            # end
-        # end
-        
-        # if count_total_pieces(board) < total_pieces
-        #     pt.captures[depth] += 1
-        # end
+       
         if m.capture_type != "none"
             pt.captures[depth] += 1
         end
         if m.promotion_type != "none"
             pt.promotions[depth] += 1
         end
-        # println(UINT2PGN[m.source],UINT2PGN[m.target])
+        
         if depth == 1
             move_name = m.piece_type*"-"*UINT2PGN[m.source]*UINT2PGN[m.target]
         end
+
         pt = explore(pt, board, max_depth, depth+1, new_color, move_name)
         board = unmove_piece(board, m, color)
-        # if depth == 1
-        #     break
-        # end
     end
 
     return pt
@@ -104,7 +93,7 @@ end
 
 
 function count_total_pieces(board::Bitboard)
-    total_pieces = 2
+    total_pieces = 2 # kings
     total_pieces += length(board.p)
     total_pieces += length(board.n)
     total_pieces += length(board.r)
