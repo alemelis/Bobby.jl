@@ -4,6 +4,7 @@ mutable struct Move
     piece_type :: String
     capture_type :: String
     promotion_type :: String
+    enpassant_square :: UInt64
 end
 
 
@@ -74,12 +75,12 @@ function get_non_sliding_pieces_list(board::Bitboard, piece_type::String,
             if move & other_king == EMPTY
                 if move & same == EMPTY && move & other == EMPTY
                     push!(piece_moves, Move(piece, move,
-                                            piece_type, "none", "none"))
+                                            piece_type, "none", "none", EMPTY))
                 elseif move & same == EMPTY && move & other != EMPTY
                     taken_piece = find_piece_type(board, move, opponent_color)
                     push!(piece_moves, Move(piece, move,
                                             piece_type, taken_piece,
-                                            "none"))
+                                            "none", EMPTY))
                 end
             end
         end
@@ -167,17 +168,17 @@ function get_sliding_pieces_list(board::Bitboard, piece_type::String,
         moves, edges = attack_fun(board.taken, piece)
         for move in moves
             push!(piece_moves, Move(piece, move, piece_type,
-                "none", "none"))
+                "none", "none", EMPTY))
         end
         for edge in edges
             if edge & other_king == EMPTY
                 if edge & same == EMPTY && edge & other == EMPTY
                     push!(piece_moves, Move(piece, edge, piece_type,
-                                            "none", "none"))
+                                            "none", "none", EMPTY))
                 elseif edge & same == EMPTY && edge & other != EMPTY
                     taken_piece = find_piece_type(board, edge, opponent_color)
                     push!(piece_moves, Move(piece, edge, piece_type,
-                                            taken_piece, "none"))
+                                            taken_piece, "none", EMPTY))
                 end
             end
         end
@@ -284,7 +285,7 @@ end
 
 
 function move_white_piece(board::Bitboard, source::UInt64, target::UInt64,
-    promotion_type::String="none")
+    promotion_type::String="none", enpassant_square::UInt64=EMPTY)
 
     board.free |= source # +
     board.free = xor(board.free, target) # -
@@ -300,6 +301,12 @@ function move_white_piece(board::Bitboard, source::UInt64, target::UInt64,
         filter!(e -> e != target, board.n)
         filter!(e -> e != target, board.b)
         filter!(e -> e != target, board.r)
+    end
+
+    println(enpassant_square, " ", target)
+    if target == enpassant_square
+        println("AAAAAA")
+        filter!(e -> e != enpassant_square >> 8, board.p)
     end
 
     if promotion_type == "none"
@@ -333,12 +340,14 @@ function move_white_piece(board::Bitboard, source::UInt64, target::UInt64,
             push!(board.B, target)
         end
     end
+
+    board.enpassant_square = enpassant_square
     return board
 end
 
 
 function move_black_piece(board::Bitboard, source::UInt64, target::UInt64,
-    promotion_type::String="none")
+    promotion_type::String="none", enpassant_square::UInt64=EMPTY)
 
     board.free |= source
     board.free = xor(board.free, target)
@@ -356,15 +365,19 @@ function move_black_piece(board::Bitboard, source::UInt64, target::UInt64,
         filter!(e -> e != target, board.R)
     end
 
+    println(enpassant_square, " ", target)
+    # if enpassant_square == EMPTY
+    #     filter!(e -> e != enpassant_square << 8, board.P)
+    # end
+
     if promotion_type == "none"
-        if source in board.p != EMPTY
+        if source in board.p
             filter!(e -> e != source, board.p)
             push!(board.p, target)
         elseif source in board.q
             filter!(e -> e != source, board.q)
             push!(board.q, target)
         elseif source in board.k
-            board.k = xor(board.k, source)
             board.k = target
         elseif source in board.n
             filter!(e -> e != source, board.n)
@@ -388,6 +401,8 @@ function move_black_piece(board::Bitboard, source::UInt64, target::UInt64,
             push!(board.b, target)
         end
     end
+
+    board.enpassant_square = enpassant_square
     return board
 end
 
@@ -395,10 +410,10 @@ end
 function move_piece(board::Bitboard, move::Move, color::String="white")
     if color == "white"
         board = move_white_piece(board, move.source, move.target,
-            move.promotion_type)
+            move.promotion_type, move.enpassant_square)
     else
         board = move_black_piece(board, move.source, move.target,
-            move.promotion_type)
+            move.promotion_type, move.enpassant_square)
     end
     return board
 end
@@ -409,12 +424,15 @@ function move(board::Bitboard, source::String, target::String,
 
     s = PGN2UINT[source]
     t = PGN2UINT[target]
-
+    enpassant_square = EMPTY
     if s & board.white != EMPTY
         color = "white"
         
         if s in board.P
             piece_type = "pawn"
+            if source[2] == '2' && target[2] == '4'
+                enpassant_square = PGN2UINT[source[1]*"3"]
+            end
         elseif s in board.Q
             piece_type = "queen"
         elseif s in board.N
@@ -456,6 +474,9 @@ function move(board::Bitboard, source::String, target::String,
 
         if s in board.p
             piece_type = "pawn"
+            if source[2] == '7' && target[2] == '5'
+                enpassant_square = PGN2UINT[source[1]*"6"]
+            end
         elseif s in board.q
             piece_type = "queen"
         elseif s in board.n
@@ -496,8 +517,8 @@ function move(board::Bitboard, source::String, target::String,
         throw(ArgumentError("Invalid source UCI string: no piece to move"))
     end
 
-    move = Move(s, t, piece_type, capture_type, promotion_type)
-
+    move = Move(s, t, piece_type, capture_type,
+                promotion_type, enpassant_square)
     return move_piece(board, move, color)
 end
 
