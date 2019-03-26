@@ -285,7 +285,7 @@ end
 
 
 function move_white_piece(board::Bitboard, source::UInt64, target::UInt64,
-    promotion_type::String="none", enpassant_square::UInt64=EMPTY)
+    promotion_type::String="none")
 
     board.free |= source # +
     board.free = xor(board.free, target) # -
@@ -303,10 +303,11 @@ function move_white_piece(board::Bitboard, source::UInt64, target::UInt64,
         filter!(e -> e != target, board.r)
     end
 
-    println(enpassant_square, " ", target)
-    if target == enpassant_square
-        println("AAAAAA")
-        filter!(e -> e != enpassant_square >> 8, board.p)
+    if board.enpassant_square != EMPTY && target == board.enpassant_square
+        board.black = xor(board.black, board.enpassant_square >> 8)
+        filter!(e -> e != board.enpassant_square >> 8, board.p )
+        board.free |= board.enpassant_square >> 8
+        board.taken = xor(board.taken, board.enpassant_square)
     end
 
     if promotion_type == "none"
@@ -341,13 +342,12 @@ function move_white_piece(board::Bitboard, source::UInt64, target::UInt64,
         end
     end
 
-    board.enpassant_square = enpassant_square
     return board
 end
 
 
 function move_black_piece(board::Bitboard, source::UInt64, target::UInt64,
-    promotion_type::String="none", enpassant_square::UInt64=EMPTY)
+    promotion_type::String="none")
 
     board.free |= source
     board.free = xor(board.free, target)
@@ -365,10 +365,12 @@ function move_black_piece(board::Bitboard, source::UInt64, target::UInt64,
         filter!(e -> e != target, board.R)
     end
 
-    println(enpassant_square, " ", target)
-    # if enpassant_square == EMPTY
-    #     filter!(e -> e != enpassant_square << 8, board.P)
-    # end
+    if board.enpassant_square != EMPTY && target == board.enpassant_square
+        board.white = xor(board.white, board.enpassant_square << 8)
+        filter!(e -> e != board.enpassant_square << 8, board.P)
+        board.free |= board.enpassant_square << 8
+        board.taken = xor(board.taken, board.enpassant_square)
+    end
 
     if promotion_type == "none"
         if source in board.p
@@ -402,18 +404,22 @@ function move_black_piece(board::Bitboard, source::UInt64, target::UInt64,
         end
     end
 
-    board.enpassant_square = enpassant_square
     return board
 end
 
 
 function move_piece(board::Bitboard, move::Move, color::String="white")
+    if move.enpassant_square != EMPTY
+        board.enpassant_square = move.enpassant_square
+    else
+        board.enpassant_square = EMPTY
+    end
     if color == "white"
         board = move_white_piece(board, move.source, move.target,
-            move.promotion_type, move.enpassant_square)
+            move.promotion_type)
     else
         board = move_black_piece(board, move.source, move.target,
-            move.promotion_type, move.enpassant_square)
+            move.promotion_type)
     end
     return board
 end

@@ -14,7 +14,7 @@ function perft(board, depth, color::String="white")
     pt = explore(pt, board, depth, 1, color)
     # println(pt)
     # println(sum(pt.nodes))
-    print_perftree(pt)
+    # print_perftree(pt)
     return pt
 end
 
