@@ -5,13 +5,13 @@ mutable struct PerftTree
     captures :: Array{Int64,1}
     divide :: Dict{String,Int64}
     promotions :: Array{Int64,1}
-    # enpassants :: Array{Int64,1}
+    stalemates :: Array{Int64,1}
 end
 
 
 function perft(board, depth, color::String="white")
     pt = PerftTree(zeros(depth), zeros(depth), zeros(depth), zeros(depth),
-        Dict{String,Int64}(), zeros(depth))
+        Dict{String,Int64}(), zeros(depth), zeros(depth))
     pt = explore(pt, board, depth, 1, color)
     # println(pt)
     # println(sum(pt.nodes))
@@ -23,7 +23,6 @@ end
 function print_perftree(pt::PerftTree)
     println("Nodes      ", pt.nodes)
     println("Captures   ", pt.captures)
-    # println("E.p.       ", pt.enpassants)
     println("Promotions ", pt.promotions)
     println("Checks     ", pt.checks)
     println("Mates      ", pt.mates)
@@ -33,31 +32,42 @@ function print_perftree(pt::PerftTree)
 end
 
 
+function count_total_pieces(board::Bitboard)
+    total_pieces = 2 # kings
+    total_pieces += length(board.p)
+    total_pieces += length(board.n)
+    total_pieces += length(board.r)
+    total_pieces += length(board.q)
+    total_pieces += length(board.P)
+    total_pieces += length(board.N)
+    total_pieces += length(board.R)
+    total_pieces += length(board.Q)
+    return total_pieces
+end
+
+
 function explore(pt::PerftTree, board::Bitboard, 
     max_depth::Int64, depth::Int64, color::String="white", move_name::String="")
     
-    if check_check_raytrace(board, color) && depth > 1
-        # if depth == 1
-        #     pt.checks[depth] += 1
-        # else
-        pt.checks[depth-1] += 1
-        # end
-        # Bobby.pretty_print(board)
-    end
     total_pieces = count_total_pieces(board)
     moves = get_all_valid_moves(board, color)
 
     if depth == 1
         for m in moves
-            push!(pt.divide, m.piece_type*"-"*UINT2PGN[m.source]*UINT2PGN[m.target]=>0)
+            push!(pt.divide,
+                m.piece_type*"-"*UINT2PGN[m.source]*UINT2PGN[m.target]=>0)
         end
     else
         pt.divide[move_name] += length(moves)
     end
 
-    # for move in moves
-    #     println(move.piece_type)#, " ", cvt_to_int(move.source), " ", cvt_to_int(move.target))
-    # end
+    if check_check_raytrace(board, color) && depth > 1
+        check = true
+        pt.checks[depth-1] += 1
+    else
+        check = false
+    end
+
     if length(moves) == 0 # ?????????????????????????? stalemate
         pt.mates[depth-1] += 1
         return pt
@@ -89,18 +99,4 @@ function explore(pt::PerftTree, board::Bitboard,
     end
 
     return pt
-end
-
-
-function count_total_pieces(board::Bitboard)
-    total_pieces = 2 # kings
-    total_pieces += length(board.p)
-    total_pieces += length(board.n)
-    total_pieces += length(board.r)
-    total_pieces += length(board.q)
-    total_pieces += length(board.P)
-    total_pieces += length(board.N)
-    total_pieces += length(board.R)
-    total_pieces += length(board.Q)
-    return total_pieces
 end

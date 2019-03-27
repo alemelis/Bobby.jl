@@ -1,42 +1,3 @@
-# https://web.archive.org/web/20180109042730/http://www.rivalchess.com/magic-bitboards/
-function gen_rook_mask(i::Int64)
-    pgn = INT2PGN[i]
-
-    file = Int(pgn[1]) - 96
-    rank = parse(Int, pgn[2])
-
-    mask = xor(MASK_FILES[file], MASK_RANKS[rank])
-
-    if INT2UINT[i] & FRAME != EMPTY # rook on the board frame
-        if INT2UINT[i] & CORNERS != EMPTY # rook on a corner
-            return mask & ~CORNERS
-        else
-            if file == 1
-                return mask & CLEAR_RANK_1 & CLEAR_RANK_8 & CLEAR_FILE_H
-            elseif file == 8
-                return mask & CLEAR_RANK_1 & CLEAR_RANK_8 & CLEAR_FILE_A
-            elseif rank == 1
-                return mask & CLEAR_FILE_A & CLEAR_FILE_H & CLEAR_RANK_8
-            elseif rank == 8
-                return mask & CLEAR_FILE_A & CLEAR_FILE_H & CLEAR_RANK_1
-            end
-        end
-    else
-        return mask & ~FRAME # rook in the middle of the board
-    end
-end
-
-
-function gen_rook_masks()
-    rook_masks = Dict{UInt64, UInt64}()
-    for i in 1:64
-        rook_masks[INT2UINT[i]] = gen_rook_mask(i)
-    end
-    return rook_masks
-end
-const ROOK_MASKS = gen_rook_masks()
-
-
 function slide_rank(rank_occupancy_mask::UInt64, ui::UInt64, shift::Int64)
     direction = 1
     increment = 1
@@ -76,7 +37,7 @@ end
 function rank_attack(board::UInt64, ui::UInt64)
     for i in 1:8
         if MASK_RANKS[i] & ui != EMPTY
-            occupancy_rank = ROOK_MASKS[ui] & MASK_RANKS[i] & board
+            occupancy_rank = MASK_RANKS[i] & board
             shift = RANK_SHIFTS[i]
             return slide_rank(occupancy_rank, ui, shift)
         end
@@ -108,7 +69,7 @@ end
 function file_attack(board::UInt64, ui::UInt64)
     for i in 1:8 # A to H
         if MASK_FILES[i] & ui != EMPTY
-            occupancy_file = transpose_uint(ROOK_MASKS[ui]&MASK_FILES[i]&board)
+            occupancy_file = transpose_uint(MASK_FILES[i]&board)
 
             shift = FILE_SHIFTS[i]
             mvs, edgs = slide_rank(occupancy_file, transpose_uint(ui), shift)

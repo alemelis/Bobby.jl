@@ -28,7 +28,7 @@ end
 
 function get_all_valid_moves(board::Bitboard, color::String="white")
     moves = get_all_moves(board, color)
-    valid_moves = Set{Move}()
+    valid_moves = Array{Move,1}()
     for move in moves
         if validate_move(board, move, color)
             push!(valid_moves, move)
@@ -69,7 +69,7 @@ function get_non_sliding_pieces_list(board::Bitboard, piece_type::String,
         piece_dict = NIGHT_MOVES
     end
 
-    piece_moves = Set{Move}()
+    piece_moves = Array{Move,1}()
     for piece in pieces
         for move in piece_dict[piece]
             if move & other_king == EMPTY
@@ -163,7 +163,7 @@ function get_sliding_pieces_list(board::Bitboard, piece_type::String,
         attack_fun = cross_attack
     end
 
-    piece_moves = Set{Move}()
+    piece_moves = Array{Move,1}()
     for piece in pieces
         moves, edges = attack_fun(board.taken, piece)
         for move in moves

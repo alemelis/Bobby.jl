@@ -138,7 +138,7 @@ function get_pawns_list(board::Bitboard, color::String="white")
         promotion_rank = MASK_RANK_1
     end
 
-    piece_moves = Set{Move}()
+    piece_moves = Array{Move,1}()
     for piece in pieces
         move = one_step[piece]
         if move & same == EMPTY && move & other == EMPTY && move != EMPTY

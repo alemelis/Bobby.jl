@@ -7,32 +7,32 @@ function slide_diagonal(board::UInt64, diag_mask::UInt64, ui::UInt64,
         increment_mod = 7
     end
     direction = 1
-    increment = direction*increment_mod
+    increment = increment_mod
 
     moves = zeros(UInt64, 0)
     edges = zeros(UInt64, 0)
 
     while true
         if ((ui >> increment) & diag_mask) != EMPTY # we are on the diagonal
-            if (board & ((ui>>increment) & diag_mask) == EMPTY &&
-                ((ui>>increment) & diag_mask) != EMPTY)
+            if (board & ((ui >> increment) & diag_mask) == EMPTY &&
+                ((ui >> increment) & diag_mask) != EMPTY)
 
-                push!(moves, ui>>increment)
-                increment += direction*increment_mod
+                push!(moves, ui >> increment)
+                increment += increment_mod
             else
-                push!(edges, ui>>increment)
+                push!(edges, ui >> increment)
 
-                if direction == 1
-                    direction = -1
-                    increment = increment_mod*direction
+                if increment_mod > 0
+                    increment_mod = -increment_mod
+                    increment = increment_mod
                 else
                     return moves, edges
                 end
             end
         else
-            if direction == 1
-                direction = -1
-                increment = increment_mod*direction
+            if increment_mod > 0
+                increment_mod = -increment_mod
+                increment = increment_mod
             else
                 return moves, edges
             end

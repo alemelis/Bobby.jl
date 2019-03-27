@@ -10,7 +10,7 @@ function ugly_print(pieces_array::Array{UInt64,1})
 end
 
 
-function ugly_print(valid_moves::Set{Any})
+function ugly_print(valid_moves::Array{Any,1})
     pieces = EMPTY
     for move in valid_moves
         pieces |= move[2]
