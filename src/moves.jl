@@ -48,6 +48,7 @@ function get_non_sliding_pieces_list(board::Bitboard, piece_type::String,
         other_king = board.k
         if piece_type == "king"
             pieces = board.K
+            home_square = WHITE_KING_HOME
         else
             pieces = board.N
         end
@@ -58,6 +59,7 @@ function get_non_sliding_pieces_list(board::Bitboard, piece_type::String,
         other_king = board.K
         if piece_type == "king"
             pieces = board.k
+            home_square = BLACK_KING_HOME
         else
             pieces = board.n
         end
@@ -68,7 +70,7 @@ function get_non_sliding_pieces_list(board::Bitboard, piece_type::String,
     if piece_type == "king"
         piece_dict = KING_MOVES
 
-        if king == home_square
+        if pieces == home_square
             if color == "white"
                 if board.white_can_castle_kingside == true
                     if board.free & PGN2UINT["f1"] != EMPTY &&
