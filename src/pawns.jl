@@ -144,18 +144,18 @@ function get_pawns_list(board::Bitboard, color::String="white")
         if move & same == EMPTY && move & other == EMPTY && move != EMPTY
             if move & promotion_rank == EMPTY
                 push!(piece_moves, Move(piece, move,
-                                        "pawn", "none", "none", EMPTY))
+                                        "pawn", "none", "none", EMPTY, "-"))
             else
                 for new_piece in ["queen", "rook", "night", "bishop"]
                     push!(piece_moves, Move(piece, move, "pawn",
-                                            "none", new_piece, EMPTY))
+                                            "none", new_piece, EMPTY, "-"))
                 end
             end
             if (two_steps[piece] & same == EMPTY && 
                 two_steps[piece] & other == EMPTY && 
                 two_steps[piece] != EMPTY)
                 push!(piece_moves, Move(piece, two_steps[piece],
-                                        "pawn", "none", "none", piece))
+                                        "pawn", "none", "none", piece, "-"))
             end
             for attack in attacks[piece]
                 if attack & same == EMPTY &&
@@ -166,18 +166,18 @@ function get_pawns_list(board::Bitboard, color::String="white")
                     if move & promotion_rank == EMPTY
                         push!(piece_moves, Move(piece, attack,
                                                 "pawn", taken_piece, "none",
-                                                EMPTY))
+                                                EMPTY, "-"))
                     else
                         for new_piece in ["queen", "rook", "night", "bishop"]
                             push!(piece_moves, Move(piece, attack,
                                                     "pawn", taken_piece,
-                                                    new_piece, EMPTY))
+                                                    new_piece, EMPTY, "-"))
                         end
                     end
                 elseif board.enpassant_square != EMPTY &&
                        attack == board.enpassant_square
                     push!(piece_moves, Move(piece, attack, "pawn", "none",
-                                            "none", EMPTY))
+                                            "none", EMPTY, "-"))
                 end
             end
         end

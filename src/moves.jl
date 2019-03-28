@@ -5,6 +5,7 @@ mutable struct Move
     capture_type :: String
     promotion_type :: String
     enpassant_square :: UInt64
+    castling_type :: String
 end
 
 
@@ -63,24 +64,63 @@ function get_non_sliding_pieces_list(board::Bitboard, piece_type::String,
         opponent_color = "white"
     end
 
+    piece_moves = Array{Move,1}()
     if piece_type == "king"
         piece_dict = KING_MOVES
+
+        if king == home_square
+            if color == "white"
+                if board.white_can_castle_kingside == true
+                    if board.free & PGN2UINT["f1"] != EMPTY &&
+                        board.free & PGN2UINT["g1"] != EMPTY &&
+                        PGN2UINT["h1"] in board.R
+                        push!(piece_moves, Move(pieces, PGN2UINT["g1"],
+                            piece_type, "none", "none", EMPTY, "K"))
+                    end
+                end
+                if board.white_can_castle_queenside == true
+                    if board.free & PGN2UINT["d1"] != EMPTY &&
+                        board.free & PGN2UINT["c1"] != EMPTY &&
+                        board.free & PGN2UINT["b1"] != EMPTY &&
+                        PGN2UINT["a1"] in board.R
+                        push!(piece_moves, Move(pieces, PGN2UINT["c1"],
+                            piece_type, "none", "none", EMPTY, "Q"))
+                    end
+                end
+            else
+                if board.black_can_castle_kingside == true
+                    if board.free & PGN2UINT["f8"] != EMPTY &&
+                        board.free & PGN2UINT["g8"] != EMPTY &&
+                        PGN2UINT["h8"] in board.r
+                        push!(piece_moves, Move(pieces, PGN2UINT["g8"],
+                            piece_type, "none", "none", EMPTY, "k"))
+                    end
+                end
+                if board.black_can_castle_queenside == true
+                    if board.free & PGN2UINT["d8"] != EMPTY &&
+                        board.free & PGN2UINT["c8"] != EMPTY &&
+                        board.free & PGN2UINT["b8"] != EMPTY &&
+                        PGN2UINT["a8"] in board.r
+                        push!(piece_moves, Move(pieces, PGN2UINT["c8"],
+                            piece_type, "none", "none", EMPTY, "q"))
+                    end
+                end
+            end
+        end
     else
         piece_dict = NIGHT_MOVES
     end
 
-    piece_moves = Array{Move,1}()
     for piece in pieces
         for move in piece_dict[piece]
             if move & other_king == EMPTY
                 if move & same == EMPTY && move & other == EMPTY
                     push!(piece_moves, Move(piece, move,
-                                            piece_type, "none", "none", EMPTY))
+                        piece_type, "none", "none", EMPTY, "-"))
                 elseif move & same == EMPTY && move & other != EMPTY
                     taken_piece = find_piece_type(board, move, opponent_color)
                     push!(piece_moves, Move(piece, move,
-                                            piece_type, taken_piece,
-                                            "none", EMPTY))
+                        piece_type, taken_piece, "none", EMPTY, "-"))
                 end
             end
         end
@@ -168,17 +208,17 @@ function get_sliding_pieces_list(board::Bitboard, piece_type::String,
         moves, edges = attack_fun(board.taken, piece)
         for move in moves
             push!(piece_moves, Move(piece, move, piece_type,
-                "none", "none", EMPTY))
+                "none", "none", EMPTY, "-"))
         end
         for edge in edges
             if edge & other_king == EMPTY
                 if edge & same == EMPTY && edge & other == EMPTY
                     push!(piece_moves, Move(piece, edge, piece_type,
-                                            "none", "none", EMPTY))
+                                            "none", "none", EMPTY, "-"))
                 elseif edge & same == EMPTY && edge & other != EMPTY
                     taken_piece = find_piece_type(board, edge, opponent_color)
                     push!(piece_moves, Move(piece, edge, piece_type,
-                                            taken_piece, "none", EMPTY))
+                                            taken_piece, "none", EMPTY, "-"))
                 end
             end
         end
@@ -285,7 +325,7 @@ end
 
 
 function move_white_piece(board::Bitboard, source::UInt64, target::UInt64,
-    promotion_type::String="none")
+    promotion_type::String="none", castling_type::String="-")
 
     board.free |= source # +
     board.free = xor(board.free, target) # -
@@ -343,12 +383,40 @@ function move_white_piece(board::Bitboard, source::UInt64, target::UInt64,
         end
     end
 
+    if castling_type != "-"
+        if castling_type == "K"
+            c_move = Move(board.K, PGN2UINT["f1"], "king",
+                "none", "none", EMPTY, "-")
+            if validate_move(board, c_move)
+                c_move = Move(board.K, PGN2UINT["g1"], "king",
+                "none", "none", EMPTY, "-")
+                if validate_move(board, c_move)
+                    board = move_white_piece(board, PGN2UINT["h1"],
+                        PGN2UINT["f1"])
+                end
+            end
+        elseif castling_type == "Q"
+            c_move = Move(board.K, PGN2UINT["d1"], "king",
+                "none", "none", EMPTY, "-")
+            if validate_move(board, c_move)
+                c_move = Move(board.K, PGN2UINT["c1"], "king",
+                    "none", "none", EMPTY, "-")
+                if validate_move(board, c_move)
+                    board = move_white_piece(board, PGN2UINT["a1"],
+                        PGN2UINT["d1"])
+                end
+            end
+        end
+        board.white_can_castle_queenside = false
+        board.white_can_castle_kingside = false
+    end
+
     return board
 end
 
 
 function move_black_piece(board::Bitboard, source::UInt64, target::UInt64,
-    promotion_type::String="none")
+    promotion_type::String="none", castling_type::String="-")
 
     board.free |= source
     board.free = xor(board.free, target)
@@ -406,6 +474,34 @@ function move_black_piece(board::Bitboard, source::UInt64, target::UInt64,
         end
     end
 
+    if castling_type != "-"
+        if castling_type == "k"
+            c_move = Move(board.k, PGN2UINT["f8"], "king",
+                "none", "none", EMPTY, "-")
+            if validate_move(board, c_move)
+                c_move = Move(board.k, PGN2UINT["g8"], "king",
+                    "none", "none", EMPTY, "-")
+                if validate_move(board, c_move)
+                    board = move_black_piece(board, PGN2UINT["h8"],
+                        PGN2UINT["f8"])
+                end
+            end
+        elseif castling_type == "q"
+            c_move = Move(board.k, PGN2UINT["d8"], "king",
+                "none", "none", EMPTY, "-")
+            if validate_move(board, c_move)
+                c_move = Move(board.k, PGN2UINT["c8"], "king",
+                    "none", "none", EMPTY, "-")
+                if validate_move(board, c_move)
+                    board = move_black_piece(board, PGN2UINT["a8"],
+                        PGN2UINT["d8"])
+                end
+            end
+        end
+        board.black_can_castle_queenside = false
+        board.black_can_castle_kingside = false
+    end
+
     return board
 end
 
@@ -418,10 +514,10 @@ function move_piece(board::Bitboard, move::Move, color::String="white")
     end
     if color == "white"
         board = move_white_piece(board, move.source, move.target,
-            move.promotion_type)
+            move.promotion_type, move.castling_type)
     else
         board = move_black_piece(board, move.source, move.target,
-            move.promotion_type)
+            move.promotion_type, move.castling_type)
     end
     return board
 end
@@ -433,6 +529,7 @@ function move(board::Bitboard, source::String, target::String,
     s = PGN2UINT[source]
     t = PGN2UINT[target]
     enpassant_square = EMPTY
+    castling_type = "-"
     if s & board.white != EMPTY
         color = "white"
         
@@ -451,6 +548,11 @@ function move(board::Bitboard, source::String, target::String,
             piece_type = "rook"
         elseif s == board.K
             piece_type = "king"
+            if source == "e1" && target == "g1"
+                castling_type = "K"
+            elseif source == "e1" && target == "c1"
+                castling_type = "Q"
+            end
         end
 
         if t & board.white != EMPTY
@@ -495,6 +597,12 @@ function move(board::Bitboard, source::String, target::String,
             piece_type = "rook"
         elseif s == board.k
             piece_type = "king"
+            println(source, " ", target)
+            if source == "e8" && target == "g8"
+                castling_type = "k"
+            elseif source == "e8" && target == "c8"
+                castling_type = "q"
+            end
         end
 
         if t & board.black != EMPTY
@@ -525,8 +633,10 @@ function move(board::Bitboard, source::String, target::String,
         throw(ArgumentError("Invalid source UCI string: no piece to move"))
     end
 
+    println(castling_type)
+    
     move = Move(s, t, piece_type, capture_type,
-                promotion_type, enpassant_square)
+                promotion_type, enpassant_square, castling_type)
     return move_piece(board, move, color)
 end
 

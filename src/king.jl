@@ -24,6 +24,8 @@ function gen_all_king_valid_moves()
     return king_moves
 end
 const KING_MOVES = gen_all_king_valid_moves()
+const WHITE_KING_HOME = PGN2UINT["e1"]
+const BLACK_KING_HOME = PGN2UINT["e8"]
 
 
 function get_current_king_valid(board::Bitboard, color::String="white")
