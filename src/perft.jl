@@ -47,7 +47,8 @@ end
 
 
 function explore(pt::PerftTree, board::Bitboard, 
-    max_depth::Int64, depth::Int64, color::String="white", move_name::String="")
+    max_depth::Int64, depth::Int64, color::String="white",
+    move_name::String="")
     
     total_pieces = count_total_pieces(board)
     moves = get_all_valid_moves(board, color)
@@ -84,7 +85,6 @@ function explore(pt::PerftTree, board::Bitboard,
         board = move_piece(board, m, color)
        
         if m.capture_type != "none"
-            println(m.capture_type)
             pt.captures[depth] += 1
         end
         if m.promotion_type != "none"

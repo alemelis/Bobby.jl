@@ -186,17 +186,19 @@ const BLACK_PAWN_ATTACK = gen_all_pawns_valid_attack("black")
 # end
 
 
-function add_promotions!(pawn_moves::Array{Move,1}, source::UInt64,
+function add_promotions(pawns_moves::Array{Move,1}, source::UInt64,
     target::UInt64, taken_piece::String="none")
 
     for promotion_type in ["queen", "rook", "night", "bishop"]
-        push!(pawn_moves, Move(source, target, "pawn", taken_piece,
+        push!(pawns_moves, Move(source, target, "pawn", taken_piece,
             promotion_type, EMPTY, "-"))
     end
+
+    return pawns_moves
 end
 
 
-function find_pawn_pseudo!(pawn_moves::Array{Move,1}, board::Bitboard,
+function find_pawn_pseudo(pawns_moves::Array{Move,1}, board::Bitboard,
     pawn::UInt64, color::String="white")
 
     if color == "white"
@@ -222,16 +224,16 @@ function find_pawn_pseudo!(pawn_moves::Array{Move,1}, board::Bitboard,
     # move once
     if one_step[pawn] & board.taken == EMPTY # check front square
         if pawn & promotion_rank != EMPTY
-            add_promotions!(pawns_moves, pawn, one_step[pawn], "none")
+            pawns_moves = add_promotions(pawns_moves, pawn, one_step[pawn], "none")
         else
             # move once
-            push!(pawn_moves, Move(pawn, one_step[pawn], "pawn", "none",
+            push!(pawns_moves, Move(pawn, one_step[pawn], "pawn", "none",
                 "none", EMPTY, "-"))
 
             # move twice and take note of the en-passant square
             if pawn & home_rank != EMPTY
                 if two_steps[pawn] & board.taken == EMPTY
-                    push!(pawn_moves, Move(pawn, two_steps[pawn],
+                    push!(pawns_moves, Move(pawn, two_steps[pawn],
                         "pawn", "none", "none", one_step[pawn], "-"))
                 end
             end
@@ -240,24 +242,25 @@ function find_pawn_pseudo!(pawn_moves::Array{Move,1}, board::Bitboard,
 
     # attack squares
     pawn_attacks = attacks[pawn]
-    @inbounds for i = 1:length(pawn_attacks)
-        attack = pawn_attacks[i]
+    for attack in pawn_attacks
         if attack & others != EMPTY
             taken_piece = find_piece_type(board, attack, opponent_color)
             if pawn & promotion_rank != EMPTY
-                add_promotions!(pawn_moves, pawn, attack, taken_piece)
+                pawns_moves = add_promotions(pawns_moves, pawn, attack, taken_piece)
                 return
             else
-                push!(pawn_moves, Move(pawn, attack, "pawn", taken_piece,
+                push!(pawns_moves, Move(pawn, attack, "pawn", taken_piece,
                     "none", EMPTY, "-"))
                 return
             end
         elseif attack == board.enpassant_square # use enpassant square
-            push!(pawn_moves, Move(pawn, attack,
-                "pawn", "none", "none", EMPTY, "-"))
+            push!(pawns_moves, Move(pawn, attack, "pawn", "none", "none",
+                EMPTY, "-"))
             return
         end
     end
+
+    return pawns_moves
 end
 
 
@@ -269,8 +272,8 @@ function get_pawns_list(board::Bitboard, color::String="white")
     end
     
     pawns_moves = Array{Move,1}()
-    @inbounds for i=1:length(pawns)
-        find_pawn_pseudo!(pawns_moves, board, pawns[i], color)
+    for pawn in pawns
+        pawns_moves = find_pawn_pseudo(pawns_moves, board, pawn, color)
     end
 
     return pawns_moves
