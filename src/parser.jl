@@ -109,6 +109,7 @@ function fen_to_bitboard(fen::String)
     end
     
     enpassant_square = EMPTY
+    enpassant_done = false
     if fen[4] != "-"
         enpassant_square = PGN2UINT[fen[4]]
     end 
@@ -133,5 +134,6 @@ function fen_to_bitboard(fen::String)
                     black_can_castle_queenside,
                     black_can_castle_kingside,
                     enpassant_square,
+                    enpassant_done,
                     halfmove_clock, fullmove_clock) 
 end

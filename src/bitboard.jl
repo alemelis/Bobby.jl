@@ -29,6 +29,7 @@ mutable struct Bitboard
     black_can_castle_kingside  :: Bool
 
     enpassant_square :: UInt64
+    enpassant_done :: Bool
 
     halfmove_clock :: Int64
     fullmove_clock :: Int64 # start at 1, increment for each black move
