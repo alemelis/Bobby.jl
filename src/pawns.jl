@@ -198,7 +198,7 @@ function add_promotions(pawns_moves::Array{Move,1}, source::UInt64,
 end
 
 
-function find_pawn_pseudo(pawns_moves::Array{Move,1}, board::Bitboard,
+function find_pawn_pseudo!(pawns_moves::Array{Move,1}, board::Bitboard,
     pawn::UInt64, color::String="white")
 
     if color == "white"
@@ -259,8 +259,6 @@ function find_pawn_pseudo(pawns_moves::Array{Move,1}, board::Bitboard,
             return
         end
     end
-
-    return pawns_moves
 end
 
 
@@ -273,7 +271,7 @@ function get_pawns_list(board::Bitboard, color::String="white")
     
     pawns_moves = Array{Move,1}()
     for pawn in pawns
-        pawns_moves = find_pawn_pseudo(pawns_moves, board, pawn, color)
+        find_pawn_pseudo!(pawns_moves, board, pawn, color)
     end
 
     return pawns_moves

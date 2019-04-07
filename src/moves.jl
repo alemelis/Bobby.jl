@@ -766,12 +766,11 @@ end
 
 
 function move_piece(board::Bitboard, move::Move, color::String="white")
-    # if move.capture_type != "none"
-    #     println("a")
-    # end
     if color == "white"
-        board.white = update_from_to_squares(board.white, move.source, move.target)
-        board.taken = update_from_to_squares(board.taken, move.source, move.target)
+        board.white = update_from_to_squares(board.white, move.source,
+            move.target)
+        board.taken = update_from_to_squares(board.taken, move.source,
+            move.target)
 
         if move.capture_type != "none"
             board.black = remove_from_square(board.black, move.target)
@@ -824,8 +823,10 @@ function move_piece(board::Bitboard, move::Move, color::String="white")
             end
         end
     else
-        board.black = update_from_to_squares(board.black, move.source, move.target)
-        board.taken = update_from_to_squares(board.taken, move.source, move.target)
+        board.black = update_from_to_squares(board.black, move.source,
+            move.target)
+        board.taken = update_from_to_squares(board.taken, move.source,
+            move.target)
 
         if move.capture_type != "none"
             board.white = remove_from_square(board.white, move.target)
@@ -886,8 +887,10 @@ end
 
 function unmove_piece(board::Bitboard, move::Move, color::String="white")
     if color == "white"
-        board.white = update_from_to_squares(board.white, move.target, move.source)
-        board.taken = update_from_to_squares(board.taken, move.target, move.source)
+        board.white = update_from_to_squares(board.white, move.target,
+            move.source)
+        board.taken = update_from_to_squares(board.taken, move.target,
+            move.source)
 
         if move.piece_type == "pawn"
             if board.enpassant_done
@@ -926,8 +929,10 @@ function unmove_piece(board::Bitboard, move::Move, color::String="white")
             end
         end
     else
-        board.black = update_from_to_squares(board.black, move.target, move.source)
-        board.taken = update_from_to_squares(board.taken, move.target, move.source)
+        board.black = update_from_to_squares(board.black, move.target,
+            move.source)
+        board.taken = update_from_to_squares(board.taken, move.target,
+            move.source)
 
         if move.piece_type == "pawn"
             if board.enpassant_done
