@@ -62,7 +62,7 @@ function explore(pt::PerftTree, board::Bitboard,
         pt.divide[move_name] += length(moves)
     end
 
-    if check_check_raytrace(board, color) && depth > 1
+    if kingtrace(board, color) && depth > 1
         check = true
         pt.checks[depth-1] += 1
     else
@@ -81,9 +81,10 @@ function explore(pt::PerftTree, board::Bitboard,
     pt.nodes[depth] += length(moves)
 
     new_color = change_color(color)
+    # fen = board.fen
     for m in moves
         board = move_piece(board, m, color)
-       
+        # board.fen = bitboard_to_fen(board)
         if m.capture_type != "none"
             pt.captures[depth] += 1
         end
@@ -97,6 +98,7 @@ function explore(pt::PerftTree, board::Bitboard,
 
         pt = explore(pt, board, max_depth, depth+1, new_color, move_name)
         board = unmove_piece(board, m, color)
+        # board = fen_to_bitboard(fen)
     end
 
     return pt

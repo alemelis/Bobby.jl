@@ -33,6 +33,8 @@ mutable struct Bitboard
 
     halfmove_clock :: Int64
     fullmove_clock :: Int64 # start at 1, increment for each black move
+
+    fen :: String
 end
 
 

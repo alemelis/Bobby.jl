@@ -1,4 +1,4 @@
-function fen_to_bitboard(fen::String)
+function fen_to_bitboard(fen_string::String)
     white = EMPTY
     R = zeros(UInt64, 0)
     N = zeros(UInt64, 0)
@@ -22,7 +22,7 @@ function fen_to_bitboard(fen::String)
     black_attacks = EMPTY
 
     # board
-    fen = split(fen, ' ')
+    fen = split(fen_string, ' ')
     board = fen[1]
     square_i = 1
     fen_i = 1
@@ -135,5 +135,6 @@ function fen_to_bitboard(fen::String)
                     black_can_castle_kingside,
                     enpassant_square,
                     enpassant_done,
-                    halfmove_clock, fullmove_clock) 
+                    halfmove_clock, fullmove_clock,
+                    fen_string) 
 end

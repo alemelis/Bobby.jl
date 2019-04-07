@@ -12,7 +12,7 @@ function check_check(board::Bitboard, color::String="white")
 end
 
 
-function check_check_raytrace(board::Bitboard, color::String="white")
+function kingtrace(board::Bitboard, color::String="white")
     if color == "white"
         squares = NIGHT_MOVES[board.K]
         for night in board.n
