@@ -81,7 +81,7 @@ function explore(pt::PerftTree, board::Bitboard,
     pt.nodes[depth] += length(moves)
 
     new_color = change_color(color)
-    # fen = board.fen
+    fen = board.fen
     for m in moves
         board = move_piece(board, m, color)
         # board.fen = bitboard_to_fen(board)
@@ -97,8 +97,8 @@ function explore(pt::PerftTree, board::Bitboard,
         end
 
         pt = explore(pt, board, max_depth, depth+1, new_color, move_name)
-        board = unmove_piece(board, m, color)
-        # board = fen_to_bitboard(fen)
+        # board = unmove_piece(board, m, color)
+        board = fen_to_bitboard(fen)
     end
 
     return pt

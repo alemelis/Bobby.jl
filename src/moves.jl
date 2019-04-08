@@ -10,10 +10,11 @@ end
 
 
 function validate_move(board::Bitboard, move::Move, color::String="white")
+    # println(move)
     board = move_piece(board, move, color)
     in_check = kingtrace(board, color)
-    board = unmove_piece(board, move, color)
-    # board = fen_to_bitboard(board.fen)
+    # board = unmove_piece(board, move, color)
+    board = fen_to_bitboard(board.fen)
     return ~in_check
 end
 
