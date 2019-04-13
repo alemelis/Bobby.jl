@@ -133,9 +133,11 @@ function fen_to_bitboard(fen_string::String)
     end
 
     game = Array{String,1}[]
-
-    return Bitboard(white, P, R, N, B, Q, K,
-                    black, p, r, n, b, q, k,
+    
+    A = [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY]
+    a = [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY]
+    board = Bitboard(white, P, R, N, B, Q, K, A,
+                    black, p, r, n, b, q, k, a,
                     free, taken,
                     white_attacks, black_attacks,
                     player_color,
@@ -148,4 +150,5 @@ function fen_to_bitboard(fen_string::String)
                     enpassant_done,
                     halfmove_clock, fullmove_clock,
                     fen_string, game)
+    return update_attacked(board)
 end

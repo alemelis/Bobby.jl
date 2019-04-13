@@ -6,6 +6,7 @@ mutable struct Bitboard
     B :: Array{UInt64,1}
     Q :: Array{UInt64,1}
     K :: UInt64
+    A :: Array{UInt64,1}
 
     black :: UInt64 # all black pieces
     p :: Array{UInt64,1}
@@ -14,6 +15,7 @@ mutable struct Bitboard
     b :: Array{UInt64,1}
     q :: Array{UInt64,1}
     k :: UInt64
+    a :: Array{UInt64,1}
 
     free :: UInt64  # all free squares
     taken :: UInt64 # all pieces

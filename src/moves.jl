@@ -11,7 +11,7 @@ end
 
 function validate_move(board::Bitboard, move::Move, color::String="white")
     board = move_piece(board, move, color)
-    in_check = kingtrace(board, color)
+    in_check = king_in_check(board, color)
     board = unmove_piece(board, move, color)
     return ~in_check
 end
@@ -260,6 +260,7 @@ function update_from_to_squares(bs::Array{UInt64,1}, s::UInt64, t::UInt64)
     return bs
 end
 
+
 function update_castling_rights(board::Bitboard)
     if board.K == PGN2UINT["e1"]
         board.white_king_moved = false
@@ -296,6 +297,130 @@ function update_castling_rights(board::Bitboard)
     end
     return board
 end
+
+
+function update_attacked(board::Bitboard)
+    board.white_attacks = EMPTY
+    board.A = [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY]
+    board.a = [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY]
+    for p in board.P
+        for a in WHITE_PAWN_ATTACK[p]
+            board.white_attacks |= a
+            board.A[1] |= a
+        end
+    end
+    for n in board.N
+        for a in NIGHT_MOVES[n]
+            board.white_attacks |= a
+            board.A[2] |= a
+        end
+    end
+    for i = 1:8
+        for q in board.Q
+            if q & MASK_FILES[i] != EMPTY
+                board.white_attacks |= MASK_FILES[i]
+                board.A[3] |= MASK_FILES[i]
+            end
+            if q & MASK_RANKS[i] != EMPTY
+                board.white_attacks |= MASK_RANKS[i]
+                board.A[3] |= MASK_RANKS[i]
+            end
+        end
+        for r in board.R
+            if r & MASK_FILES[i] != EMPTY
+                board.white_attacks |= MASK_FILES[i]
+                board.A[4] |= MASK_FILES[i]
+            end
+            if r & MASK_RANKS[i] != EMPTY
+                board.white_attacks |= MASK_RANKS[i]
+                board.A[4] |= MASK_RANKS[i]
+            end
+        end
+    end
+    for i = 1:15
+        for q in board.Q
+            if q & ANTIDIAGONALS[i] != EMPTY
+                board.white_attacks |= ANTIDIAGONALS[i]
+                board.A[3] |= ANTIDIAGONALS[i]
+            end
+            if q & DIAGONALS[i] != EMPTY
+                board.white_attacks |= DIAGONALS[i]
+                board.A[3] |= DIAGONALS[i]
+            end
+        end
+        for b in board.B
+            if b & ANTIDIAGONALS[i] != EMPTY
+                board.white_attacks |= ANTIDIAGONALS[i]
+                board.A[5] |= ANTIDIAGONALS[i]
+            end
+            if b & DIAGONALS[i] != EMPTY
+                board.white_attacks |= DIAGONALS[i]
+                board.A[5] |= DIAGONALS[i]
+            end
+        end
+    end
+
+    board.black_attacks = EMPTY
+    for p in board.p
+        for a in BLACK_PAWN_ATTACK[p]
+            board.black_attacks |= a
+            board.a[1] |= a
+        end
+    end
+    for n in board.n
+        for a in NIGHT_MOVES[n]
+            board.black_attacks |= a
+            board.a[2] |= a
+        end
+    end
+    for i = 1:8
+        for q in board.q
+            if q & MASK_FILES[i] != EMPTY
+                board.black_attacks |= MASK_FILES[i]
+                board.a[3] |= MASK_FILES[i]
+            end
+            if q & MASK_RANKS[i] != EMPTY
+                board.black_attacks |= MASK_RANKS[i]
+                board.a[3] |= MASK_RANKS[i]
+            end
+        end
+        for r in board.r
+            if r & MASK_FILES[i] != EMPTY
+                board.black_attacks |= MASK_FILES[i]
+                board.a[4] |= MASK_FILES[i]
+            end
+            if r & MASK_RANKS[i] != EMPTY
+                board.black_attacks |= MASK_RANKS[i]
+                board.a[4] |= MASK_RANKS[i]
+            end
+        end
+    end
+    for i = 1:15
+        for q in board.q
+            if q & ANTIDIAGONALS[i] != EMPTY
+                board.black_attacks |= ANTIDIAGONALS[i]
+                board.a[3] |= ANTIDIAGONALS[i]
+            end
+            if q & DIAGONALS[i] != EMPTY
+                board.black_attacks |= DIAGONALS[i]
+                board.a[3] |= DIAGONALS[i]
+            end
+        end
+        for b in board.b
+            if b & ANTIDIAGONALS[i] != EMPTY
+                board.black_attacks |= ANTIDIAGONALS[i]
+                board.a[5] |= ANTIDIAGONALS[i]
+            end
+            if b & DIAGONALS[i] != EMPTY
+                board.black_attacks |= DIAGONALS[i]
+                board.a[5] |= DIAGONALS[i]
+            end
+        end
+    end
+
+    return board
+end
+
 
 function move_piece(board::Bitboard, move::Move, color::String="white")
     push!(board.game,
@@ -448,6 +573,8 @@ function move_piece(board::Bitboard, move::Move, color::String="white")
         end
     end
     board.free = ~board.taken
+    
+    # board = update_attacked(board)
 
     return update_castling_rights(board)
 end
