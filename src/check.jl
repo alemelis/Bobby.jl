@@ -98,20 +98,20 @@ function kingtrace(board::Bitboard, color::String="white")
 end
 
 
-# function check_mate(board::Bitboard, color::String="white")
-#     if color == "white"
-#         king = board.K
-#     elseif color == "black"
-#         king = board.k
-#     end
+function check_mate(board::Bitboard, color::String="white")
+    if color == "white"
+        king = board.K
+    elseif color == "black"
+        king = board.k
+    end
 
-#     if length(get_current_king_valid(board, color)) != 0
-#         return false
-#     else
-#         if length(get_all_valid_moves(board, color)) == 0
-#             return true
-#         else
-#             return false
-#         end
-#     end
-# end
+    if length(get_current_king_valid(board, color)) != 0
+        return false
+    else
+        if length(get_all_valid_moves(board, color)) == 0
+            return true
+        else
+            return false
+        end
+    end
+end

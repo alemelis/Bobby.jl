@@ -11,6 +11,7 @@ end
 
 function validate_move(board::Bitboard, move::Move, color::String="white")
     board = move_piece(board, move, color)
+    # board = update_attacked(board)
     in_check = king_in_check(board, color)
     board = unmove_piece(board, move, color)
     return ~in_check
@@ -298,17 +299,17 @@ function update_castling_rights(board::Bitboard)
         board.black_can_castle_kingside = true
     end
     for move in board.game
-        if move == "white-king-e1"
+        if move == "whitekinge1"
             board.white_king_moved = true
-        elseif move == "white-rook-a1"
+        elseif move == "whiterooka1"
             board.white_can_castle_queenside = false
-        elseif move == "white-rook-h1"
+        elseif move == "whiterookh1"
             board.white_can_castle_kingside = false
-        elseif move == "black-king-e8"
+        elseif move == "blackkinge8"
             board.black_king_moved = true
-        elseif move == "black-rook-a8"
+        elseif move == "blackrooka8"
             board.black_can_castle_queenside = false
-        elseif move == "black-rook-h8"
+        elseif move == "blackrookh8"
             board.black_can_castle_kingside = false
         end
     end
@@ -449,7 +450,7 @@ end
 
 function move_piece(board::Bitboard, move::Move, color::String="white")
     push!(board.game,
-        color*"-"*move.piece_type*"-"*UINT2PGN[move.source])
+        color*move.piece_type*UINT2PGN[move.source])
 
     if color == "white"
         board.white = update_from_to_squares(board.white, move.source,
@@ -592,9 +593,10 @@ function move_piece(board::Bitboard, move::Move, color::String="white")
     end
     board.free = ~board.taken
     
-    board = update_attacked(board)
+    # board = update_attacked(board)
 
-    return update_castling_rights(board)
+    # return update_castling_rights(board)
+    return board
 end
 
 
@@ -709,7 +711,8 @@ function unmove_piece(board::Bitboard, move::Move, color::String="white")
     board.free = ~board.taken
     pop!(board.game)
     # board = update_attacked(board)
-    return update_castling_rights(board)
+    # return update_castling_rights(board)
+    return board
 end
 
 
