@@ -68,7 +68,6 @@ function get_non_sliding_pieces_list(piece_moves::Array{Move,1},
         opponent_color = "white"
     end
 
-    # piece_moves = Array{Move,1}()
     if piece_type == "king"
         piece_dict = KING_MOVES
 
@@ -79,8 +78,11 @@ function get_non_sliding_pieces_list(piece_moves::Array{Move,1},
                         if board.free & F1 != EMPTY &&
                             board.free & G1 != EMPTY &&
                             H1 in board.R
-                            push!(piece_moves, Move(pieces, G1,
-                                piece_type, "none", "none", EMPTY, "K"))
+                            if ~square_in_check(board, E1, color) &&
+                                ~square_in_check(board, F1, color)
+                                push!(piece_moves, Move(pieces, G1,
+                                    piece_type, "none", "none", EMPTY, "K"))
+                            end
                         end
                     end
                     if board.white_can_castle_queenside == true
@@ -88,8 +90,11 @@ function get_non_sliding_pieces_list(piece_moves::Array{Move,1},
                             board.free & C1 != EMPTY &&
                             board.free & B1 != EMPTY &&
                             A1 in board.R
-                            push!(piece_moves, Move(pieces, C1,
-                                piece_type, "none", "none", EMPTY, "Q"))
+                            if ~square_in_check(board, E1, color) &&
+                                ~square_in_check(board, D1, color)
+                                push!(piece_moves, Move(pieces, C1,
+                                    piece_type, "none", "none", EMPTY, "K"))
+                            end
                         end
                     end
                 end
@@ -99,8 +104,11 @@ function get_non_sliding_pieces_list(piece_moves::Array{Move,1},
                         if board.free & F8 != EMPTY &&
                             board.free & G8 != EMPTY &&
                             H8 in board.r
-                            push!(piece_moves, Move(pieces, G8,
-                                piece_type, "none", "none", EMPTY, "k"))
+                            if ~square_in_check(board, E8, color) &&
+                                ~square_in_check(board, F8, color)
+                                push!(piece_moves, Move(pieces, G8,
+                                    piece_type, "none", "none", EMPTY, "k"))
+                            end
                         end
                     end
                     if board.black_can_castle_queenside == true
@@ -108,8 +116,11 @@ function get_non_sliding_pieces_list(piece_moves::Array{Move,1},
                             board.free & C8 != EMPTY &&
                             board.free & B8 != EMPTY &&
                             A8 in board.r
-                            push!(piece_moves, Move(pieces, C8,
-                                piece_type, "none", "none", EMPTY, "q"))
+                            if ~square_in_check(board, E8, color) &&
+                                ~square_in_check(board, D8, color)
+                                push!(piece_moves, Move(pieces, C8,
+                                    piece_type, "none", "none", EMPTY, "q"))
+                            end
                         end
                     end
                 end

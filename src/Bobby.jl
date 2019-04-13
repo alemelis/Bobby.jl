@@ -9,6 +9,7 @@ module Bobby
     include("bitboard.jl")
     include("parser.jl")
     include("print.jl")
+    include("check.jl")
     include("moves.jl")
     include("pawns.jl")
     include("king.jl")
@@ -17,5 +18,4 @@ module Bobby
     include("rooks.jl")
     include("bishops.jl")
     include("perft.jl")
-    include("check.jl")
 end
