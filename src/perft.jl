@@ -84,7 +84,6 @@ function explore(pt::PerftTree, board::Bitboard,
     fen = board.fen
     for m in moves
         board = move_piece(board, m, color)
-        # board.fen = bitboard_to_fen(board)
         if m.capture_type != "none"
             pt.captures[depth] += 1
         end
@@ -97,8 +96,7 @@ function explore(pt::PerftTree, board::Bitboard,
         end
 
         pt = explore(pt, board, max_depth, depth+1, new_color, move_name)
-        # board = unmove_piece(board, m, color)
-        board = fen_to_bitboard(fen)
+        board = unmove_piece(board, m, color)
     end
 
     return pt

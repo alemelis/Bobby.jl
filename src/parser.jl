@@ -90,6 +90,14 @@ function fen_to_bitboard(fen_string::String)
         player_color = "black"
     end
 
+    white_king_moved = false
+    black_king_moved = false
+    if k != PGN2UINT["e8"]
+        black_king_moved = true
+    end
+    if K != PGN2UINT["e1"]
+        white_king_moved = true
+    end
     white_can_castle_queenside = false
     white_can_castle_kingside = false
     black_can_castle_queenside = false
@@ -124,6 +132,8 @@ function fen_to_bitboard(fen_string::String)
         fullmove_clock = parse(Int64, fen[6])
     end
 
+    game = Array{String,1}[]
+
     return Bitboard(white, P, R, N, B, Q, K,
                     black, p, r, n, b, q, k,
                     free, taken,
@@ -133,114 +143,9 @@ function fen_to_bitboard(fen_string::String)
                     white_can_castle_kingside,
                     black_can_castle_queenside,
                     black_can_castle_kingside,
+                    white_king_moved, black_king_moved,
                     enpassant_square,
                     enpassant_done,
                     halfmove_clock, fullmove_clock,
-                    fen_string) 
-end
-
-
-function bitboard_to_fen(b::Bitboard)
-    fen = ""
-    i = 1
-    rank_counter = 1
-    empty_counter = 0
-    for i = 1:64
-        c = ""
-        if INT2UINT[i] & b.taken != EMPTY
-            if INT2UINT[i] & b.white != EMPTY
-                if INT2UINT[i] in b.P
-                    c = "P"
-                elseif INT2UINT[i] in b.R
-                    c = "R"
-                elseif INT2UINT[i] in b.N
-                    c = "N"
-                elseif INT2UINT[i] in b.B
-                    c = "B"
-                elseif INT2UINT[i] in b.Q
-                    c = "Q"
-                elseif INT2UINT[i] == b.K
-                    c = "K"
-                end
-            elseif INT2UINT[i] & b.black != EMPTY
-                if INT2UINT[i] in b.p
-                    c = "p"
-                elseif INT2UINT[i] in b.r
-                    c = "r"
-                elseif INT2UINT[i] in b.n
-                    c = "n"
-                elseif INT2UINT[i] in b.b
-                    c = "b"
-                elseif INT2UINT[i] in b.q
-                    c = "q"
-                elseif INT2UINT[i] == b.k
-                    c = "k"
-                end
-            end
-        else
-            c = ""
-            empty_counter += 1
-        end
-
-        if c != "" && empty_counter != 0
-            fen *= string(empty_counter)
-            empty_counter = 0
-        end
-        fen *= c
-        rank_counter += 1
-        if (rank_counter > 8 && i != 64) || empty_counter == 8
-            if empty_counter != 0
-                fen *= string(empty_counter)
-                empty_counter = 0
-            end
-            if i != 64
-                fen *= "/"
-            end
-            rank_counter = 1
-            empty_counter = 0
-        end
-
-        if i == 64 && empty_counter != 0
-            fen *= string(empty_counter)
-            break
-        end
-    end
-
-    if b.player_color == "white"
-        fen *= " w "
-    else
-        fen *= " b "
-    end
-
-    no_castling = true
-    if b.white_can_castle_kingside
-        fen *= "K"
-        no_castling = false
-    end
-    if b.white_can_castle_queenside
-        fen *= "Q"
-        no_castling = false
-    end
-    if b.black_can_castle_kingside
-        fen *= "k"
-        no_castling = false
-    end
-    if b.black_can_castle_queenside
-        fen *= "q"
-        no_castling = false
-    end
-    if no_castling
-        fen *= "-"
-    end
-
-    if b.enpassant_square != EMPTY
-        fen *= " "*UINT2PGN[b.enpassant_square]*" "
-    else
-        fen *= " - "
-    end
-
-    fen *= string(b.halfmove_clock)*" "
-    fen *= string(b.fullmove_clock)
-
-    return fen
+                    fen_string, game)
 end
