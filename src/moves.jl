@@ -610,8 +610,8 @@ function unmove_piece(board::Bitboard, move::Move, color::String="white")
         if move.piece_type == "pawn"
             if board.enpassant_done
                 board.black = add_to_square(board.black, move.target>>8)
-                board.black = add_to_square(board.p, move.target>>8)
-                board.black = add_to_square(board.taken, move.target>>8)
+                board.p = add_to_square(board.p, move.target>>8)
+                board.taken = add_to_square(board.taken, move.target>>8)
                 board.enpassant_done = false
                 board.enpassant_square = move.target
             end
