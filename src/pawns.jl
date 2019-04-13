@@ -153,7 +153,8 @@ function find_pawn_pseudo!(pawns_moves::Array{Move,1}, board::Bitboard,
     # move once
     if one_step[pawn] & board.taken == EMPTY # check front square
         if pawn & promotion_rank != EMPTY
-            pawns_moves = add_promotions(pawns_moves, pawn, one_step[pawn], "none")
+            pawns_moves = add_promotions(pawns_moves, pawn, 
+                one_step[pawn], "none")
         else
             # move once
             push!(pawns_moves, Move(pawn, one_step[pawn], "pawn", "none",
@@ -176,18 +177,16 @@ function find_pawn_pseudo!(pawns_moves::Array{Move,1}, board::Bitboard,
             taken_piece = find_piece_type(board, attack, opponent_color)
             if pawn & promotion_rank != EMPTY
                 pawns_moves = add_promotions(pawns_moves, pawn, attack, taken_piece)
-                return
             else
                 push!(pawns_moves, Move(pawn, attack, "pawn", taken_piece,
                     "none", EMPTY, "-"))
-                return
             end
         elseif attack == board.enpassant_square # use enpassant square
             push!(pawns_moves, Move(pawn, attack, "pawn", "none", "none",
                 EMPTY, "-"))
-            return
         end
     end
+    return
 end
 
 
@@ -201,6 +200,23 @@ function get_pawns_list(pawns_moves::Array{Move,1}, board::Bitboard,
     end
     
     # pawns_moves = Array{Move,1}()
+    for pawn in pawns
+        find_pawn_pseudo!(pawns_moves, board, pawn, color)
+    end
+
+    return pawns_moves
+end
+
+
+function get_pawns_list(board::Bitboard, color::String="white")
+
+    if color == "white"
+        pawns = board.P
+    else
+        pawns = board.p
+    end
+    
+    pawns_moves = Array{Move,1}()
     for pawn in pawns
         find_pawn_pseudo!(pawns_moves, board, pawn, color)
     end
