@@ -75,4 +75,8 @@
     b = Bobby.fen_to_bitboard("k3r3/8/8/8/8/8/8/4K2R w K - 0 1")
     pt = Bobby.perft(b, 1, b.player_color)
     @test pt == [4]
+
+    b = Bobby.fen_to_bitboard("k7/8/8/8/6p1/6Pp/6PP/r6K w - - 0 1")
+    pt = Bobby.perft(b, 1, b.player_color)
+    @test pt == [0]
 end
