@@ -191,14 +191,16 @@ function find_pawn_pseudo!(pawns_moves::Array{Move,1}, board::Bitboard,
 end
 
 
-function get_pawns_list(board::Bitboard, color::String="white")
+function get_pawns_list(pawns_moves::Array{Move,1}, board::Bitboard,
+    color::String="white")
+
     if color == "white"
         pawns = board.P
     else
         pawns = board.p
     end
     
-    pawns_moves = Array{Move,1}()
+    # pawns_moves = Array{Move,1}()
     for pawn in pawns
         find_pawn_pseudo!(pawns_moves, board, pawn, color)
     end

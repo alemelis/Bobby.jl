@@ -18,12 +18,15 @@ end
 
 
 function get_all_moves(board::Bitboard, color::String="white")
-    valid_moves = get_non_sliding_pieces_list(board, "king", color)
-    union!(valid_moves, get_non_sliding_pieces_list(board, "night", color))
-    union!(valid_moves, get_pawns_list(board, color))
-    union!(valid_moves, get_sliding_pieces_list(board, "queen", color))
-    union!(valid_moves, get_sliding_pieces_list(board, "rook", color))
-    return union!(valid_moves, get_sliding_pieces_list(board, "bishop", color))
+    valid_moves = Array{Move,1}()
+    valid_moves = get_non_sliding_pieces_list(valid_moves, board,
+        "king", color)
+    valid_moves = get_non_sliding_pieces_list(valid_moves, board,
+        "night", color)
+    valid_moves = get_pawns_list(valid_moves, board, color)
+    valid_moves = get_sliding_pieces_list(valid_moves, board, "queen", color)
+    valid_moves = get_sliding_pieces_list(valid_moves, board, "rook", color)
+    return get_sliding_pieces_list(valid_moves, board, "bishop", color)
 end
 
 
@@ -39,8 +42,8 @@ function get_all_valid_moves(board::Bitboard, color::String="white")
 end
 
 
-function get_non_sliding_pieces_list(board::Bitboard, piece_type::String,
-    color::String="white")
+function get_non_sliding_pieces_list(piece_moves::Array{Move,1},
+    board::Bitboard, piece_type::String, color::String="white")
 
     if color == "white"
         same = board.white
@@ -64,7 +67,7 @@ function get_non_sliding_pieces_list(board::Bitboard, piece_type::String,
         opponent_color = "white"
     end
 
-    piece_moves = Array{Move,1}()
+    # piece_moves = Array{Move,1}()
     if piece_type == "king"
         piece_dict = KING_MOVES
 
@@ -72,19 +75,19 @@ function get_non_sliding_pieces_list(board::Bitboard, piece_type::String,
             if color == "white"
                 if ~board.white_king_moved
                     if board.white_can_castle_kingside == true
-                        if board.free & PGN2UINT["f1"] != EMPTY &&
-                            board.free & PGN2UINT["g1"] != EMPTY &&
-                            PGN2UINT["h1"] in board.R
-                            push!(piece_moves, Move(pieces, PGN2UINT["g1"],
+                        if board.free & F1 != EMPTY &&
+                            board.free & G1 != EMPTY &&
+                            H1 in board.R
+                            push!(piece_moves, Move(pieces, G1,
                                 piece_type, "none", "none", EMPTY, "K"))
                         end
                     end
                     if board.white_can_castle_queenside == true
-                        if board.free & PGN2UINT["d1"] != EMPTY &&
-                            board.free & PGN2UINT["c1"] != EMPTY &&
-                            board.free & PGN2UINT["b1"] != EMPTY &&
-                            PGN2UINT["a1"] in board.R
-                            push!(piece_moves, Move(pieces, PGN2UINT["c1"],
+                        if board.free & D1 != EMPTY &&
+                            board.free & C1 != EMPTY &&
+                            board.free & B1 != EMPTY &&
+                            A1 in board.R
+                            push!(piece_moves, Move(pieces, C1,
                                 piece_type, "none", "none", EMPTY, "Q"))
                         end
                     end
@@ -92,19 +95,19 @@ function get_non_sliding_pieces_list(board::Bitboard, piece_type::String,
             else
                 if ~board.black_king_moved
                     if board.black_can_castle_kingside == true
-                        if board.free & PGN2UINT["f8"] != EMPTY &&
-                            board.free & PGN2UINT["g8"] != EMPTY &&
-                            PGN2UINT["h8"] in board.r
-                            push!(piece_moves, Move(pieces, PGN2UINT["g8"],
+                        if board.free & F8 != EMPTY &&
+                            board.free & G8 != EMPTY &&
+                            H8 in board.r
+                            push!(piece_moves, Move(pieces, G8,
                                 piece_type, "none", "none", EMPTY, "k"))
                         end
                     end
                     if board.black_can_castle_queenside == true
-                        if board.free & PGN2UINT["d8"] != EMPTY &&
-                            board.free & PGN2UINT["c8"] != EMPTY &&
-                            board.free & PGN2UINT["b8"] != EMPTY &&
-                            PGN2UINT["a8"] in board.r
-                            push!(piece_moves, Move(pieces, PGN2UINT["c8"],
+                        if board.free & D8 != EMPTY &&
+                            board.free & C8 != EMPTY &&
+                            board.free & B8 != EMPTY &&
+                            A8 in board.r
+                            push!(piece_moves, Move(pieces, C8,
                                 piece_type, "none", "none", EMPTY, "q"))
                         end
                     end
@@ -168,8 +171,8 @@ function find_piece_type(board::Bitboard, ui::UInt64, color::String)
 end
 
 
-function get_sliding_pieces_list(board::Bitboard, piece_type::String,
-    color::String="white")
+function get_sliding_pieces_list(piece_moves::Array{Move,1}, board::Bitboard,
+    piece_type::String, color::String="white")
 
     if color == "white"
         same = board.white
@@ -203,7 +206,6 @@ function get_sliding_pieces_list(board::Bitboard, piece_type::String,
         attack_fun = cross_attack
     end
 
-    piece_moves = Array{Move,1}()
     for piece in pieces
         moves, edges = attack_fun(board.taken, piece)
         for move in moves
@@ -260,38 +262,53 @@ function update_from_to_squares(bs::Array{UInt64,1}, s::UInt64, t::UInt64)
     return bs
 end
 
-
+const A1 = PGN2UINT["a1"]
+const B1 = PGN2UINT["b1"]
+const C1 = PGN2UINT["c1"]
+const D1 = PGN2UINT["d1"]
+const E1 = PGN2UINT["e1"]
+const F1 = PGN2UINT["f1"]
+const G1 = PGN2UINT["g1"]
+const H1 = PGN2UINT["h1"]
+const A8 = PGN2UINT["a8"]
+const B8 = PGN2UINT["b8"]
+const C8 = PGN2UINT["c8"]
+const D8 = PGN2UINT["d8"]
+const E8 = PGN2UINT["e8"]
+const F8 = PGN2UINT["f8"]
+const G8 = PGN2UINT["g8"]
+const H8 = PGN2UINT["h8"]
 function update_castling_rights(board::Bitboard)
-    if board.K == PGN2UINT["e1"]
+    if board.K == E1
         board.white_king_moved = false
     end
-    if PGN2UINT["a1"] in board.R
+    if A1 in board.R
         board.white_can_castle_queenside = true
     end
-    if PGN2UINT["h1"] in board.R
+    if H1 in board.R
         board.white_can_castle_kingside = true
     end
-    if board.k == PGN2UINT["e8"]
+    if board.k == E8
         board.black_king_moved = false
     end
-    if PGN2UINT["a8"] in board.r
+    if A8 in board.r
         board.black_can_castle_queenside = true
     end
-    if PGN2UINT["h8"] in board.r
+    if H8 in board.r
         board.black_can_castle_kingside = true
     end
     for move in board.game
-        if occursin("white-king-e1", move)
+        if move == "white-king-e1"
             board.white_king_moved = true
-        elseif occursin("white-rook-a1", move)
+        elseif move == "white-rook-a1"
             board.white_can_castle_queenside = false
-        elseif occursin("white-rook-h1", move)
+        elseif move == "white-rook-h1"
             board.white_can_castle_kingside = false
-        elseif occursin("black-king-e8", move)
+        elseif move == "black-king-e8"
             board.black_king_moved = true
-        elseif occursin("black-rook-a8", move)
+        elseif move == "black-rook-a8"
             board.black_can_castle_queenside = false
-        elseif occursin("black-rook-h8", move)
+        elseif move == "black-rook-h8"
             board.black_can_castle_kingside = false
         end
     end
@@ -301,20 +318,22 @@ end
 
 function update_attacked(board::Bitboard)
     board.white_attacks = EMPTY
-    board.A = [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY]
-    board.a = [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY]
+    board.A[1] = EMPTY
     for p in board.P
         for a in WHITE_PAWN_ATTACK[p]
             board.white_attacks |= a
             board.A[1] |= a
         end
     end
+    board.A[2] = EMPTY
     for n in board.N
         for a in NIGHT_MOVES[n]
             board.white_attacks |= a
             board.A[2] |= a
         end
     end
+    board.A[3] = EMPTY
+    board.A[4] = EMPTY
     for i = 1:8
         for q in board.Q
             if q & MASK_FILES[i] != EMPTY
@@ -337,6 +356,7 @@ function update_attacked(board::Bitboard)
             end
         end
     end
+    board.A[5] = EMPTY
     for i = 1:15
         for q in board.Q
             if q & ANTIDIAGONALS[i] != EMPTY
@@ -361,18 +381,22 @@ function update_attacked(board::Bitboard)
     end
 
     board.black_attacks = EMPTY
+    board.a[1] = EMPTY
     for p in board.p
         for a in BLACK_PAWN_ATTACK[p]
             board.black_attacks |= a
             board.a[1] |= a
         end
     end
+    board.a[2] = EMPTY
     for n in board.n
         for a in NIGHT_MOVES[n]
             board.black_attacks |= a
             board.a[2] |= a
         end
     end
+    board.a[3] = EMPTY
+    board.a[4] = EMPTY
     for i = 1:8
         for q in board.q
             if q & MASK_FILES[i] != EMPTY
@@ -395,6 +419,7 @@ function update_attacked(board::Bitboard)
             end
         end
     end
+    board.a[5] = EMPTY
     for i = 1:15
         for q in board.q
             if q & ANTIDIAGONALS[i] != EMPTY
@@ -424,8 +449,7 @@ end
 
 function move_piece(board::Bitboard, move::Move, color::String="white")
     push!(board.game,
-        color*"-"*move.piece_type*"-"*
-        UINT2PGN[move.source]*"-"*UINT2PGN[move.target])
+        color*"-"*move.piece_type*"-"*UINT2PGN[move.source])
 
     if color == "white"
         board.white = update_from_to_squares(board.white, move.source,
@@ -471,18 +495,18 @@ function move_piece(board::Bitboard, move::Move, color::String="white")
             if move.castling_type != "-"
                 if move.castling_type == "K"
                     board.R = update_from_to_squares(board.R,
-                        PGN2UINT["h1"], PGN2UINT["f1"])
+                        H1, F1)
                     board.white = update_from_to_squares(board.white,
-                        PGN2UINT["h1"], PGN2UINT["f1"])
+                        H1, F1)
                     board.taken = update_from_to_squares(board.taken,
-                        PGN2UINT["h1"], PGN2UINT["f1"])
+                        H1, F1)
                 elseif move.castling_type == "Q"
                     board.R = update_from_to_squares(board.R,
-                        PGN2UINT["a1"], PGN2UINT["d1"])
+                        A1, D1)
                     board.white = update_from_to_squares(board.white,
-                        PGN2UINT["a1"], PGN2UINT["d1"])
+                        A1, D1)
                     board.taken = update_from_to_squares(board.taken,
-                        PGN2UINT["a1"], PGN2UINT["d1"])
+                        A1, D1)
                 end
             end
         end
@@ -542,19 +566,13 @@ function move_piece(board::Bitboard, move::Move, color::String="white")
             board.k = update_from_to_squares(board.k, move.source, move.target)
             if move.castling_type != "-"
                 if move.castling_type == "k"
-                    board.r = update_from_to_squares(board.r,
-                        PGN2UINT["h8"], PGN2UINT["f8"])
-                    board.black = update_from_to_squares(board.black,
-                        PGN2UINT["h8"], PGN2UINT["f8"])
-                    board.taken = update_from_to_squares(board.taken,
-                        PGN2UINT["h8"], PGN2UINT["f8"])
+                    board.r = update_from_to_squares(board.r, H8, F8)
+                    board.black = update_from_to_squares(board.black, H8, F8)
+                    board.taken = update_from_to_squares(board.taken, H8, F8)
                 elseif move.castling_type == "q"
-                    board.r = update_from_to_squares(board.r,
-                        PGN2UINT["a8"], PGN2UINT["d8"])
-                    board.black = update_from_to_squares(board.black,
-                        PGN2UINT["a8"], PGN2UINT["d8"])
-                    board.taken = update_from_to_squares(board.taken,
-                        PGN2UINT["a8"], PGN2UINT["d8"])
+                    board.r = update_from_to_squares(board.r, A8, D8)
+                    board.black = update_from_to_squares(board.black, A8, D8)
+                    board.taken = update_from_to_squares(board.taken, A8, D8)
                 end
             end
         end
@@ -574,7 +592,7 @@ function move_piece(board::Bitboard, move::Move, color::String="white")
     end
     board.free = ~board.taken
     
-    # board = update_attacked(board)
+    board = update_attacked(board)
 
     return update_castling_rights(board)
 end
@@ -608,19 +626,13 @@ function unmove_piece(board::Bitboard, move::Move, color::String="white")
             board.K = update_from_to_squares(board.K, move.target, move.source)
             if move.castling_type != "-"
                 if move.castling_type == "K"
-                    board.R = update_from_to_squares(board.R,
-                        PGN2UINT["f1"], PGN2UINT["h1"])
-                    board.white = update_from_to_squares(board.white,
-                        PGN2UINT["f1"], PGN2UINT["h1"])
-                    board.taken = update_from_to_squares(board.taken,
-                        PGN2UINT["f1"], PGN2UINT["h1"])
+                    board.R = update_from_to_squares(board.R, F1, H1)
+                    board.white = update_from_to_squares(board.white, F1, H1)
+                    board.taken = update_from_to_squares(board.taken, F1, H1)
                 elseif move.castling_type == "Q"
-                    board.R = update_from_to_squares(board.R,
-                        PGN2UINT["d1"], PGN2UINT["a1"])
-                    board.white = update_from_to_squares(board.white,
-                        PGN2UINT["d1"], PGN2UINT["a1"])
-                    board.taken = update_from_to_squares(board.taken,
-                        PGN2UINT["d1"], PGN2UINT["a1"])
+                    board.R = update_from_to_squares(board.R, D1, A1)
+                    board.white = update_from_to_squares(board.white, D1, A1)
+                    board.taken = update_from_to_squares(board.taken, D1, A1)
                 end
             end
         end
@@ -667,19 +679,13 @@ function unmove_piece(board::Bitboard, move::Move, color::String="white")
             board.k = update_from_to_squares(board.k, move.target, move.source)
             if move.castling_type != "-"
                 if move.castling_type == "k"
-                    board.r = update_from_to_squares(board.r,
-                        PGN2UINT["f8"], PGN2UINT["h8"])
-                    board.black = update_from_to_squares(board.black,
-                        PGN2UINT["f8"], PGN2UINT["h8"])
-                    board.taken = update_from_to_squares(board.taken,
-                        PGN2UINT["f8"], PGN2UINT["h8"])
+                    board.r = update_from_to_squares(board.r, F8, H8)
+                    board.black = update_from_to_squares(board.black, F8, H8)
+                    board.taken = update_from_to_squares(board.taken, F8, H8)
                 elseif move.castling_type == "q"
-                    board.r = update_from_to_squares(board.r,
-                        PGN2UINT["d8"], PGN2UINT["a8"])
-                    board.black = update_from_to_squares(board.black,
-                        PGN2UINT["d8"], PGN2UINT["a8"])
-                    board.taken = update_from_to_squares(board.taken,
-                        PGN2UINT["d8"], PGN2UINT["a8"])
+                    board.r = update_from_to_squares(board.r, D8, A8)
+                    board.black = update_from_to_squares(board.black, D8, A8)
+                    board.taken = update_from_to_squares(board.taken, D8, A8)
                 end
             end
         end
@@ -702,8 +708,10 @@ function unmove_piece(board::Bitboard, move::Move, color::String="white")
     end
     board.free = ~board.taken
     pop!(board.game)
+    # board = update_attacked(board)
     return update_castling_rights(board)
 end
+
 
 function move(board::Bitboard, source::String, target::String)
     moves = get_all_valid_moves(board, board.player_color)

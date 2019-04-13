@@ -1,8 +1,10 @@
 @testset "pawns" begin
     bb = Bobby.set_board()
-    pvl = Bobby.get_pawns_list(bb)
+    pl = Array{Bobby.Move,1}()
+    pvl = Bobby.get_pawns_list(pl, bb)
     @test length(pvl) == 16
 
-    pvl = Bobby.get_pawns_list(bb, "black")
+    pl = Array{Bobby.Move,1}()
+    pvl = Bobby.get_pawns_list(pl, bb, "black")
     @test length(pvl) == 16
 end

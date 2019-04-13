@@ -16,7 +16,4 @@
     
     akv = Bobby.gen_all_king_valid_moves()
     @test all(Int.(Bobby.cvt_to_bitarray(akv[Bobby.INT2UINT[61]])) .== kvw)
-
-    ckv = Bobby.get_current_king_valid(b)
-    @test isempty(ckv)
 end
