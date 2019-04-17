@@ -4,7 +4,6 @@ A mediocre chess engine written in Julia
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Build Status](https://travis-ci.org/alemelis/Bobby.jl.svg?branch=master)](https://travis-ci.org/alemelis/Bobby.jl)
 [![codecov](https://codecov.io/gh/alemelis/Bobby.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/alemelis/Bobby.jl)
-[![HitCount](http://hits.dwyl.io/alemelis/Bobby.jl.svg)](http://hits.dwyl.io/alemelis/Bobby.jl)
 
 ## Install
 
