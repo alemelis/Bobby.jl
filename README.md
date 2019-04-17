@@ -11,30 +11,31 @@ A mediocre chess engine written in Julia
 In Julia REPL
 
 ```
-(v1.0) pkg> add https://github.com/alemelis/Bobby.jl
+(v1.1) pkg> add https://github.com/alemelis/Bobby.jl
 ```
 
 ## Play
 ```
-(v1.0) pkg> activate .
+(v1.1) pkg> activate .
 ```
 
 ```
 julia> using Bobby
 julia> Bobby.play()
 
-  o-----------------o
-8 | r n b q k b n r |
-7 | p p p p p p p p |
-6 | ⋅ ⋅ ⋅ ⋅ ⋅ ⋅ ⋅ ⋅ |
-5 | ⋅ ⋅ ⋅ ⋅ ⋅ ⋅ ⋅ ⋅ |
-4 | ⋅ ⋅ ⋅ ⋅ ⋅ ⋅ ⋅ ⋅ |
-3 | ⋅ ⋅ ⋅ ⋅ ⋅ ⋅ ⋅ ⋅ |
-2 | P P P P P P P P |
-1 | R N B Q K B N R |
-  o-----------------o
-    a b c d e f g h
-white to move, enter source square and press enter
+o-------------------------o
+8 |  Π  ζ  Δ  Ψ  +  Δ  ζ  Π |
+7 |  o  o  o  o  o  o  o  o |  o pawn
+6 |                         |  ζ knight
+5 |                         |  Δ bishop
+4 |                         |  Π rook
+3 |                         |  Ψ queen
+2 |  o  o  o  o  o  o  o  o |  + king
+1 |  Π  ζ  Δ  Ψ  +  Δ  ζ  Π |
+o-------------------------o
+   a  b  c  d  e  f  g  h
+white to move
+Enter move:
 
 ```
 
