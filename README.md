@@ -23,7 +23,7 @@ In Julia REPL
 julia> using Bobby
 julia> Bobby.play()
 
-o-------------------------o
+  o-------------------------o
 8 |  Π  ζ  Δ  Ψ  +  Δ  ζ  Π |
 7 |  o  o  o  o  o  o  o  o |  o pawn
 6 |                         |  ζ knight
@@ -32,7 +32,7 @@ o-------------------------o
 3 |                         |  Ψ queen
 2 |  o  o  o  o  o  o  o  o |  + king
 1 |  Π  ζ  Δ  Ψ  +  Δ  ζ  Π |
-o-------------------------o
+  o-------------------------o
    a  b  c  d  e  f  g  h
 white to move
 Enter move:
