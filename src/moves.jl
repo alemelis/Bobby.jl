@@ -14,6 +14,7 @@ function validate_move(board::Bitboard, move::Move, color::String="white")
     # board = update_attacked(board)
     in_check = king_in_check(board, color)
     board = unmove_piece(board, move, color)
+    # board = update_attacked(board)
     return ~in_check
 end
 
@@ -218,8 +219,10 @@ function get_sliding_pieces_list(piece_moves::Array{Move,1}, board::Bitboard,
         attack_fun = cross_attack
     end
 
+    moves = Array{UInt64,1}()
+    edges = Array{UInt64,1}()
     for piece in pieces
-        moves, edges = attack_fun(board.taken, piece)
+        moves, edges = attack_fun(moves, edges, board.taken, piece)
         for move in moves
             push!(piece_moves, Move(piece, move, piece_type,
                 "none", "none", EMPTY, "-"))
@@ -605,7 +608,6 @@ function move_piece(board::Bitboard, move::Move, color::String="white")
     board.free = ~board.taken
     
     # board = update_attacked(board)
-
     # return update_castling_rights(board)
     return board
 end
@@ -727,15 +729,15 @@ function unmove_piece(board::Bitboard, move::Move, color::String="white")
 end
 
 
-function move(board::Bitboard, source::String, target::String)
-    moves = get_all_valid_moves(board, board.player_color)
-    for move in moves
-        if PGN2UINT[source] == move.source && PGN2UINT[target] == move.target
-            board = move_piece(board, move, board.player_color)
-            board.player_color = change_color(board.player_color)
-            return board
-        end
-    end
-    println("not valid move")
-    return board
-end
+# function move(board::Bitboard, source::String, target::String)
+#     moves = get_all_valid_moves(board, board.player_color)
+#     for move in moves
+#         if PGN2UINT[source] == move.source && PGN2UINT[target] == move.target
+#             board = move_piece(board, move, board.player_color)
+#             board.player_color = change_color(board.player_color)
+#             return board
+#         end
+#     end
+#     println("not valid move")
+#     return board
+# end

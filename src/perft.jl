@@ -99,7 +99,9 @@ function explore(pt::Array{Int64,1}, board::Bitboard,
         # if depth == 1
         #     move_name = m.piece_type*"-"*UINT2PGN[m.source]*UINT2PGN[m.target]
         # end
+        # move_name = m.piece_type*"-"*UINT2PGN[m.source]*UINT2PGN[m.target]
         # println(move_name)
+        # println(m)
 
         pt = explore(pt, board, max_depth, depth+1, new_color, "")
         board = unmove_piece(board, m, color)

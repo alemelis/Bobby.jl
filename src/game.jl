@@ -49,7 +49,8 @@ function play(human_color::String="white")
         else
             b = move_piece(b, moves[1], b.player_color)
         end
-
+        b = update_castling_rights(b)
+        
         @label next_move
         pretty_print(b)
 
