@@ -67,7 +67,7 @@ function square_in_check(board::Bitboard, ui::UInt64, color::String="white")
         if ui & board.A[2] != EMPTY
             return true
         end
-        if ui & board.A[4] != EMPTY
+        if ui & board.A[4] != EMPTY || ui & board.A[3] != EMPTY
             squares, edges = orthogonal_attack(board.taken, ui)
             for rook in board.R
                 if rook in edges
@@ -80,7 +80,7 @@ function square_in_check(board::Bitboard, ui::UInt64, color::String="white")
                 end
             end
         end
-        if ui & board.A[5] != EMPTY
+        if ui & board.A[5] != EMPTY || ui & board.A[3] != EMPTY
             squares, edges = cross_attack(board.taken, ui)
             for bishop in board.B
                 if bishop in edges

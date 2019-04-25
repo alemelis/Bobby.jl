@@ -607,9 +607,9 @@ function move_piece(board::Bitboard, move::Move, color::String="white")
     end
     board.free = ~board.taken
     
-    # board = update_attacked(board)
-    # return update_castling_rights(board)
-    return board
+    board = update_attacked(board)
+    return update_castling_rights(board)
+    # return board
 end
 
 
@@ -723,9 +723,9 @@ function unmove_piece(board::Bitboard, move::Move, color::String="white")
     end
     board.free = ~board.taken
     pop!(board.game)
-    # board = update_attacked(board)
-    # return update_castling_rights(board)
-    return board
+    board = update_attacked(board)
+    return update_castling_rights(board)
+    # return board
 end
 
 

@@ -1,6 +1,16 @@
 using Test
 using Bobby
 
+function test_fen(fen, result)
+	b = Bobby.fen_to_bitboard(fen)
+    pt = Bobby.perft(b, 1, b.player_color)
+    if pt == result
+    	return true
+    else
+    	return false
+    end
+end
+
 # @testset "parser.jl" begin
 #     include("test_parser.jl")
 # end
@@ -33,10 +43,10 @@ using Bobby
 #     include("test_pawns.jl")
 # end
 
-@testset "check.jl" begin
-    include("test_check.jl")
-end
+# @testset "check.jl" begin
+#     include("test_check.jl")
+# end
 
-@testset "perft.jl" begin
-    include("test_perft.jl")
-end
+# @testset "perft.jl" begin
+#     include("test_perft.jl")
+# end
