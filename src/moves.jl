@@ -40,6 +40,7 @@ function print_moves(moves)
     end
 end
 
+
 function get_all_valid_moves(board::Bitboard, color::String="white")
     moves = get_all_moves(board, color)
     valid_moves = Array{Move,1}()
@@ -286,6 +287,7 @@ function update_from_to_squares(bs::Array{UInt64,1}, s::UInt64, t::UInt64)
     return bs
 end
 
+
 function update_castling_rights(board::Bitboard)
     if board.K == E1
         board.white_king_moved = false
@@ -325,130 +327,63 @@ end
 
 
 function update_attacked(board::Bitboard)
-    board.white_attacks = EMPTY
     board.A[1] = EMPTY
     for p in board.P
         for a in WHITE_PAWN_ATTACK[p]
-            board.white_attacks |= a
             board.A[1] |= a
         end
     end
     board.A[2] = EMPTY
     for n in board.N
         for a in NIGHT_MOVES[n]
-            board.white_attacks |= a
             board.A[2] |= a
         end
     end
     board.A[3] = EMPTY
+    for q in board.Q
+        board.A[3] |= ORTHO_MASKS[q] | DIAG_MASKS[q]
+    end
     board.A[4] = EMPTY
-    for i = 1:8
-        for q in board.Q
-            if q & MASK_FILES[i] != EMPTY
-                board.white_attacks |= MASK_FILES[i]
-                board.A[3] |= MASK_FILES[i]
-            end
-            if q & MASK_RANKS[i] != EMPTY
-                board.white_attacks |= MASK_RANKS[i]
-                board.A[3] |= MASK_RANKS[i]
-            end
-        end
-        for r in board.R
-            if r & MASK_FILES[i] != EMPTY
-                board.white_attacks |= MASK_FILES[i]
-                board.A[4] |= MASK_FILES[i]
-            end
-            if r & MASK_RANKS[i] != EMPTY
-                board.white_attacks |= MASK_RANKS[i]
-                board.A[4] |= MASK_RANKS[i]
-            end
-        end
+    for r in board.R
+        board.A[4] |= ORTHO_MASKS[r]
     end
     board.A[5] = EMPTY
-    for i = 1:15
-        for q in board.Q
-            if q & ANTIDIAGONALS[i] != EMPTY
-                board.white_attacks |= ANTIDIAGONALS[i]
-                board.A[3] |= ANTIDIAGONALS[i]
-            end
-            if q & DIAGONALS[i] != EMPTY
-                board.white_attacks |= DIAGONALS[i]
-                board.A[3] |= DIAGONALS[i]
-            end
-        end
-        for b in board.B
-            if b & ANTIDIAGONALS[i] != EMPTY
-                board.white_attacks |= ANTIDIAGONALS[i]
-                board.A[5] |= ANTIDIAGONALS[i]
-            end
-            if b & DIAGONALS[i] != EMPTY
-                board.white_attacks |= DIAGONALS[i]
-                board.A[5] |= DIAGONALS[i]
-            end
-        end
+    for b in board.B
+        board.A[5] |= DIAG_MASKS[b]
+    end
+    board.white_attacks = EMPTY
+    for i = 1:5
+        board.white_attacks |= board.A[i]
     end
 
-    board.black_attacks = EMPTY
+    # black
     board.a[1] = EMPTY
     for p in board.p
         for a in BLACK_PAWN_ATTACK[p]
-            board.black_attacks |= a
             board.a[1] |= a
         end
     end
     board.a[2] = EMPTY
     for n in board.n
         for a in NIGHT_MOVES[n]
-            board.black_attacks |= a
             board.a[2] |= a
         end
     end
     board.a[3] = EMPTY
+    for q in board.q
+        board.a[3] |= ORTHO_MASKS[q] | DIAG_MASKS[q]
+    end
     board.a[4] = EMPTY
-    for i = 1:8
-        for q in board.q
-            if q & MASK_FILES[i] != EMPTY
-                board.black_attacks |= MASK_FILES[i]
-                board.a[3] |= MASK_FILES[i]
-            end
-            if q & MASK_RANKS[i] != EMPTY
-                board.black_attacks |= MASK_RANKS[i]
-                board.a[3] |= MASK_RANKS[i]
-            end
-        end
-        for r in board.r
-            if r & MASK_FILES[i] != EMPTY
-                board.black_attacks |= MASK_FILES[i]
-                board.a[4] |= MASK_FILES[i]
-            end
-            if r & MASK_RANKS[i] != EMPTY
-                board.black_attacks |= MASK_RANKS[i]
-                board.a[4] |= MASK_RANKS[i]
-            end
-        end
+    for r in board.r
+        board.a[4] |= ORTHO_MASKS[r]
     end
     board.a[5] = EMPTY
-    for i = 1:15
-        for q in board.q
-            if q & ANTIDIAGONALS[i] != EMPTY
-                board.black_attacks |= ANTIDIAGONALS[i]
-                board.a[3] |= ANTIDIAGONALS[i]
-            end
-            if q & DIAGONALS[i] != EMPTY
-                board.black_attacks |= DIAGONALS[i]
-                board.a[3] |= DIAGONALS[i]
-            end
-        end
-        for b in board.b
-            if b & ANTIDIAGONALS[i] != EMPTY
-                board.black_attacks |= ANTIDIAGONALS[i]
-                board.a[5] |= ANTIDIAGONALS[i]
-            end
-            if b & DIAGONALS[i] != EMPTY
-                board.black_attacks |= DIAGONALS[i]
-                board.a[5] |= DIAGONALS[i]
-            end
-        end
+    for b in board.b
+        board.a[5] |= DIAG_MASKS[b]
+    end
+    board.black_attacks = EMPTY
+    for i = 1:5
+        board.black_attacks |= board.a[i]
     end
 
     return board
@@ -482,9 +417,9 @@ function move_piece(board::Bitboard, move::Move, color::String="white")
 
         if move.piece_type == "pawn"
             if move.target == board.enpassant_square
-                board.black = remove_from_square(board.black, move.target>>8)
-                board.p = remove_from_square(board.p, move.target>>8)
-                board.taken = remove_from_square(board.taken, move.target>>8)
+                board.black = remove_from_square(board.black, move.target >> 8)
+                board.p = remove_from_square(board.p, move.target >> 8)
+                board.taken = remove_from_square(board.taken, move.target >> 8)
                 board.enpassant_done = true
             else
                 board.enpassant_done = false
@@ -554,9 +489,9 @@ function move_piece(board::Bitboard, move::Move, color::String="white")
 
         if move.piece_type == "pawn"
             if move.target == board.enpassant_square
-                board.white = remove_from_square(board.white, move.target<<8)
-                board.P = remove_from_square(board.P, move.target<<8)
-                board.taken = remove_from_square(board.taken, move.target<<8)
+                board.white = remove_from_square(board.white, move.target << 8)
+                board.P = remove_from_square(board.P, move.target << 8)
+                board.taken = remove_from_square(board.taken, move.target << 8)
                 board.enpassant_done = true
             else
                 board.enpassant_done = false
@@ -602,7 +537,7 @@ function move_piece(board::Bitboard, move::Move, color::String="white")
     
     board = update_attacked(board)
     return update_castling_rights(board)
-    return board
+    # return board
 end
 
 
@@ -615,9 +550,9 @@ function unmove_piece(board::Bitboard, move::Move, color::String="white")
 
         if move.piece_type == "pawn"
             if board.enpassant_done
-                board.black = add_to_square(board.black, move.target>>8)
-                board.p = add_to_square(board.p, move.target>>8)
-                board.taken = add_to_square(board.taken, move.target>>8)
+                board.black = add_to_square(board.black, move.target >> 8)
+                board.p = add_to_square(board.p, move.target >> 8)
+                board.taken = add_to_square(board.taken, move.target >> 8)
                 board.enpassant_done = false
                 board.enpassant_square = move.target
             end
@@ -668,9 +603,9 @@ function unmove_piece(board::Bitboard, move::Move, color::String="white")
 
         if move.piece_type == "pawn"
             if board.enpassant_done
-                board.white = add_to_square(board.white, move.target<<8)
-                board.P = add_to_square(board.P, move.target<<8)
-                board.taken = add_to_square(board.taken, move.target<<8)
+                board.white = add_to_square(board.white, move.target << 8)
+                board.P = add_to_square(board.P, move.target << 8)
+                board.taken = add_to_square(board.taken, move.target << 8)
                 board.enpassant_done = false
                 board.enpassant_square = move.target
             end
@@ -718,5 +653,5 @@ function unmove_piece(board::Bitboard, move::Move, color::String="white")
     pop!(board.game)
     board = update_attacked(board)
     return update_castling_rights(board)
-    return board
+    # return board
 end
