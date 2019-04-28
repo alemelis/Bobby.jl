@@ -227,16 +227,16 @@ function get_sliding_pieces_list(piece_moves::Array{Move,1}, board::Bitboard,
         attack_fun = cross_attack
     end
 
-    occ = board.taken
+    moves = Array{UInt64,1}()
+    edges = Array{UInt64,1}()
     for piece in pieces
-        moves = Array{UInt64,1}()
-        edges = Array{UInt64,1}()
-        moves, edges = attack_fun(moves, edges, occ, piece)
-        for move in moves
-            push!(piece_moves, Move(piece, move, piece_type,
+        moves, edges = attack_fun(moves, edges, board.taken, piece)
+        while length(moves) > 0
+            push!(piece_moves, Move(piece, pop!(moves), piece_type,
                 "none", "none", EMPTY, "-"))
         end
-        for edge in edges
+        while length(edges) > 0
+            edge = pop!(edges)
             if edge & same == EMPTY && edge & other == EMPTY
                 push!(piece_moves, Move(piece, edge, piece_type,
                                         "none", "none", EMPTY, "-"))
@@ -286,22 +286,6 @@ function update_from_to_squares(bs::Array{UInt64,1}, s::UInt64, t::UInt64)
     return bs
 end
 
-const A1 = PGN2UINT["a1"]
-const B1 = PGN2UINT["b1"]
-const C1 = PGN2UINT["c1"]
-const D1 = PGN2UINT["d1"]
-const E1 = PGN2UINT["e1"]
-const F1 = PGN2UINT["f1"]
-const G1 = PGN2UINT["g1"]
-const H1 = PGN2UINT["h1"]
-const A8 = PGN2UINT["a8"]
-const B8 = PGN2UINT["b8"]
-const C8 = PGN2UINT["c8"]
-const D8 = PGN2UINT["d8"]
-const E8 = PGN2UINT["e8"]
-const F8 = PGN2UINT["f8"]
-const G8 = PGN2UINT["g8"]
-const H8 = PGN2UINT["h8"]
 function update_castling_rights(board::Bitboard)
     if board.K == E1
         board.white_king_moved = false
@@ -618,7 +602,7 @@ function move_piece(board::Bitboard, move::Move, color::String="white")
     
     board = update_attacked(board)
     return update_castling_rights(board)
-    # return board
+    return board
 end
 
 
@@ -734,19 +718,5 @@ function unmove_piece(board::Bitboard, move::Move, color::String="white")
     pop!(board.game)
     board = update_attacked(board)
     return update_castling_rights(board)
-    # return board
+    return board
 end
-
-
-# function move(board::Bitboard, source::String, target::String)
-#     moves = get_all_valid_moves(board, board.player_color)
-#     for move in moves
-#         if PGN2UINT[source] == move.source && PGN2UINT[target] == move.target
-#             board = move_piece(board, move, board.player_color)
-#             board.player_color = change_color(board.player_color)
-#             return board
-#         end
-#     end
-#     println("not valid move")
-#     return board
-# end

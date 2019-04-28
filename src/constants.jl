@@ -109,3 +109,20 @@ const DIAGONALS = [0x8040201008040201,
              	   0x0000000000804020<<35,
              	   0x0000000000008040<<42,
              	   0x0000000000000080<<49]
+
+const A1 = PGN2UINT["a1"]
+const B1 = PGN2UINT["b1"]
+const C1 = PGN2UINT["c1"]
+const D1 = PGN2UINT["d1"]
+const E1 = PGN2UINT["e1"]
+const F1 = PGN2UINT["f1"]
+const G1 = PGN2UINT["g1"]
+const H1 = PGN2UINT["h1"]
+const A8 = PGN2UINT["a8"]
+const B8 = PGN2UINT["b8"]
+const C8 = PGN2UINT["c8"]
+const D8 = PGN2UINT["d8"]
+const E8 = PGN2UINT["e8"]
+const F8 = PGN2UINT["f8"]
+const G8 = PGN2UINT["g8"]
+const H8 = PGN2UINT["h8"]
