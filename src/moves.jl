@@ -32,6 +32,14 @@ function get_all_moves(board::Bitboard, color::String="white")
 end
 
 
+function print_moves(moves)
+    for move in moves
+        s = UINT2PGN[move.source]
+        t = UINT2PGN[move.target]
+        println(move.piece_type, " ", s, " ", t)
+    end
+end
+
 function get_all_valid_moves(board::Bitboard, color::String="white")
     moves = get_all_moves(board, color)
     valid_moves = Array{Move,1}()
@@ -219,10 +227,11 @@ function get_sliding_pieces_list(piece_moves::Array{Move,1}, board::Bitboard,
         attack_fun = cross_attack
     end
 
-    moves = Array{UInt64,1}()
-    edges = Array{UInt64,1}()
+    occ = board.taken
     for piece in pieces
-        moves, edges = attack_fun(moves, edges, board.taken, piece)
+        moves = Array{UInt64,1}()
+        edges = Array{UInt64,1}()
+        moves, edges = attack_fun(moves, edges, occ, piece)
         for move in moves
             push!(piece_moves, Move(piece, move, piece_type,
                 "none", "none", EMPTY, "-"))
