@@ -89,6 +89,8 @@ function explore(pt::Array{Int64,1}, board::Bitboard,
     # fen = board.fen
     for m in moves
         board = move_piece(board, m, color)
+        board = update_attacked(board)
+        board = update_castling_rights(board)
         # if m.capture_type != "none"
         #     pt.captures[depth] += 1
         # end
@@ -105,6 +107,8 @@ function explore(pt::Array{Int64,1}, board::Bitboard,
 
         pt = explore(pt, board, max_depth, depth+1, new_color, "")
         board = unmove_piece(board, m, color)
+        board = update_attacked(board)
+        board = update_castling_rights(board)
     end
 
     return pt
