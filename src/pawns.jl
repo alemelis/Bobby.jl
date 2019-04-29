@@ -176,7 +176,8 @@ function find_pawn_pseudo!(pawns_moves::Array{Move,1}, board::Bitboard,
         if attack & others != EMPTY
             taken_piece = find_piece_type(board, attack, opponent_color)
             if pawn & promotion_rank != EMPTY
-                pawns_moves = add_promotions(pawns_moves, pawn, attack, taken_piece)
+                pawns_moves = add_promotions(pawns_moves, pawn,
+                    attack, taken_piece)
             else
                 push!(pawns_moves, Move(pawn, attack, "pawn", taken_piece,
                     "none", EMPTY, "-"))
