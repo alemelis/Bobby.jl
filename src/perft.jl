@@ -12,8 +12,8 @@ end
 function perft(board, depth, color::String="white")
     # pt = PerftTree(zeros(depth), zeros(depth), zeros(depth), zeros(depth),
     #     Dict{String,Int64}(), zeros(depth), zeros(depth))
-    # pt = 
-    # pt = 
+    # pt =
+    # pt =
     # println(pt)
     # println(sum(pt.nodes))
     # print_perftree(pt)
@@ -47,7 +47,7 @@ function count_total_pieces(board::Bitboard)
 end
 
 
-function explore(pt::Array{Int64,1}, board::Bitboard, 
+function explore(pt::Array{Int64,1}, board::Bitboard,
     max_depth::Int64, depth::Int64, color::String="white",
     move_name::String="")
 
@@ -57,7 +57,7 @@ function explore(pt::Array{Int64,1}, board::Bitboard,
     # else
     #     check = false
     # end
-    
+
     # total_pieces = count_total_pieces(board)
     moves = get_all_valid_moves(board, color)
 
@@ -97,7 +97,7 @@ function explore(pt::Array{Int64,1}, board::Bitboard,
         # if m.promotion_type != "none"
         #     pt.promotions[depth] += 1
         # end
-        
+
         # if depth == 1
         #     move_name = m.piece_type*"-"*UINT2PGN[m.source]*UINT2PGN[m.target]
         # end
@@ -107,8 +107,8 @@ function explore(pt::Array{Int64,1}, board::Bitboard,
 
         pt = explore(pt, board, max_depth, depth+1, new_color, "")
         board = unmove_piece(board, m, color)
-        board = update_attacked(board)
-        board = update_castling_rights(board)
+        # board = update_attacked(board)
+        # board = update_castling_rights(board)
     end
 
     return pt
