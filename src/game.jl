@@ -6,6 +6,7 @@ function validate_uci_move(uci_move::String)
     return true
 end
 
+
 function ask_for_move()
     while true
         println("Enter move:")
@@ -17,13 +18,14 @@ function ask_for_move()
     return "xx xx"
 end
 
+
 function play(human_color::String="white")
     b = set_board()
     check = false
-    pretty_print(b)
 
     while true
-        println(b.player_color," to move")
+        pretty_print(b)
+
         moves = get_all_valid_moves(b, b.player_color)
         if length(moves) == 0
             if check
@@ -34,6 +36,7 @@ function play(human_color::String="white")
                 return
             end
         end
+        println(b.player_color," to move")
 
         if b.player_color == human_color
             while true
@@ -41,6 +44,8 @@ function play(human_color::String="white")
                 for move in moves
                     if move.source == PGN2UINT[s] && move.target == PGN2UINT[t]
                         b = move_piece(b, move, b.player_color)
+                        b = update_attacked(b)
+                        b = update_castling_rights(b)
                         @goto next_move
                     end
                 end
@@ -48,12 +53,11 @@ function play(human_color::String="white")
             end
         else
             b = move_piece(b, moves[1], b.player_color)
+            b = update_attacked(b)
+            b = update_castling_rights(b)
         end
-        b = update_castling_rights(b)
         
         @label next_move
-        pretty_print(b)
-
         b.player_color = change_color(b.player_color)
         if king_in_check(b, b.player_color)
             check = true

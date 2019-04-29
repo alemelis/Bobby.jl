@@ -1,16 +1,3 @@
-# function check_check(board::Bitboard, color::String="white")
-#     if color == "white"
-#         if board.K & board.black_attacks != EMPTY
-#             return true
-#         end
-#     else
-#         if board.k & board.white_attacks != EMPTY
-#             return true
-#         end
-#     end
-#     return false
-# end
-
 function king_in_check(board::Bitboard, color::String="white")
     if color == "white"
         if board.K & board.black_attacks == EMPTY
