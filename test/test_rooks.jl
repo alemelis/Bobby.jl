@@ -36,6 +36,4 @@ end
     @test test_fen("k2r1r2/8/8/8/8/p3p2p/P3P2P/R3K3 w KQkq - 0 1", [3])
     @test test_fen("k2r1r2/8/8/8/8/p3p2p/P3P2P/4K2R w KQkq - 0 1", [2])
     @test test_fen("k2r1r2/8/8/8/8/p3p2p/P3P2P/R3K2R w KQkq - 0 1", [5])
-
-
 end
