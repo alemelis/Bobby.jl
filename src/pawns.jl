@@ -137,7 +137,7 @@ function find_pawn_pseudo!(pawns_moves::Array{Move,1}, board::Bitboard,
         two_steps = WHITE_PAWN_TWOSTEPS_MOVES
         attacks = WHITE_PAWN_ATTACK
         others = board.black
-        enpassant_rank = MASK_RANK_6
+        # enpassant_rank = MASK_RANK_6
         opponent_color = "black"
     else
         home_rank = MASK_RANK_7
@@ -146,7 +146,7 @@ function find_pawn_pseudo!(pawns_moves::Array{Move,1}, board::Bitboard,
         two_steps = BLACK_PAWN_TWOSTEPS_MOVES
         attacks = BLACK_PAWN_ATTACK
         others = board.white
-        enpassant_rank = MASK_RANK_3
+        # enpassant_rank = MASK_RANK_3
         opponent_color = "white"
     end
 

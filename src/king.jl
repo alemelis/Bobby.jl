@@ -26,28 +26,3 @@ end
 const KING_MOVES = gen_all_king_valid_moves()
 const WHITE_KING_HOME = PGN2UINT["e1"]
 const BLACK_KING_HOME = PGN2UINT["e8"]
-
-
-# function get_current_king_valid(board::Bitboard, color::String="white")
-#     if color == "white"
-#         king = board.K
-#         same_color = board.white
-#         enemy_attack = board.black_attacks
-#     else
-#         king = board.k
-#         same_color = board.black
-#         enemy_attack = board.white_attacks
-#     end
-
-#     king_valid = Set()
-
-#     targets = KING_MOVES[king]
-#     for target in targets
-#         if target & same_color == EMPTY
-#             if target & enemy_attack == EMPTY
-#                 push!(king_valid, (king, target))
-#             end
-#         end
-#     end
-#     return king_valid
-# end

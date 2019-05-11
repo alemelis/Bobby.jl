@@ -97,7 +97,7 @@ end
 function check_mate(board::Bitboard, color::String="white")
     if color == "white"
         king = board.K
-    elseif color == "black"
+    else
         king = board.k
     end
 
