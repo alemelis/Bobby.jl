@@ -47,6 +47,6 @@ end
     include("test_check.jl")
 end
 
-# @testset "perft.jl" begin
-#     include("test_perft.jl")
-# end
+@testset "perft.jl" begin
+    include("test_perft.jl")
+end

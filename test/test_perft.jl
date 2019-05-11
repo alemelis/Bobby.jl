@@ -1,7 +1,7 @@
 @testset "perft1" begin
 	b = Bobby.set_board()
-	pt = Bobby.perft(b, 3, b.player_color)
-	@test pt == [20, 400, 8902]
+	pt = Bobby.perft(b, 4, b.player_color)
+	@test pt == [20, 400, 8902, 197281]
 end
 # @testset "perft2" begin
 # 	b = Bobby.fen_to_bitboard(
@@ -33,9 +33,9 @@ end
 # 	pt = Bobby.perft(b, 3, b.player_color)
 # 	@test pt == [44, 1486, 62379]
 # end
-@testset "perft6" begin
-	b = Bobby.fen_to_bitboard(
-		"r4rk1/1pp1qppp/p1np1n2/2b1p1B1/2B1P1b1/P1NP1N2/1PP1QPPP/R4RK1 w - - 0 10")
-	pt = Bobby.perft(b, 3, b.player_color)
-	@test pt == [46, 2079, 89890]
-end
+# @testset "perft6" begin
+# 	b = Bobby.fen_to_bitboard(
+# 		"r4rk1/1pp1qppp/p1np1n2/2b1p1B1/2B1P1b1/P1NP1N2/1PP1QPPP/R4RK1 w - - 0 10")
+# 	pt = Bobby.perft(b, 3, b.player_color)
+# 	@test pt == [46, 2079, 89890]
+# end
