@@ -423,6 +423,9 @@ function move_piece(board::Bitboard, move::Move, color::String="white")
                 board.enpassant_done = true
             else
                 board.enpassant_done = false
+                if move.enpassant_square != EMPTY
+                    board.enpassant_square = move.enpassant_square
+                end
             end
             board.P = update_from_to_squares(board.P, move.source, move.target)
         elseif move.piece_type == "night"
@@ -495,6 +498,9 @@ function move_piece(board::Bitboard, move::Move, color::String="white")
                 board.enpassant_done = true
             else
                 board.enpassant_done = false
+                if move.enpassant_square != EMPTY
+                    board.enpassant_square = move.enpassant_square
+                end
             end
             board.p = update_from_to_squares(board.p, move.source, move.target)
         elseif move.piece_type == "night"
