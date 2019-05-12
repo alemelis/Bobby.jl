@@ -10,10 +10,11 @@ end
 
 
 function validate_move(board::Bitboard, move::Move, color::String="white")
-    board = move_piece(board, move, color)
-    # board = update_attacked(board)
-    in_check = king_in_check(board, color)
-    board = unmove_piece(board, move, color)
+    newb = deepcopy(board)
+    newb = move_piece(newb, move, color)
+    # newb = update_attacked(newb)
+    in_check = king_in_check(newb, color)
+    # board = unmove_piece(board, move, color)
     # board = update_attacked(board)
     return ~in_check
 end
