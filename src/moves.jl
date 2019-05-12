@@ -104,7 +104,7 @@ function get_non_sliding_pieces_list(piece_moves::Array{Move,1},
                             if ~square_in_check(board, E1, color) &&
                                 ~square_in_check(board, D1, color)
                                 push!(piece_moves, Move(pieces, C1,
-                                    piece_type, "none", "none", EMPTY, "K"))
+                                    piece_type, "none", "none", EMPTY, "Q"))
                             end
                         end
                     end
