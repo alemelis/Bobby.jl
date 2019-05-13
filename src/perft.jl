@@ -88,12 +88,16 @@ function explore(pt::PerftTree, board::Bitboard,
         end
     end
 
-    if depth > max_depth
-        return pt
-    end
+    # if depth > max_depth
+    #     return pt
+    # end
 
     pt.nodes[depth] += length(moves)
     # pt[depth] += length(moves)
+
+    if depth == max_depth
+        return pt
+    end
 
     new_color = change_color(color)
     # fen = board.fen
