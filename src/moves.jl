@@ -12,7 +12,7 @@ end
 function validate_move(board::Bitboard, move::Move, color::String="white")
     newb = deepcopy(board)
     newb = move_piece(newb, move, color)
-    # newb = update_attacked(newb)
+    newb = update_attacked(newb)
     in_check = king_in_check(newb, color)
     # board = unmove_piece(board, move, color)
     # board = update_attacked(board)

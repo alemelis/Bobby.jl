@@ -17,7 +17,8 @@ function perft(board, depth, color::String="white")
     # println(pt)
     # println(sum(pt.nodes))
     # print_perftree(pt)
-    return explore(pt, board, depth, 1, color)
+    return explore(zeros(depth), board, depth, 1, color)
+    # return explore(pt, board, depth, 1, color)
 end
 
 
@@ -54,7 +55,7 @@ function count_total_pieces(board::Bitboard)
 end
 
 
-function explore(pt::PerftTree, board::Bitboard,
+function explore(pt, board::Bitboard,
     max_depth::Int64, depth::Int64, color::String="white",
     move_name::String="")
 
@@ -81,21 +82,21 @@ function explore(pt::PerftTree, board::Bitboard,
     end
     # else: stalemate += 1; return
 
-    if depth == 1
-        for m in moves
-            push!(pt.divide,
-                m.piece_type*"-"*UINT2PGN[m.source]*UINT2PGN[m.target]=>0)
-        end
-    end
-
-    # if depth > max_depth
-    #     return pt
+    # if depth == 1
+    #     for m in moves
+    #         push!(pt.divide,
+    #             m.piece_type*"-"*UINT2PGN[m.source]*UINT2PGN[m.target]=>0)
+    #     end
     # end
 
-    pt.nodes[depth] += length(moves)
-    # pt[depth] += length(moves)
+    if depth > max_depth
+        return pt
+    end
 
-    if depth == max_depth
+    # pt.nodes[depth] += length(moves)
+    pt[depth] += length(moves)
+
+    if depth >= max_depth
         return pt
     end
 
@@ -122,11 +123,12 @@ function explore(pt::PerftTree, board::Bitboard,
         #     pt.promotions[depth] += 1
         # end
 
-        if depth == 1
-            move_name = m.piece_type*"-"*UINT2PGN[m.source]*UINT2PGN[m.target]
-        else
-            pt.divide[move_name] += 1
-        end
+        # if depth == 1
+        #     move_name = m.piece_type*"-"*UINT2PGN[m.source]*UINT2PGN[m.target]
+        # else
+        #     pt.divide[move_name] += 1
+        # end
+
         # if move_name == "rook-a8a2"
         #     println(c, " ", m.piece_type*"-"*UINT2PGN[m.source]*UINT2PGN[m.target])
         # end
