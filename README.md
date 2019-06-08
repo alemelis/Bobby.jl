@@ -4,6 +4,16 @@
 [![Build Status](https://travis-ci.org/alemelis/Bobby.jl.svg?branch=master)](https://travis-ci.org/alemelis/Bobby.jl)
 [![codecov](https://codecov.io/gh/alemelis/Bobby.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/alemelis/Bobby.jl)
 
+Bobby is a chess move validator, i.e. given a position and a candidate move, Bobby tells you whether the move is legal or not. He can also look for check/mates and stalemates.
+
+## Features
+- 64-bit [bitboard](https://www.chessprogramming.org/Bitboards)
+- [perft and divide](http://www.rocechess.ch/perft.html) calculation
+- check and checkmate
+- castling
+- en-passant
+- promotion
+
 ## Install
 
 In Julia REPL
@@ -39,13 +49,10 @@ Enter move:
 
 Moves should be entered in UCI format, e.g. `e2 e4`. Promotion is automatic to _queen_.
 
-## Features
-- 64-bit [bitboard](https://www.chessprogramming.org/Bitboards)
-- [perft and divide](http://www.rocechess.ch/perft.html) calculation
-- check and checkmate
-- castling
-- en-passant
-- promotion
+
+:suspect: _huh? not very useful, isn't it?_
+
+yep...if you want to play a proper game try [Chess.jl](https://github.com/abahm/Chess.jl)
 
 ## Possible speed-ups
 - [ ] unmove (instead of `deepcopy`ing board)
