@@ -1,5 +1,4 @@
 # Bobby.jl
-A mediocre chess engine written in Julia
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Build Status](https://travis-ci.org/alemelis/Bobby.jl.svg?branch=master)](https://travis-ci.org/alemelis/Bobby.jl)
@@ -10,13 +9,13 @@ A mediocre chess engine written in Julia
 In Julia REPL
 
 ```
+julia> ]
 (v1.1) pkg> add https://github.com/alemelis/Bobby.jl
+(v1.1) pkg> activate .
 ```
 
 ## Play
-```
-(v1.1) pkg> activate .
-```
+You can play against Bobby, but he'll simply move randomly
 
 ```
 julia> using Bobby
@@ -38,12 +37,16 @@ Enter move:
 
 ```
 
-## Contributing
+Moves should be entered in UCI format, e.g. `e2 e4`. Promotion is automatic to _queen_.
 
-Very simple:
+## Features
+- bitboard representation
+- perft and divide functions
+- check and checkmate
+- castling
+- en-passant
+- promotion
 
-1. Pick an issue/new feature
-2. Solve/implement it
-3. Add unit tests
-4. Update docs
-5. Make a pull request
+## Possible speed-ups
+[ ] unmove (instead of `deepcopy`ing board)
+[ ] magic bitboard for sliding pieces

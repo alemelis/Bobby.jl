@@ -52,7 +52,7 @@ function play(human_color::String="white")
                 println("Move not available, try again")
             end
         else
-            b = move_piece(b, moves[1], b.player_color)
+            b = move_piece(b, moves[rand(1:length(moves))], b.player_color)
             b = update_attacked(b)
             b = update_castling_rights(b)
         end
