@@ -48,5 +48,5 @@ Moves should be entered in UCI format, e.g. `e2 e4`. Promotion is automatic to _
 - promotion
 
 ## Possible speed-ups
-[ ] unmove (instead of `deepcopy`ing board)
-[ ] magic bitboard for sliding pieces
+- [ ] unmove (instead of `deepcopy`ing board)
+- [ ] magic bitboard for sliding pieces
