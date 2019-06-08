@@ -40,8 +40,8 @@ Enter move:
 Moves should be entered in UCI format, e.g. `e2 e4`. Promotion is automatic to _queen_.
 
 ## Features
-- bitboard representation
-- perft and divide functions
+- 64-bit [bitboard](https://www.chessprogramming.org/Bitboards)
+- [perft and divide](http://www.rocechess.ch/perft.html) calculation
 - check and checkmate
 - castling
 - en-passant
@@ -49,4 +49,4 @@ Moves should be entered in UCI format, e.g. `e2 e4`. Promotion is automatic to _
 
 ## Possible speed-ups
 - [ ] unmove (instead of `deepcopy`ing board)
-- [ ] magic bitboard for sliding pieces
+- [ ] [magic](http://pradu.us/old/Nov27_2008/Buzz/research/magic/Bitboards.pdf) [bitboards](https://www.chessprogramming.org/Magic_Bitboards)
