@@ -1,10 +1,10 @@
 using Test
 using Bobby
 
-function test_fen(fen, result)
+function test_fen(fen, depth, result)
 	b = Bobby.fen_to_bitboard(fen)
-    pt = Bobby.perft(b, 1, b.player_color)
-    if pt == result
+    pt = Bobby.perft(b, depth, b.player_color)
+    if pt.nodes == result
     	return true
     else
     	return false
