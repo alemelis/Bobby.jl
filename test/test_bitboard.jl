@@ -1,3 +1,0 @@
-@testset "bitboard" begin
-
-end

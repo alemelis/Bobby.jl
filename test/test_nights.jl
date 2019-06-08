@@ -16,27 +16,10 @@
     anv = Bobby.gen_all_night_valid_moves()
     @test all(Int.(Bobby.cvt_to_bitarray(anv[Bobby.INT2UINT[58]])) .== nvw)
 
-    b = Bobby.fen_to_bitboard("k7/8/8/8/8/8/8/N6K w - - 0 1")
-    pt = Bobby.perft(b, 1, b.player_color)
-    @test pt == [5]
-
-    b = Bobby.fen_to_bitboard("k7/8/8/8/8/8/1N6/7K w - - 0 1")
-    pt = Bobby.perft(b, 1, b.player_color)
-    @test pt == [7]
-
-    b = Bobby.fen_to_bitboard("k7/8/8/8/P1P5/3P4/1N6/7K w - - 0 1")
-    pt = Bobby.perft(b, 1, b.player_color)
-    @test pt == [7]
-
-    b = Bobby.fen_to_bitboard("k7/8/8/8/p1p5/3p4/1N6/7K w - - 0 1")
-    pt = Bobby.perft(b, 1, b.player_color)
-    @test pt == [7]
-
-    b = Bobby.fen_to_bitboard("k7/8/8/8/3n4/8/2P1P3/7K b - - 0 1")
-    pt = Bobby.perft(b, 1, b.player_color)
-    @test pt == [11]
-
-    b = Bobby.fen_to_bitboard("k7/8/8/3n4/1p3p2/1Pp1pP2/2P1P3/7K b - - 0 1")
-    pt = Bobby.perft(b, 1, b.player_color)
-    @test pt == [7]
+    @test test_fen("k7/8/8/8/8/8/8/N6K w - - 0 1", 1, [5])
+    @test test_fen("k7/8/8/8/8/8/1N6/7K w - - 0 1", 1, [7])
+    @test test_fen("k7/8/8/8/P1P5/3P4/1N6/7K w - - 0 1", 1, [7])
+    @test test_fen("k7/8/8/8/p1p5/3p4/1N6/7K w - - 0 1", 1, [7])
+    @test test_fen("k7/8/8/8/3n4/8/2P1P3/7K b - - 0 1", 1, [11])
+    @test test_fen("k7/8/8/3n4/1p3p2/1Pp1pP2/2P1P3/7K b - - 0 1", 1, [7])
 end

@@ -2,12 +2,12 @@ using Test
 using Bobby
 
 function test_fen(fen, depth, result)
-	b = Bobby.fen_to_bitboard(fen)
+    b = Bobby.fen_to_bitboard(fen)
     pt = Bobby.perft(b, depth, b.player_color)
     if pt.nodes == result
-    	return true
+        return true
     else
-    	return false
+        return false
     end
 end
 
