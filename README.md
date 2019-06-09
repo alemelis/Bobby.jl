@@ -52,7 +52,7 @@ Moves should be entered in UCI format, e.g. `e2 e4`. Promotion is automatic to _
 
 :suspect: _huh? not very useful, isn't it?_
 
-yep...if you want to play a proper game try [Chess.jl](https://github.com/abahm/Chess.jl)
+if you want to play a proper game try [Chess.jl](https://github.com/abahm/Chess.jl)
 
 ## Possible speed-ups
 - [ ] unmove (instead of `deepcopy`ing board)
