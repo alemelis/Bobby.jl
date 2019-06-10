@@ -29,50 +29,44 @@ function slide(free_squares::Array{UInt64,1},
     end
 end
 
-function slide_rank(free_squares::Array{UInt64,1},
-    edge_squares::Array{UInt64,1}, occ::UInt64, ui::UInt64)
 
-    for i in 1:8
-        if MASK_RANKS[i] & ui != EMPTY
+function slide(free_squares::Array{UInt64,1},
+    edge_squares::Array{UInt64,1}, occ::UInt64, ui::UInt64,
+    masks::Array{UInt64,1}, shift::Int64)
+
+    for i in 1:length(masks)
+        if masks[i] & ui != EMPTY
             return slide(free_squares, edge_squares, occ,
-                ui, 1, MASK_RANKS[i])
+                ui, shift, masks[i])
         end
     end
 end
 
-function slide_file(free_squares::Array{UInt64,1},
-    edge_squares::Array{UInt64,1}, occ::UInt64, ui::UInt64)
-
-    for i in 1:8
-        if MASK_FILES[i] & ui != EMPTY
-            return slide(free_squares, edge_squares, occ,
-                ui, 8, MASK_FILES[i])
-        end
-    end
-end
 
 function orthogonal_attack(occ::UInt64, ui::UInt64)
     free_squares = Array{UInt64,1}()
     edge_squares = Array{UInt64,1}()
 
-    free_squares, edge_squares = slide_rank(free_squares, edge_squares,
-        occ, ui)
-    free_squares, edge_squares = slide_file(free_squares, edge_squares,
-        occ, ui)
+    free_squares, edge_squares = slide(free_squares, edge_squares,
+        occ, ui, MASK_FILES, 8)
+    free_squares, edge_squares = slide(free_squares, edge_squares,
+        occ, ui, MASK_RANKS, 1)
 
     return free_squares, edge_squares
 end
+
 
 function orthogonal_attack(free_squares::Array{UInt64,1},
     edge_squares::Array{UInt64,1}, occ::UInt64, ui::UInt64)
 
-    free_squares, edge_squares = slide_rank(free_squares, edge_squares,
-        occ, ui)
-    free_squares, edge_squares = slide_file(free_squares, edge_squares,
-        occ, ui)
+    free_squares, edge_squares = slide(free_squares, edge_squares,
+        occ, ui, MASK_FILES, 8)
+    free_squares, edge_squares = slide(free_squares, edge_squares,
+        occ, ui, MASK_RANKS, 1)
 
     return free_squares, edge_squares
 end
+
 
 function gen_all_orthogonal_masks()
     ortho_masks = Dict{UInt64, UInt64}()
