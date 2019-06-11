@@ -1,5 +1,6 @@
 function validate_uci_move(uci_move::String)
-    if  ~occursin(r"[a-h][1-8] [a-h][1-8]", uci_move)
+    if  ~occursin(r"[a-h][1-8] [a-h][1-8] [queen, rook, night, bishop, none]", 
+        uci_move)
         println("wrong move format, try again")
         return false
     end
