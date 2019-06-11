@@ -11,6 +11,11 @@ function ask_for_move()
     while true
         println("Enter move:")
         user_move = readline(stdin)
+
+        if user_move == "quit"
+            return "xx", "xx"
+        end
+
         if validate_uci_move(user_move)
             return split(user_move, ' ')
         end
@@ -18,6 +23,24 @@ function ask_for_move()
     return "xx xx"
 end
 
+
+function validate_promotion_type(promotion_type::String)
+    if ~occursin(r"[queen, rook, night, bishop]", promotion_type)
+        println("invalid promotion type, try again")
+        return false
+    end
+    return true
+end
+
+function ask_for_promotion()
+    while true
+        println("Promove to [queen], [rook], k[night], or [bishop]?")
+        promotion_type = readline(stdin)
+        if validate_promotion_type(promotion_type)
+            return promotion_type
+        end
+    end
+end
 
 function play(human_color::String="white")
     b = set_board()
@@ -40,9 +63,17 @@ function play(human_color::String="white")
 
         if b.player_color == human_color
             while true
-                s, t = ask_for_move()
+                s, t, p = ask_for_move()
+                if s == "xx"
+                    return
+                end
+
                 for move in moves
                     if move.source == PGN2UINT[s] && move.target == PGN2UINT[t]
+                        if move.promotion_type != "none"
+                            promotion_type = ask_for_promotion()
+                        end
+
                         b = move_piece(b, move, b.player_color)
                         b = update_attacked(b)
                         b = update_castling_rights(b)
