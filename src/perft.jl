@@ -4,7 +4,7 @@ mutable struct PerftTree
 end
 
 
-function perft(board, depth, color::String="white")
+function perft(board::Bitboard, depth::Int64, color::String)
 
     pt = PerftTree(zeros(depth), Dict{String,Int64}())
 
@@ -36,7 +36,6 @@ function explore(pt::PerftTree, board::Bitboard,
     moves = get_all_valid_moves(board, color)
 
     if length(moves) == 0
-
         return pt
     end
 
@@ -61,18 +60,21 @@ function explore(pt::PerftTree, board::Bitboard,
     new_color = change_color(color)
     c = 1
     for m in moves
-        newb = deepcopy(board)
-        newb = move_piece(newb, m, color)
-        newb = update_attacked(newb)
-        newb = update_castling_rights(newb)
+        # newb = deepcopy(board)
+        board = move_piece(board, m, color)
+        # board = update_attacked(board)
+        board = update_castling_rights(board)
 
         if depth == 1
             move_name = m.piece_type*"-"*UINT2PGN[m.source]*UINT2PGN[m.target]
         else
             pt.divide[move_name] += 1
         end
-
-        pt = explore(pt, newb, max_depth, depth+1, new_color, move_name)
+        
+        pt = explore(pt, board, max_depth, depth+1, new_color, move_name)
+        board = unmove_piece(board, m, color)
+        # board = update_attacked(board)
+        # board = update_castling_rights(board)
     end
 
     return pt

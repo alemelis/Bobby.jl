@@ -7,6 +7,7 @@ function test_fen(fen, depth, result)
     if pt.nodes == result
         return true
     else
+        println(pt.nodes)
         return false
     end
 end
@@ -47,6 +48,6 @@ end
     include("test_check.jl")
 end
 
-@testset "perft.jl" begin
-    include("test_perft.jl")
-end
+# @testset "perft.jl" begin
+#     include("test_perft.jl")
+# end

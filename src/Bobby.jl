@@ -11,6 +11,7 @@ module Bobby
     include("print.jl")
     include("check.jl")
     include("moves.jl")
+    include("unmove.jl")
     include("pawns.jl")
     include("king.jl")
     include("queen.jl")

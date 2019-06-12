@@ -10,14 +10,24 @@ end
 
 
 function validate_move(board::Bitboard, move::Move, color::String="white")
-    newb = deepcopy(board)
-    newb = move_piece(newb, move, color)
-    newb = update_attacked(newb)
-    in_check = king_in_check(newb, color)
-    # board = unmove_piece(board, move, color)
+    board = move_piece(board, move, color)
+    board = update_attacked(board)
+    in_check = king_in_check(board, color)
+    board = unmove_piece(board, move, color)
     # board = update_attacked(board)
     return ~in_check
 end
+
+
+# function validate_move(board::Bitboard, move::Move, color::String="white")
+#     newb = deepcopy(board)
+#     newb = move_piece(newb, move, color)
+#     newb = update_attacked(newb)
+#     in_check = king_in_check(newb, color)
+#     # board = unmove_piece(board, move, color)
+#     # board = update_attacked(board)
+#     return ~in_check
+# end
 
 
 function get_all_moves(board::Bitboard, color::String="white")
@@ -391,274 +401,263 @@ function update_attacked(board::Bitboard)
 end
 
 
-function move_piece(board::Bitboard, move::Move, color::String="white")
-    push!(board.game,
-        color*move.piece_type*UINT2PGN[move.source])
+function move_piece(b::Bitboard, m::Move, color::String="white")
+    push!(b.game, color*m.piece_type*UINT2PGN[m.source])
 
     if color == "white"
-        board.white = update_from_to_squares(board.white, move.source,
-            move.target)
-        board.taken = update_from_to_squares(board.taken, move.source,
-            move.target)
+        b.white = update_from_to_squares(b.white, m.source, m.target)
+        b.taken = update_from_to_squares(b.taken, m.source, m.target)
 
-        if move.capture_type != "none"
-            board.black = remove_from_square(board.black, move.target)
-            if move.capture_type == "pawn"
-                board.p = remove_from_square(board.p, move.target)
-            elseif move.capture_type == "night"
-                board.n = remove_from_square(board.n, move.target)
-            elseif move.capture_type == "bishop"
-                board.b = remove_from_square(board.b, move.target)
-            elseif move.capture_type == "queen"
-                board.q = remove_from_square(board.q, move.target)
-            elseif move.capture_type == "rook"
-                board.r = remove_from_square(board.r, move.target)
+        if m.capture_type != "none"
+            b.black = remove_from_square(b.black, m.target)
+            if m.capture_type == "pawn"
+                b.p = remove_from_square(b.p, m.target)
+            elseif m.capture_type == "night"
+                b.n = remove_from_square(b.n, m.target)
+            elseif m.capture_type == "bishop"
+                b.b = remove_from_square(b.b, m.target)
+            elseif m.capture_type == "queen"
+                b.q = remove_from_square(b.q, m.target)
+            elseif m.capture_type == "rook"
+                b.r = remove_from_square(b.r, m.target)
             end
         end
 
-        if move.piece_type == "pawn"
-            if move.target == board.enpassant_square
-                board.black = remove_from_square(board.black, move.target >> 8)
-                board.p = remove_from_square(board.p, move.target >> 8)
-                board.taken = remove_from_square(board.taken, move.target >> 8)
-                board.enpassant_done = true
+        if m.piece_type == "pawn"
+            if m.target == b.enpassant_square
+                b.black = remove_from_square(b.black, m.target >> 8)
+                b.p = remove_from_square(b.p, m.target >> 8)
+                b.taken = remove_from_square(b.taken, m.target >> 8)
+                b.enpassant_done = true
             else
-                board.enpassant_done = false
-                if move.enpassant_square != EMPTY
-                    board.enpassant_square = move.enpassant_square
+                b.enpassant_done = false
+                if m.enpassant_square != EMPTY
+                    b.enpassant_square = m.enpassant_square
                 end
             end
-            board.P = update_from_to_squares(board.P, move.source, move.target)
-        elseif move.piece_type == "night"
-            board.N = update_from_to_squares(board.N, move.source, move.target)
-        elseif move.piece_type == "bishop"
-            board.B = update_from_to_squares(board.B, move.source, move.target)
-        elseif move.piece_type == "queen"
-            board.Q = update_from_to_squares(board.Q, move.source, move.target)
-        elseif move.piece_type == "rook"
-            board.R = update_from_to_squares(board.R, move.source, move.target)
-        elseif move.piece_type == "king"
-            board.K = update_from_to_squares(board.K, move.source, move.target)
-            if move.castling_type != "-"
-                if move.castling_type == "K"
-                    board.R = update_from_to_squares(board.R,
-                        H1, F1)
-                    board.white = update_from_to_squares(board.white,
-                        H1, F1)
-                    board.taken = update_from_to_squares(board.taken,
-                        H1, F1)
-                elseif move.castling_type == "Q"
-                    board.R = update_from_to_squares(board.R,
-                        A1, D1)
-                    board.white = update_from_to_squares(board.white,
-                        A1, D1)
-                    board.taken = update_from_to_squares(board.taken,
-                        A1, D1)
+            b.P = update_from_to_squares(b.P, m.source, m.target)
+        elseif m.piece_type == "night"
+            b.N = update_from_to_squares(b.N, m.source, m.target)
+        elseif m.piece_type == "bishop"
+            b.B = update_from_to_squares(b.B, m.source, m.target)
+        elseif m.piece_type == "queen"
+            b.Q = update_from_to_squares(b.Q, m.source, m.target)
+        elseif m.piece_type == "rook"
+            b.R = update_from_to_squares(b.R, m.source, m.target)
+        elseif m.piece_type == "king"
+            b.K = update_from_to_squares(b.K, m.source, m.target)
+            if m.castling_type != "-"
+                if m.castling_type == "K"
+                    b.R = update_from_to_squares(b.R, H1, F1)
+                    b.white = update_from_to_squares(b.white, H1, F1)
+                    b.taken = update_from_to_squares(b.taken, H1, F1)
+                elseif m.castling_type == "Q"
+                    b.R = update_from_to_squares(b.R, A1, D1)
+                    b.white = update_from_to_squares(b.white, A1, D1)
+                    b.taken = update_from_to_squares(b.taken, A1, D1)
                 end
             end
         end
 
-        if move.promotion_type != "none"
-            board.P = remove_from_square(board.P, move.target)
-            if move.promotion_type == "queen"
-                board.Q = add_to_square(board.Q, move.target)
-            elseif move.promotion_type == "rook"
-                board.R = add_to_square(board.R, move.target)
-            elseif move.promotion_type == "night"
-                board.N = add_to_square(board.N, move.target)
-            elseif move.promotion_type == "bishop"
-                board.B = add_to_square(board.B, move.target)
+        if m.promotion_type != "none"
+            b.P = remove_from_square(b.P, m.target)
+            if m.promotion_type == "queen"
+                b.Q = add_to_square(b.Q, m.target)
+            elseif m.promotion_type == "rook"
+                b.R = add_to_square(b.R, m.target)
+            elseif m.promotion_type == "night"
+                b.N = add_to_square(b.N, m.target)
+            elseif m.promotion_type == "bishop"
+                b.B = add_to_square(b.B, m.target)
             end
         end
     else
-        board.black = update_from_to_squares(board.black, move.source,
-            move.target)
-        board.taken = update_from_to_squares(board.taken, move.source,
-            move.target)
+        b.black = update_from_to_squares(b.black, m.source, m.target)
+        b.taken = update_from_to_squares(b.taken, m.source, m.target)
 
-        if move.capture_type != "none"
-            board.white = remove_from_square(board.white, move.target)
-            if move.capture_type == "pawn"
-                board.P = remove_from_square(board.P, move.target)
-            elseif move.capture_type == "night"
-                board.N = remove_from_square(board.N, move.target)
-            elseif move.capture_type == "bishop"
-                board.B = remove_from_square(board.B, move.target)
-            elseif move.capture_type == "queen"
-                board.Q = remove_from_square(board.Q, move.target)
-            elseif move.capture_type == "rook"
-                board.R = remove_from_square(board.R, move.target)
+        if m.capture_type != "none"
+            b.white = remove_from_square(b.white, m.target)
+            if m.capture_type == "pawn"
+                b.P = remove_from_square(b.P, m.target)
+            elseif m.capture_type == "night"
+                b.N = remove_from_square(b.N, m.target)
+            elseif m.capture_type == "bishop"
+                b.B = remove_from_square(b.B, m.target)
+            elseif m.capture_type == "queen"
+                b.Q = remove_from_square(b.Q, m.target)
+            elseif m.capture_type == "rook"
+                b.R = remove_from_square(b.R, m.target)
             end
         end
 
-        if move.piece_type == "pawn"
-            if move.target == board.enpassant_square
-                board.white = remove_from_square(board.white, move.target << 8)
-                board.P = remove_from_square(board.P, move.target << 8)
-                board.taken = remove_from_square(board.taken, move.target << 8)
-                board.enpassant_done = true
+        if m.piece_type == "pawn"
+            if m.target == b.enpassant_square
+                b.white = remove_from_square(b.white, m.target << 8)
+                b.P = remove_from_square(b.P, m.target << 8)
+                b.taken = remove_from_square(b.taken, m.target << 8)
+                b.enpassant_done = true
             else
-                board.enpassant_done = false
-                if move.enpassant_square != EMPTY
-                    board.enpassant_square = move.enpassant_square
+                b.enpassant_done = false
+                if m.enpassant_square != EMPTY
+                    b.enpassant_square = m.enpassant_square
                 end
             end
-            board.p = update_from_to_squares(board.p, move.source, move.target)
-        elseif move.piece_type == "night"
-            board.n = update_from_to_squares(board.n, move.source, move.target)
-        elseif move.piece_type == "bishop"
-            board.b = update_from_to_squares(board.b, move.source, move.target)
-        elseif move.piece_type == "queen"
-            board.q = update_from_to_squares(board.q, move.source, move.target)
-        elseif move.piece_type == "rook"
-            board.r = update_from_to_squares(board.r, move.source, move.target)
-        elseif move.piece_type == "king"
-            board.k = update_from_to_squares(board.k, move.source, move.target)
-            if move.castling_type != "-"
-                if move.castling_type == "k"
-                    board.r = update_from_to_squares(board.r, H8, F8)
-                    board.black = update_from_to_squares(board.black, H8, F8)
-                    board.taken = update_from_to_squares(board.taken, H8, F8)
-                elseif move.castling_type == "q"
-                    board.r = update_from_to_squares(board.r, A8, D8)
-                    board.black = update_from_to_squares(board.black, A8, D8)
-                    board.taken = update_from_to_squares(board.taken, A8, D8)
+            b.p = update_from_to_squares(b.p, m.source, m.target)
+        elseif m.piece_type == "night"
+            b.n = update_from_to_squares(b.n, m.source, m.target)
+        elseif m.piece_type == "bishop"
+            b.b = update_from_to_squares(b.b, m.source, m.target)
+        elseif m.piece_type == "queen"
+            b.q = update_from_to_squares(b.q, m.source, m.target)
+        elseif m.piece_type == "rook"
+            b.r = update_from_to_squares(b.r, m.source, m.target)
+        elseif m.piece_type == "king"
+            b.k = update_from_to_squares(b.k, m.source, m.target)
+            if m.castling_type != "-"
+                if m.castling_type == "k"
+                    b.r = update_from_to_squares(b.r, H8, F8)
+                    b.black = update_from_to_squares(b.black, H8, F8)
+                    b.taken = update_from_to_squares(b.taken, H8, F8)
+                elseif m.castling_type == "q"
+                    b.r = update_from_to_squares(b.r, A8, D8)
+                    b.black = update_from_to_squares(b.black, A8, D8)
+                    b.taken = update_from_to_squares(b.taken, A8, D8)
                 end
             end
         end
         
-        if move.promotion_type != "none"
-            board.p = remove_from_square(board.p, move.target)
-            if move.promotion_type == "queen"
-                board.q = add_to_square(board.q, move.target)
-            elseif move.promotion_type == "rook"
-                board.r = add_to_square(board.r, move.target)
-            elseif move.promotion_type == "night"
-                board.n = add_to_square(board.n, move.target)
-            elseif move.promotion_type == "bishop"
-                board.b = add_to_square(board.b, move.target)
+        if m.promotion_type != "none"
+            b.p = remove_from_square(b.p, m.target)
+            if m.promotion_type == "queen"
+                b.q = add_to_square(b.q, m.target)
+            elseif m.promotion_type == "rook"
+                b.r = add_to_square(b.r, m.target)
+            elseif m.promotion_type == "night"
+                b.n = add_to_square(b.n, m.target)
+            elseif m.promotion_type == "bishop"
+                b.b = add_to_square(b.b, m.target)
             end
         end
     end
-    board.free = ~board.taken
+    b.free = ~b.taken
     
-    # board = update_attacked(board)
-    # return update_castling_rights(board)
-    return board
+    # b = update_attacked(b)
+    # return update_castling_rights(b)
+    return b
 end
 
 
-function unmove_piece(board::Bitboard, move::Move, color::String="white")
-    if color == "white"
-        board.white = update_from_to_squares(board.white, move.target,
-            move.source)
-        board.taken = update_from_to_squares(board.taken, move.target,
-            move.source)
+# function unmove_piece(board::Bitboard, move::Move, color::String="white")
+#     if color == "white"
+#         board.white = update_from_to_squares(board.white, move.target,
+#             move.source)
+#         board.taken = update_from_to_squares(board.taken, move.target,
+#             move.source)
 
-        if move.piece_type == "pawn"
-            if board.enpassant_done
-                board.black = add_to_square(board.black, move.target >> 8)
-                board.p = add_to_square(board.p, move.target >> 8)
-                board.taken = add_to_square(board.taken, move.target >> 8)
-                board.enpassant_done = false
-                board.enpassant_square = move.target
-            end
-            board.P = update_from_to_squares(board.P, move.target, move.source)
-        elseif move.piece_type == "night"
-            board.N = update_from_to_squares(board.N, move.target, move.source)
-        elseif move.piece_type == "bishop"
-            board.B = update_from_to_squares(board.B, move.target, move.source)
-        elseif move.piece_type == "queen"
-            board.Q = update_from_to_squares(board.Q, move.target, move.source)
-        elseif move.piece_type == "rook"
-            board.R = update_from_to_squares(board.R, move.target, move.source)
-        elseif move.piece_type == "king"
-            board.K = update_from_to_squares(board.K, move.target, move.source)
-            if move.castling_type != "-"
-                if move.castling_type == "K"
-                    board.R = update_from_to_squares(board.R, F1, H1)
-                    board.white = update_from_to_squares(board.white, F1, H1)
-                    board.taken = update_from_to_squares(board.taken, F1, H1)
-                elseif move.castling_type == "Q"
-                    board.R = update_from_to_squares(board.R, D1, A1)
-                    board.white = update_from_to_squares(board.white, D1, A1)
-                    board.taken = update_from_to_squares(board.taken, D1, A1)
-                end
-            end
-        end
+#         if move.piece_type == "pawn"
+#             if board.enpassant_done
+#                 board.black = add_to_square(board.black, move.target >> 8)
+#                 board.p = add_to_square(board.p, move.target >> 8)
+#                 board.taken = add_to_square(board.taken, move.target >> 8)
+#                 board.enpassant_done = false
+#                 board.enpassant_square = move.target
+#             end
+#             board.P = update_from_to_squares(board.P, move.target, move.source)
+#         elseif move.piece_type == "night"
+#             board.N = update_from_to_squares(board.N, move.target, move.source)
+#         elseif move.piece_type == "bishop"
+#             board.B = update_from_to_squares(board.B, move.target, move.source)
+#         elseif move.piece_type == "queen"
+#             board.Q = update_from_to_squares(board.Q, move.target, move.source)
+#         elseif move.piece_type == "rook"
+#             board.R = update_from_to_squares(board.R, move.target, move.source)
+#         elseif move.piece_type == "king"
+#             board.K = update_from_to_squares(board.K, move.target, move.source)
+#             if move.castling_type != "-"
+#                 if move.castling_type == "K"
+#                     board.R = update_from_to_squares(board.R, F1, H1)
+#                     board.white = update_from_to_squares(board.white, F1, H1)
+#                     board.taken = update_from_to_squares(board.taken, F1, H1)
+#                 elseif move.castling_type == "Q"
+#                     board.R = update_from_to_squares(board.R, D1, A1)
+#                     board.white = update_from_to_squares(board.white, D1, A1)
+#                     board.taken = update_from_to_squares(board.taken, D1, A1)
+#                 end
+#             end
+#         end
 
-        if move.capture_type != "none"
-            board.black = add_to_square(board.black, move.target)
-            board.taken = add_to_square(board.taken, move.target)
-            if move.capture_type == "pawn"
-                board.p = add_to_square(board.p, move.target)
-            elseif move.capture_type == "night"
-                board.n = add_to_square(board.n, move.target)
-            elseif move.capture_type == "bishop"
-                board.b = add_to_square(board.b, move.target)
-            elseif move.capture_type == "queen"
-                board.q = add_to_square(board.q, move.target)
-            elseif move.capture_type == "rook"
-                board.r = add_to_square(board.r, move.target)
-            end
-        end
-    else
-        board.black = update_from_to_squares(board.black, move.target,
-            move.source)
-        board.taken = update_from_to_squares(board.taken, move.target,
-            move.source)
+#         if move.capture_type != "none"
+#             board.black = add_to_square(board.black, move.target)
+#             board.taken = add_to_square(board.taken, move.target)
+#             if move.capture_type == "pawn"
+#                 board.p = add_to_square(board.p, move.target)
+#             elseif move.capture_type == "night"
+#                 board.n = add_to_square(board.n, move.target)
+#             elseif move.capture_type == "bishop"
+#                 board.b = add_to_square(board.b, move.target)
+#             elseif move.capture_type == "queen"
+#                 board.q = add_to_square(board.q, move.target)
+#             elseif move.capture_type == "rook"
+#                 board.r = add_to_square(board.r, move.target)
+#             end
+#         end
+#     else
+#         board.black = update_from_to_squares(board.black, move.target,
+#             move.source)
+#         board.taken = update_from_to_squares(board.taken, move.target,
+#             move.source)
 
-        if move.piece_type == "pawn"
-            if board.enpassant_done
-                board.white = add_to_square(board.white, move.target << 8)
-                board.P = add_to_square(board.P, move.target << 8)
-                board.taken = add_to_square(board.taken, move.target << 8)
-                board.enpassant_done = false
-                board.enpassant_square = move.target
-            end
-            board.p = update_from_to_squares(board.p, move.target, move.source)
-        elseif move.piece_type == "night"
-            board.n = update_from_to_squares(board.n, move.target, move.source)
-        elseif move.piece_type == "bishop"
-            board.b = update_from_to_squares(board.b, move.target, move.source)
-        elseif move.piece_type == "queen"
-            board.q = update_from_to_squares(board.q, move.target, move.source)
-        elseif move.piece_type == "rook"
-            board.r = update_from_to_squares(board.r, move.target, move.source)
-        elseif move.piece_type == "king"
-            board.k = update_from_to_squares(board.k, move.target, move.source)
-            if move.castling_type != "-"
-                if move.castling_type == "k"
-                    board.r = update_from_to_squares(board.r, F8, H8)
-                    board.black = update_from_to_squares(board.black, F8, H8)
-                    board.taken = update_from_to_squares(board.taken, F8, H8)
-                elseif move.castling_type == "q"
-                    board.r = update_from_to_squares(board.r, D8, A8)
-                    board.black = update_from_to_squares(board.black, D8, A8)
-                    board.taken = update_from_to_squares(board.taken, D8, A8)
-                end
-            end
-        end
+#         if move.piece_type == "pawn"
+#             if board.enpassant_done
+#                 board.white = add_to_square(board.white, move.target << 8)
+#                 board.P = add_to_square(board.P, move.target << 8)
+#                 board.taken = add_to_square(board.taken, move.target << 8)
+#                 board.enpassant_done = false
+#                 board.enpassant_square = move.target
+#             end
+#             board.p = update_from_to_squares(board.p, move.target, move.source)
+#         elseif move.piece_type == "night"
+#             board.n = update_from_to_squares(board.n, move.target, move.source)
+#         elseif move.piece_type == "bishop"
+#             board.b = update_from_to_squares(board.b, move.target, move.source)
+#         elseif move.piece_type == "queen"
+#             board.q = update_from_to_squares(board.q, move.target, move.source)
+#         elseif move.piece_type == "rook"
+#             board.r = update_from_to_squares(board.r, move.target, move.source)
+#         elseif move.piece_type == "king"
+#             board.k = update_from_to_squares(board.k, move.target, move.source)
+#             if move.castling_type != "-"
+#                 if move.castling_type == "k"
+#                     board.r = update_from_to_squares(board.r, F8, H8)
+#                     board.black = update_from_to_squares(board.black, F8, H8)
+#                     board.taken = update_from_to_squares(board.taken, F8, H8)
+#                 elseif move.castling_type == "q"
+#                     board.r = update_from_to_squares(board.r, D8, A8)
+#                     board.black = update_from_to_squares(board.black, D8, A8)
+#                     board.taken = update_from_to_squares(board.taken, D8, A8)
+#                 end
+#             end
+#         end
 
-        if move.capture_type != "none"
-            board.white = add_to_square(board.white, move.target)
-            board.taken = add_to_square(board.taken, move.target)
-            if move.capture_type == "pawn"
-                board.P = add_to_square(board.P, move.target)
-            elseif move.capture_type == "night"
-                board.N = add_to_square(board.N, move.target)
-            elseif move.capture_type == "bishop"
-                board.B = add_to_square(board.B, move.target)
-            elseif move.capture_type == "queen"
-                board.Q = add_to_square(board.Q, move.target)
-            elseif move.capture_type == "rook"
-                board.R = add_to_square(board.R, move.target)
-            end
-        end
-    end
-    board.free = ~board.taken
-    pop!(board.game)
-    # board = update_attacked(board)
-    # return update_castling_rights(board)
-    return board
-end
+#         if move.capture_type != "none"
+#             board.white = add_to_square(board.white, move.target)
+#             board.taken = add_to_square(board.taken, move.target)
+#             if move.capture_type == "pawn"
+#                 board.P = add_to_square(board.P, move.target)
+#             elseif move.capture_type == "night"
+#                 board.N = add_to_square(board.N, move.target)
+#             elseif move.capture_type == "bishop"
+#                 board.B = add_to_square(board.B, move.target)
+#             elseif move.capture_type == "queen"
+#                 board.Q = add_to_square(board.Q, move.target)
+#             elseif move.capture_type == "rook"
+#                 board.R = add_to_square(board.R, move.target)
+#             end
+#         end
+#     end
+#     board.free = ~board.taken
+#     pop!(board.game)
+#     # board = update_attacked(board)
+#     # return update_castling_rights(board)
+#     return board
+# end
