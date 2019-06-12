@@ -46,7 +46,7 @@ Enter move:
 
 ```
 
-Moves should be entered in UCI format, e.g. `e2 e4`. Promotion is automatic to _queen_.
+Moves should be entered in UCI format, e.g. `e2 e4`. In case a pawn can be promoted, you'll asked to type `queen`, `rook`, k`night`, or `bishop`.
 
 
 :suspect: _huh? not very useful, isn't it?_
