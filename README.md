@@ -20,8 +20,7 @@ In Julia REPL
 
 ```
 julia> ]
-(v1.1) pkg> add https://github.com/alemelis/Bobby.jl
-(v1.1) pkg> activate .
+(v1.1) pkg> add Bobby
 ```
 
 ## Play
