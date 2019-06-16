@@ -1,15 +1,55 @@
+function update_colors(board::Bitboard)
+    board.white = EMPTY
+    for P in board.P
+        board.white |= P
+    end
+    for B in board.B
+        board.white |= B
+    end
+    for N in board.N
+        board.white |= N
+    end
+    for Q in board.Q
+        board.white |= Q
+    end
+    for R in board.R
+        board.white |= R
+    end
+    board.white |= board.K
+
+    board.black = EMPTY
+    for p in board.p
+        board.black |= p
+    end
+    for bishop in board.b
+        board.black |= bishop
+    end
+    for n in board.n
+        board.black |= n
+    end
+    for q in board.q
+        board.black |= q
+    end
+    for r in board.r
+        board.black |= r
+    end
+    board.black |= board.k
+
+    board.taken = EMPTY
+    board.taken |= board.white 
+    board.taken |= board.black
+    board.free = ~board.taken
+
+    return board
+end
+
 function unmove_piece(b, m, color)
 
     # dopo?
     pop!(b.game)
 
     if color == "white"
-        b.white = update_from_to_squares(b.white, m.target, m.source)
-        b.taken = update_from_to_squares(b.taken, m.target, m.source)
-
         if m.capture_type != "none"
-            b.black = add_to_square(b.black, m.target)
-            b.taken = add_to_square(b.taken, m.target)
             if m.capture_type == "pawn"
                 b.p = add_to_square(b.p, m.target)
             elseif m.capture_type == "night"
@@ -38,15 +78,8 @@ function unmove_piece(b, m, color)
 
         if m.piece_type == "pawn"
             if m.target == b.enpassant_square
-                b.black = add_to_square(b.black, m.target >> 8)
                 b.p = add_to_square(b.p, m.target >> 8)
-                b.taken = add_to_square(b.taken, m.target >> 8)
                 b.enpassant_done = false
-            # else
-            #     b.enpassant_done = true
-            #     if m.enpassant_square != EMPTY
-            #         b.enpassant_square = m.enpassant_square
-            #     end
             end
             b.P = update_from_to_squares(b.P, m.target, m.source)
         elseif m.piece_type == "night"
@@ -62,22 +95,13 @@ function unmove_piece(b, m, color)
             if m.castling_type != "-"
                 if m.castling_type == "K"
                     b.R = update_from_to_squares(b.R, F1, H1)
-                    b.white = update_from_to_squares(b.white, F1, H1)
-                    b.taken = update_from_to_squares(b.taken, F1, H1)
                 elseif m.castling_type == "Q"
                     b.R = update_from_to_squares(b.R, D1, A1)
-                    b.white = update_from_to_squares(b.white, D1, A1)
-                    b.taken = update_from_to_squares(b.taken, D1, A1)
                 end
             end
         end
     else
-        b.black = update_from_to_squares(b.black, m.target, m.source)
-        b.taken = update_from_to_squares(b.taken, m.target, m.source)
-
         if m.capture_type != "none"
-            b.white = add_to_square(b.white, m.target)
-            b.taken = add_to_square(b.taken, m.target)
             if m.capture_type == "pawn"
                 b.P = add_to_square(b.P, m.target)
             elseif m.capture_type == "night"
@@ -106,16 +130,8 @@ function unmove_piece(b, m, color)
 
         if m.piece_type == "pawn"
             if m.target == b.enpassant_square
-                b.white = add_to_square(b.white, m.target << 8)
                 b.P = add_to_square(b.P, m.target << 8)
-                b.taken = add_to_square(b.taken, m.target << 8)
                 b.enpassant_done = false
-                # b.enpassant_square = m.enpassant_square
-            # else
-            #     b.enpassant_done = true
-            #     if m.enpassant_square != EMPTY
-            #         b.enpassant_square = m.enpassant_square
-            #     end
             end
             b.p = update_from_to_squares(b.p, m.target, m.source)
         elseif m.piece_type == "night"
@@ -131,17 +147,12 @@ function unmove_piece(b, m, color)
             if m.castling_type != "-"
                 if m.castling_type == "k"
                     b.r = update_from_to_squares(b.r, F8, H8)
-                    b.black = update_from_to_squares(b.black, F8, H8)
-                    b.taken = update_from_to_squares(b.taken, F8, H8)
                 elseif m.castling_type == "q"
                     b.r = update_from_to_squares(b.r, D8, A8)
-                    b.black = update_from_to_squares(b.black, D8, A8)
-                    b.taken = update_from_to_squares(b.taken, D8, A8)
                 end
             end
         end
 
     end
-    b.free = ~b.taken
-    return b
+    return update_colors(b)
 end
