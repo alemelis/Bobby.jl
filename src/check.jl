@@ -1,3 +1,78 @@
+function is_in_check(chessboard::Chessboard, ui::UInt64, color::String)
+    if color == "white"
+        if ui & chessboard.black.A[1] != EMPTY
+            return true
+        end
+        if ui & chessboard.black.A[2] != EMPTY
+            return true
+        end
+        if ui & chessboard.black.A[4] != EMPTY ||
+         ui & chessboard.black.A[3] != EMPTY
+            squares, edges = orthogonal_attack(chessboard.taken, ui)
+            for square in edges
+                if chessboard.black.R & square != EMPTY || 
+                    chessboard.black.Q & square != EMPTY
+                    return true
+                end
+            end
+        end
+        if ui & chessboard.black.A[5] != EMPTY ||
+         ui & chessboard.black.A[3] != EMPTY
+            squares, edges = cross_attack(chessboard.taken, ui)
+            for square in edges
+                if chessboard.black.B & square != EMPTY || 
+                    chessboard.black.Q & square != EMPTY
+                    return true
+                end
+            end
+        end
+        return false
+    else
+        if ui & chessboard.white.A[1] != EMPTY
+            return true
+        end
+        if ui & chessboard.white.A[2] != EMPTY
+            return true
+        end
+        if ui & chessboard.white.A[4] != EMPTY ||
+         ui & chessboard.white.A[3] != EMPTY
+            squares, edges = orthogonal_attack(chessboard.taken, ui)
+            for square in edges
+                if chessboard.white.R & square != EMPTY || 
+                    chessboard.white.Q & square != EMPTY
+                    return true
+                end
+            end
+        end
+        if ui & chessboard.white.A[5] != EMPTY ||
+         ui & chessboard.white.A[3] != EMPTY
+            squares, edges = cross_attack(chessboard.taken, ui)
+            for square in edges
+                if chessboard.white.B & square != EMPTY || 
+                    chessboard.white.Q & square != EMPTY
+                    return true
+                end
+            end
+        end
+        return false
+    end
+end
+
+
+function king_in_check(chessboard::Chessboard, color::String="white")
+    if color == "white"
+        if chessboard.white.K & chessboard.black_attacks == EMPTY
+            return false
+        end
+    else
+        if chessboard.black.k & chessboard.white_attacks == EMPTY
+            return false
+        end
+    end
+    return kingtrace(chessboard, color)
+end
+
+
 function king_in_check(board::Bitboard, color::String="white")
     if color == "white"
         if board.K & board.black_attacks == EMPTY
@@ -90,6 +165,14 @@ function kingtrace(board::Bitboard, color::String="white")
         return square_in_check(board, board.K, color)
     else
         return square_in_check(board, board.k, color)
+    end
+end
+
+function kingtrace(chessboard::Chessboard, color::String="white")
+    if color == "white"
+        return square_in_check(chessboard.white, chessboard.white.K, color)
+    else
+        return square_in_check(chessboard.black, chessboard.black.K, color)
     end
 end
 

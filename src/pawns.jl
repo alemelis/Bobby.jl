@@ -43,7 +43,7 @@ end
 
 
 function gen_all_pawns_two_steps_valid_moves(color::String="white")
-    pawn_moves = Dict{UInt64, UInt64}()
+    pawn_moves = Dict{UInt64,UInt64}()
 
     if color == "white"
         for i in 1:48
@@ -113,6 +113,59 @@ function gen_all_pawns_valid_attack(color::String="white")
 end
 const WHITE_PAWN_ATTACK = gen_all_pawns_valid_attack()
 const BLACK_PAWN_ATTACK = gen_all_pawns_valid_attack("black")
+
+
+function add_promotions!(pawn_moves::Array{Move,1}, source::UInt64,
+    target::UInt64, taken_piece::String="none")
+
+    for promotion_type in ["queen", "rook", "night", "bishop"]
+        push!(pawn_moves, Move(source, target, "pawn", taken_piece,
+            promotion_type, EMPTY, "-"))
+    end
+end
+
+
+function get_pawn_moves!(pawn_moves::Array{Move,1}, ui::UInt64,
+    friends::Bitboard, enemy::Bitboard, taken::UInt64, color::String,
+    enpassant_square::UInt64)
+
+    # move once
+    if friends.one_step[ui] & taken == EMPTY # check front square
+        if ui & friends.promotion_rank != EMPTY
+            add_promotions!(pawn_moves, ui, friends.one_step[ui], "none")
+        else
+            # move once
+            push!(pawn_moves, Move(ui, friends.one_step[ui], "pawn", "none", "none",
+                EMPTY, "-"))
+
+            # move twice and take note of the en-passant square
+            if ui & friends.home_rank != EMPTY
+                if friends.two_steps[ui] & taken == EMPTY
+                    push!(pawn_moves, Move(ui, friends.two_steps[ui], "pawn", "none",
+                        "none", friends.one_step[ui], "-"))
+                end
+            end
+        end
+    end
+
+    # attack squares
+    pawn_attacks = friends.attacks[ui]
+    for attack in pawn_attacks
+        if attack & enemy.pieces != EMPTY
+            if ui & friends.promotion_rank != EMPTY
+                add_promotions!(pawn_moves, ui, attack,
+                    get_piece_type(enemy, attack))
+            else
+                push!(pawn_moves, Move(ui, attack, "pawn",
+                    get_piece_type(enemy, attack), "none", EMPTY, "-"))
+            end
+        elseif attack == enpassant_square &&
+            attack & friends.enpassant_rank != EMPTY # use enpassant square
+            push!(pawn_moves, Move(ui, attack, "pawn", "none", "none",
+                EMPTY, "-"))
+        end
+    end
+end
 
 
 function add_promotions(pawns_moves::Array{Move,1}, source::UInt64,

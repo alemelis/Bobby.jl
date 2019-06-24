@@ -1,12 +1,244 @@
-struct Move
-    source :: UInt64
-    target :: UInt64
-    piece_type :: String
-    capture_type :: String
-    promotion_type :: String
-    enpassant_square :: UInt64
-    castling_type :: String
+function get_piece_color(chessboard::Chessboard, ui::UInt64)
+    if ui & chessboard.white.pieces == EMPTY
+        return "black"
+    else
+        return "white"
+    end
 end
+
+
+function get_piece_type(board::Bitboard, ui::UInt64)
+    for uil in zip([board.K, board.P, board.R, board.Q, board.B, board.N],
+        ["king", "pawn", "rook", "queen", "bishop", "night"])
+        if uil[1] & ui != EMPTY
+            return uil[2]
+        end
+    end
+end
+
+
+function find_all_semi_legal_moves(chessboard::Chessboard, player_color::String)
+    semi_legal_moves = Array{Move,1}()
+    if player_color == "white"
+        friends = chessboard.white
+        enemy = chessboard.black
+        rooks = chessboard.white.R
+    else
+        friends = chessboard.black
+        enemy = chessboard.white
+        rooks = chessboard.black.R
+    end
+
+    for i in 1:64
+        ui = INT2UINT[i]
+
+        if ui & chessboard.taken == EMPTY
+            continue
+        end
+        
+        piece_color = get_piece_color(chessboard, ui)
+        if piece_color != player_color
+            continue
+        end
+
+        if piece_color == "white"
+            piece_type = get_piece_type(chessboard.white, ui)
+        else
+            piece_type = get_piece_type(chessboard.black, ui)
+        end
+
+        if piece_type == "night"
+            get_night_moves!(semi_legal_moves, ui, friends.pieces, enemy)
+        elseif piece_type in ["queen", "rook", "bishop"]
+            get_sliding_pieces_moves!(semi_legal_moves, ui, friends.pieces,
+                enemy, chessboard.taken, piece_type)
+        elseif piece_type == "pawn"
+            get_pawn_moves!(semi_legal_moves, ui, friends, enemy,
+                chessboard.taken, player_color, chessboard.enpassant_square)
+        elseif piece_type == "king"
+            get_king_moves!(semi_legal_moves, ui, friends, enemy, player_color,
+                chessboard, rooks)
+        end
+    end
+    return semi_legal_moves
+end
+
+
+function add_to_square(b::UInt64, s::UInt64)
+    b |= s
+    return b
+end
+
+
+function remove_from_square(b::UInt64, s::UInt64)
+    return xor(b, s)
+end
+
+
+function update_from_to_squares(b::UInt64, s::UInt64, t::UInt64)
+    b = remove_from_square(b, s)
+    return add_to_square(b, t)
+end
+
+
+function update_side_bitboards!(board::Bitboard)
+    board.pieces = EMPTY | board.K
+    board.pieces |= board.P
+    board.pieces |= board.B
+    board.pieces |= board.N
+    board.pieces |= board.Q
+    board.pieces |= board.R
+end
+
+
+function update_both_sides_bitboard!(chessboard::Chessboard)
+    update_side_bitboards!(chessboard.white)
+    update_side_bitboards!(chessboard.black)
+    chessboard.taken = EMPTY | chessboard.white.pieces | chessboard.black.pieces
+    chessboard.free = ~chessboard.taken
+end
+
+
+function move_piece_(chessboard::Chessboard, move::Move, player_color::String,
+    friends::Bitboard, enemy::Bitboard)
+    push!(chessboard.game, player_color*move.piece_type*UINT2PGN[move.source])
+
+    if move.capture_type != "none"
+        if move.capture_type == "pawn"
+            enemy.P = remove_from_square(enemy.P, move.target)
+        elseif move.capture_type == "night"
+            enemy.N = remove_from_square(enemy.N, move.target)
+        elseif move.capture_type == "bishop"
+            enemy.B = remove_from_square(enemy.B, move.target)
+        elseif move.capture_type == "queen"
+            enemy.Q = remove_from_square(enemy.Q, move.target)
+        elseif move.capture_type == "rook"
+            enemy.R = remove_from_square(enemy.R, move.target)
+        end
+    end
+
+    if move.piece_type == "pawn"
+        if move.target == chessboard.enpassant_square
+            enemy.P = remove_from_square(enemy.P, move.target >> 8)
+            chessboard.enpassant_done = true
+        else
+            chessboard.enpassant_done = false
+            if move.enpassant_square != EMPTY
+                chessboard.enpassant_square = move.enpassant_square
+            end
+        end
+        friends.P = update_from_to_squares(friends.P, move.source, move.target)
+    elseif move.piece_type == "night"
+        friends.N = update_from_to_squares(friends.N, move.source, move.target)
+    elseif move.piece_type == "bishop"
+        friends.B = update_from_to_squares(friends.B, move.source, move.target)
+    elseif move.piece_type == "queen"
+        friends.Q = update_from_to_squares(friends.Q, move.source, move.target)
+    elseif move.piece_type == "rook"
+        friends.R = update_from_to_squares(friends.R, move.source, move.target)
+    elseif move.piece_type == "king"
+        friends.K = update_from_to_squares(friends.K, move.source, move.target)
+        if move.castling_type != "-"
+            if move.castling_type == "K"
+                friends.R = update_from_to_squares(friends.R,
+                    friends.king_side_rook_sq, friends.king_side_castling_sq)
+            elseif move.castling_type == "Q"
+                friends.R = update_from_to_squares(friends.R,
+                    friends.queen_side_rook_sq,
+                    friends.queen_side_castling_rook_sq)
+            end
+        end
+    end
+
+    if move.promotion_type != "none"
+        friends.P = remove_from_square(friends.P, move.target)
+        if move.promotion_type == "queen"
+            friends.Q = add_to_square(friends.Q, move.target)
+        elseif move.promotion_type == "rook"
+            friends.R = add_to_square(friends.R, move.target)
+        elseif move.promotion_type == "night"
+            friends.N = add_to_square(friends.N, move.target)
+        elseif move.promotion_type == "bishop"
+            friends.B = add_to_square(friends.B, move.target)
+        end
+    end
+    
+    if player_color == "white"
+        chessboard.white = friends
+        chessboard.black = enemy
+    else
+        chessboard.white = enemy
+        chessboard.black = friends
+    end
+
+    update_both_sides_bitboard!(chessboard)
+    
+    return chessboard
+end
+
+function update_attacked!(board::Bitboard)
+    board.A[1] = EMPTY
+    board.A[2] = EMPTY
+    board.A[3] = EMPTY
+    board.A[4] = EMPTY
+    board.A[5] = EMPTY
+    for i in 1:64
+        ui = INT2UINT[i]
+
+        if ui & board.P != EMPTY
+            for a in board.attacks[ui]
+                board.A[1] |= a
+            end
+        elseif ui & board.N != EMPTY
+            for a in NIGHT_MOVES[ui]
+                board.A[2] |= a
+            end
+        elseif ui & board.Q != EMPTY
+            board.A[3] |= ORTHO_MASKS[ui] | DIAG_MASKS[ui]
+        elseif ui & board.R != EMPTY
+            board.A[4] |= ORTHO_MASKS[ui]
+        elseif ui & board.B != EMPTY
+            board.A[5] |= DIAG_MASKS[ui]
+        end
+    end
+end
+
+function update_both_sides_attacked!(chessboard::Chessboard)
+    update_attacked!(chessboard.white)
+    update_attacked!(chessboard.black)
+    chessboard.white_attacks = EMPTY
+    chessboard.black_attacks = EMPTY
+    for i = 1:5
+        chessboard.black_attacks |= chessboard.black.A[i]
+        chessboard.white_attacks |= chessboard.white.A[i]
+    end
+end
+
+function validate_move(chessboard::Chessboard, move::Move, player_color::String)
+    if player_color == "white"
+        chessboard = move_piece_(chessboard, move, player_color,
+            chessboard.white, chessboard.black)
+    else
+        chessboard = move_piece_(chessboard, move, player_color,
+            chessboard.black, chessboard.white)
+    end
+    update_both_sides_attacked!(chessboard)
+    in_check = king_in_check(chessboard, player_color)
+    #unmove
+    return ~in_check
+end
+
+function get_all_legal_moves(chessboard::Chessboard, player_color::String)
+    semi_legal_moves = find_all_semi_legal_moves(chessboard, player_color)
+    legal_moves = Array{Move,1}()
+    for move in semi_legal_moves
+        if validate_move(chessboard, move, player_color)
+            push!(valid_moves, move)
+        end
+    end
+    return legal_moves
+end
+#----
 
 
 function validate_move(board::Bitboard, move::Move, color::String="white")
@@ -263,40 +495,40 @@ function get_sliding_pieces_list(piece_moves::Array{Move,1}, board::Bitboard,
 end
 
 
-function remove_from_square(b::UInt64, s::UInt64)
-    return xor(b, s)
-end
+# function remove_from_square(b::UInt64, s::UInt64)
+#     return xor(b, s)
+# end
 
 
-function remove_from_square(bs::Array{UInt64,1}, s::UInt64)
-    filter!(e -> e != s, bs)
-    return bs
-end
+# function remove_from_square(bs::Array{UInt64,1}, s::UInt64)
+#     filter!(e -> e != s, bs)
+#     return bs
+# end
 
 
-function add_to_square(b::UInt64, s::UInt64)
-    return b |= s
-end
+# function add_to_square(b::UInt64, s::UInt64)
+#     return b |= s
+# end
 
 
-function add_to_square(bs::Array{UInt64,1}, s::UInt64)
-    push!(bs, s)
-    return bs
-end
+# function add_to_square(bs::Array{UInt64,1}, s::UInt64)
+#     push!(bs, s)
+#     return bs
+# end
 
 
-function update_from_to_squares(b::UInt64, s::UInt64, t::UInt64)
-    b = remove_from_square(b, s)
-    b = add_to_square(b, t)
-    return b
-end
+# function update_from_to_squares(b::UInt64, s::UInt64, t::UInt64)
+#     b = remove_from_square(b, s)
+#     b = add_to_square(b, t)
+#     return b
+# end
 
 
-function update_from_to_squares(bs::Array{UInt64,1}, s::UInt64, t::UInt64)
-    bs = remove_from_square(bs, s)
-    bs = add_to_square(bs, t)
-    return bs
-end
+# function update_from_to_squares(bs::Array{UInt64,1}, s::UInt64, t::UInt64)
+#     bs = remove_from_square(bs, s)
+#     bs = add_to_square(bs, t)
+#     return bs
+# end
 
 
 function update_castling_rights(board::Bitboard)
@@ -405,11 +637,11 @@ function move_piece(b::Bitboard, m::Move, color::String="white")
     push!(b.game, color*m.piece_type*UINT2PGN[m.source])
 
     if color == "white"
-        b.white = update_from_to_squares(b.white, m.source, m.target)
-        b.taken = update_from_to_squares(b.taken, m.source, m.target)
+        # b.white = update_from_to_squares(b.white, m.source, m.target)
+        # b.taken = update_from_to_squares(b.taken, m.source, m.target)
 
         if m.capture_type != "none"
-            b.black = remove_from_square(b.black, m.target)
+            # b.black = remove_from_square(b.black, m.target)
             if m.capture_type == "pawn"
                 b.p = remove_from_square(b.p, m.target)
             elseif m.capture_type == "night"
@@ -425,9 +657,9 @@ function move_piece(b::Bitboard, m::Move, color::String="white")
 
         if m.piece_type == "pawn"
             if m.target == b.enpassant_square
-                b.black = remove_from_square(b.black, m.target >> 8)
+                # b.black = remove_from_square(b.black, m.target >> 8)
                 b.p = remove_from_square(b.p, m.target >> 8)
-                b.taken = remove_from_square(b.taken, m.target >> 8)
+                # b.taken = remove_from_square(b.taken, m.target >> 8)
                 b.enpassant_done = true
             else
                 b.enpassant_done = false
@@ -449,12 +681,12 @@ function move_piece(b::Bitboard, m::Move, color::String="white")
             if m.castling_type != "-"
                 if m.castling_type == "K"
                     b.R = update_from_to_squares(b.R, H1, F1)
-                    b.white = update_from_to_squares(b.white, H1, F1)
-                    b.taken = update_from_to_squares(b.taken, H1, F1)
+                    # b.white = update_from_to_squares(b.white, H1, F1)
+                    # b.taken = update_from_to_squares(b.taken, H1, F1)
                 elseif m.castling_type == "Q"
                     b.R = update_from_to_squares(b.R, A1, D1)
-                    b.white = update_from_to_squares(b.white, A1, D1)
-                    b.taken = update_from_to_squares(b.taken, A1, D1)
+                    # b.white = update_from_to_squares(b.white, A1, D1)
+                    # b.taken = update_from_to_squares(b.taken, A1, D1)
                 end
             end
         end
@@ -472,11 +704,11 @@ function move_piece(b::Bitboard, m::Move, color::String="white")
             end
         end
     else
-        b.black = update_from_to_squares(b.black, m.source, m.target)
-        b.taken = update_from_to_squares(b.taken, m.source, m.target)
+        # b.black = update_from_to_squares(b.black, m.source, m.target)
+        # b.taken = update_from_to_squares(b.taken, m.source, m.target)
 
         if m.capture_type != "none"
-            b.white = remove_from_square(b.white, m.target)
+            # b.white = remove_from_square(b.white, m.target)
             if m.capture_type == "pawn"
                 b.P = remove_from_square(b.P, m.target)
             elseif m.capture_type == "night"
@@ -492,9 +724,9 @@ function move_piece(b::Bitboard, m::Move, color::String="white")
 
         if m.piece_type == "pawn"
             if m.target == b.enpassant_square
-                b.white = remove_from_square(b.white, m.target << 8)
+                # b.white = remove_from_square(b.white, m.target << 8)
                 b.P = remove_from_square(b.P, m.target << 8)
-                b.taken = remove_from_square(b.taken, m.target << 8)
+                # b.taken = remove_from_square(b.taken, m.target << 8)
                 b.enpassant_done = true
             else
                 b.enpassant_done = false
@@ -516,12 +748,12 @@ function move_piece(b::Bitboard, m::Move, color::String="white")
             if m.castling_type != "-"
                 if m.castling_type == "k"
                     b.r = update_from_to_squares(b.r, H8, F8)
-                    b.black = update_from_to_squares(b.black, H8, F8)
-                    b.taken = update_from_to_squares(b.taken, H8, F8)
+                    # b.black = update_from_to_squares(b.black, H8, F8)
+                    # b.taken = update_from_to_squares(b.taken, H8, F8)
                 elseif m.castling_type == "q"
                     b.r = update_from_to_squares(b.r, A8, D8)
-                    b.black = update_from_to_squares(b.black, A8, D8)
-                    b.taken = update_from_to_squares(b.taken, A8, D8)
+                    # b.black = update_from_to_squares(b.black, A8, D8)
+                    # b.taken = update_from_to_squares(b.taken, A8, D8)
                 end
             end
         end
@@ -539,11 +771,11 @@ function move_piece(b::Bitboard, m::Move, color::String="white")
             end
         end
     end
-    b.free = ~b.taken
+    # b.free = ~b.taken
     
     # b = update_attacked(b)
     # return update_castling_rights(b)
-    return b
+    return update_colors(b)
 end
 
 

@@ -207,8 +207,9 @@ function explore(pt::PerftTree, board::Bitboard,
 
         pt = explore(pt, board, max_depth, depth+1, new_color, move_name)
         board = unmove_piece(board, m, color)
-        
+        board = update_castling_rights(board)
         board = update_attacked(board)
+        # test_unmove(b, board)
         if ~test_unmove(b, board)
             println(move_name)
             ugly_print(b.white)

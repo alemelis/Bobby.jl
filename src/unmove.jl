@@ -1,5 +1,5 @@
 function update_colors(board::Bitboard)
-    board.white = EMPTY
+    board.white = EMPTY | board.K
     for P in board.P
         board.white |= P
     end
@@ -15,14 +15,13 @@ function update_colors(board::Bitboard)
     for R in board.R
         board.white |= R
     end
-    board.white |= board.K
 
-    board.black = EMPTY
+    board.black = EMPTY | board.k
     for p in board.p
         board.black |= p
     end
-    for bishop in board.b
-        board.black |= bishop
+    for b in board.b
+        board.black |= b
     end
     for n in board.n
         board.black |= n
@@ -33,11 +32,8 @@ function update_colors(board::Bitboard)
     for r in board.r
         board.black |= r
     end
-    board.black |= board.k
 
-    board.taken = EMPTY
-    board.taken |= board.white 
-    board.taken |= board.black
+    board.taken = EMPTY | board.white | board.black
     board.free = ~board.taken
 
     return board
@@ -45,8 +41,7 @@ end
 
 function unmove_piece(b, m, color)
 
-    # dopo?
-    pop!(b.game)
+    
 
     if color == "white"
         if m.capture_type != "none"
@@ -134,14 +129,19 @@ function unmove_piece(b, m, color)
                 b.enpassant_done = false
             end
             b.p = update_from_to_squares(b.p, m.target, m.source)
+
         elseif m.piece_type == "night"
             b.n = update_from_to_squares(b.n, m.target, m.source)
+
         elseif m.piece_type == "bishop"
             b.b = update_from_to_squares(b.b, m.target, m.source)
+
         elseif m.piece_type == "queen"
             b.q = update_from_to_squares(b.q, m.target, m.source)
+
         elseif m.piece_type == "rook"
             b.r = update_from_to_squares(b.r, m.target, m.source)
+
         elseif m.piece_type == "king"
             b.k = update_from_to_squares(b.k, m.target, m.source)
             if m.castling_type != "-"
@@ -154,5 +154,6 @@ function unmove_piece(b, m, color)
         end
 
     end
+    pop!(b.game)
     return update_colors(b)
 end

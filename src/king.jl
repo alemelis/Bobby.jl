@@ -26,3 +26,47 @@ end
 const KING_MOVES = gen_all_king_valid_moves()
 const WHITE_KING_HOME = PGN2UINT["e1"]
 const BLACK_KING_HOME = PGN2UINT["e8"]
+
+
+function get_king_moves!(king_moves::Array{Move,1}, ui::UInt64,
+    friends::Bitboard, enemy::Bitboard, player_color::String,
+    chessboard::Chessboard, rooks::UInt64)
+
+    if ui == friends.king_home_sq
+        if ~chessboard.white_king_moved
+            if chessboard.white_can_castle_kingside == true
+                if chessboard.free & friends.king_side_1st_sq != EMPTY &&
+                    chessboard.free & friends.king_side_castling_sq != EMPTY &&
+                    rooks & friends.king_side_rook_sq != EMPTY
+                    if ~is_in_check(chessboard, friends.king_home_sq, player_color) && #!!!
+                        ~is_in_check(chessboard, friends.king_side_1st_sq, player_color)
+                        push!(king_moves, Move(ui, friends.king_side_castling_sq,
+                            "king", "none", "none", EMPTY, "K"))
+                    end
+                end
+            end
+            if chessboard.white_can_castle_queenside == true
+                if chessboard.free & friends.queen_side_1st_sq != EMPTY &&
+                    chessboard.free & friends.queen_side_castling_sq != EMPTY &&
+                    chessboard.free & B1 != EMPTY &&
+                    rooks & friends.queen_side_rook_sq != EMPTY
+                    if ~is_in_check(chessboard, friends.king_home_sq, player_color) &&
+                        ~is_in_check(chessboard, friends.queen_side_1st_sq, player_color)
+                        push!(king_moves, Move(ui, friends.queen_side_castling_sq,
+                            "king", "none", "none", EMPTY, "Q"))
+                    end
+                end
+            end
+        end 
+    end
+
+    for move in KING_MOVES[ui]
+        if move & friends.pieces == EMPTY && move & enemy.pieces == EMPTY
+            push!(king_moves, Move(ui, move,
+                "king", "none", "none", EMPTY, "-"))
+        elseif move & friends.pieces == EMPTY && move & enemy.pieces != EMPTY
+            push!(king_moves, Move(ui, move,
+                "king", get_piece_type(enemy, move), "none", EMPTY, "-"))
+        end
+    end
+end
