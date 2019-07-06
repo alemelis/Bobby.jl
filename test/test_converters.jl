@@ -12,19 +12,7 @@
       "0000000000000000000000000000000000000000000000000000000000000001")
 
     b = Bobby.set_board()
-    u = Bobby.cvt_to_uint(b.p)
-    @test u == 0x00ff000000000000
-
-    white_pawns = [0,0,0,0,0,0,0,0,
-                   0,0,0,0,0,0,0,0,
-                   0,0,0,0,0,0,0,0,
-                   0,0,0,0,0,0,0,0,
-                   0,0,0,0,0,0,0,0,
-                   0,0,0,0,0,0,0,0,
-                   1,1,1,1,1,1,1,1,
-                   0,0,0,0,0,0,0,0]
-    ba = Bobby.cvt_to_bitarray(b.P)
-    @test Int.(ba) == white_pawns
+    @test b.black.P == 0x00ff000000000000
 
     squares_uint = Bobby.gen_pgn_square_to_uint_dict()
     @test haskey(squares_uint, "e2")

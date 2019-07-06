@@ -4,11 +4,11 @@ mutable struct PerftTree
 end
 
 
-function perft(board::Bitboard, depth::Int64, color::String)
+function perft(chessboard::Chessboard, depth::Int64, color::String)
 
     pt = PerftTree(zeros(depth), Dict{String,Int64}())
 
-    return explore(pt, board, depth, 1, color)
+    return explore(pt, chessboard, depth, 1, color)
 end
 
 
@@ -165,11 +165,11 @@ function test_unmove(b, bm)
 end
 
 
-function explore(pt::PerftTree, board::Bitboard,
+function explore(pt::PerftTree, chessboard::Chessboard,
     max_depth::Int64, depth::Int64, color::String="white",
     move_name::String="")
 
-    moves = get_all_valid_moves(board, color)
+    moves = get_all_legal_moves(chessboard, color)
 
     if length(moves) == 0
         return pt
@@ -192,12 +192,20 @@ function explore(pt::PerftTree, board::Bitboard,
     end
 
     new_color = change_color(color)
-    b = deepcopy(board)
+    # b = deepcopy(board)
     for m in moves
         # newb = deepcopy(board)
-        board = move_piece(board, m, color)
+
+        if color == "white"
+            chessboard = move_piece_(chessboard, m, color,
+                chessboard.white, chessboard.black)
+        else
+            chessboard = move_piece_(chessboard, m, color,
+                chessboard.black, chessboard.whit)
+        end
+        update_both_sides_attacked!(chessboard)
         # board = update_attacked(board)
-        board = update_castling_rights(board)
+        chessboard = update_castling_rights(chessboard)
 
         if depth == 1
             move_name = m.piece_type*"-"*UINT2PGN[m.source]*UINT2PGN[m.target]
@@ -205,16 +213,22 @@ function explore(pt::PerftTree, board::Bitboard,
         #     pt.divide[move_name] += 1
         # end
 
-        pt = explore(pt, board, max_depth, depth+1, new_color, move_name)
-        board = unmove_piece(board, m, color)
-        board = update_castling_rights(board)
-        board = update_attacked(board)
-        # test_unmove(b, board)
-        if ~test_unmove(b, board)
-            println(move_name)
-            ugly_print(b.white)
-            ugly_print(board.white)
+        pt = explore(pt, chessboard, max_depth, depth+1, new_color, move_name)
+        if color == "white"
+            chessboard = unmove_piece_(chessboard, m, color,
+                chessboard.white, chessboard.black)
+        else
+            chessboard = unmove_piece_(chessboard, m, color,
+                chessboard.black, chessboard.whit)
         end
+        chessboard = update_castling_rights(chessboard)
+        update_both_sides_attacked!(chessboard)
+        # test_unmove(b, board)
+        # if ~test_unmove(b, board)
+        #     println(move_name)
+        #     ugly_print(b.white)
+        #     ugly_print(board.white)
+        # end
         # board = update_castling_rights(board)
     end
 

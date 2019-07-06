@@ -1,12 +1,12 @@
 @testset "pawns" begin
-    bb = Bobby.set_board()
-    pl = Array{Bobby.Move,1}()
-    pvl = Bobby.get_pawns_list(pl, bb)
-    @test length(pvl) == 16
+    # bb = Bobby.set_board()
+    # pl = Array{Bobby.Move,1}()
+    # pvl = Bobby.get_pawns_list(pl, bb)
+    # @test length(pvl) == 16
 
-    pl = Array{Bobby.Move,1}()
-    pvl = Bobby.get_pawns_list(pl, bb, "black")
-    @test length(pvl) == 16
+    # pl = Array{Bobby.Move,1}()
+    # pvl = Bobby.get_pawns_list(pl, bb, "black")
+    # @test length(pvl) == 16
     
     @test test_fen("k7/8/8/8/8/1p6/P7/7K w - - 0 1", 1, [6])
     @test test_fen("k7/8/8/8/8/8/P7/7K w - - 0 1", 1, [5])

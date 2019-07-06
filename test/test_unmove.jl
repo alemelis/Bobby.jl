@@ -1,20 +1,18 @@
 function test_unmove(b, bm)
-	@test b.white == bm.white
-	@test Set(b.P) == Set(bm.P)
-	@test Set(b.R) == Set(bm.R)
-	@test Set(b.N) == Set(bm.N)
-	@test Set(b.B) == Set(bm.B)
-	@test Set(b.Q) == Set(bm.Q)
-	@test b.K == bm.K
-	@test Set(b.A) == Set(bm.A)
-	@test b.black == bm.black
-	@test Set(b.p) == Set(bm.p)
-	@test Set(b.r) == Set(bm.r)
-	@test Set(b.n) == Set(bm.n)
-	@test Set(b.b) == Set(bm.b)
-	@test Set(b.q) == Set(bm.q)
-	@test b.k == bm.k
-	@test Set(b.a) == Set(bm.a)
+	@test b.white.P == bm.white.P
+	@test b.white.R == bm.white.R
+	@test b.white.N == bm.white.N
+	@test b.white.B == bm.white.B
+	@test b.white.Q == bm.white.Q
+	@test b.white.K == bm.white.K
+	@test Set(b.white.A) == Set(bm.white.A)
+	@test b.black.P == bm.black.P
+	@test b.black.R == bm.black.R
+	@test b.black.N == bm.black.N
+	@test b.black.B == bm.black.B
+	@test b.black.Q == bm.black.Q
+	@test b.black.K == bm.black.K
+	@test Set(b.black.A) == Set(bm.black.A)
 	@test b.free == bm.free
 	@test b.taken == bm.taken
 	@test b.white_attacks == bm.white_attacks
@@ -40,17 +38,17 @@ end
 		Bobby.PGN2UINT["e4"], "pawn", 
 		"none", "none", Bobby.EMPTY, "none")
 	bm = deepcopy(b)
-	bm = Bobby.move_piece(bm, m)
-	bm = Bobby.unmove_piece(bm, m, "white")
+	bm = Bobby.move_piece_(bm, m, "white", b.white, b.black)
+	bm = Bobby.unmove_piece_(bm, m, "white", b.white, b.black)
 	test_unmove(b, bm)
 
-	b = Bobby.fen_to_bitboard(
+	b = Bobby.fen_to_chessboard(
 		"r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 1 1")
 	m = Bobby.Move(Bobby.PGN2UINT["e1"], 
 		Bobby.PGN2UINT["f1"], "king", 
 		"none", "none", Bobby.EMPTY, "none")
 	bm = deepcopy(b)
-	bm = Bobby.move_piece(bm, m)
-	bm = Bobby.unmove_piece(bm, m, "white")
+	bm = Bobby.move_piece_(bm, m, "white", b.white, b.black)
+	bm = Bobby.unmove_piece_(bm, m, "white", b.white, b.black)
 	test_unmove(b, bm)
 end

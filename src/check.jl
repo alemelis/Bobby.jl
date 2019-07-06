@@ -64,12 +64,13 @@ function king_in_check(chessboard::Chessboard, color::String="white")
         if chessboard.white.K & chessboard.black_attacks == EMPTY
             return false
         end
+        return is_in_check(chessboard, chessboard.white.K, color)
     else
-        if chessboard.black.k & chessboard.white_attacks == EMPTY
+        if chessboard.black.K & chessboard.white_attacks == EMPTY
             return false
         end
+        return is_in_check(chessboard, chessboard.black.K, color)
     end
-    return kingtrace(chessboard, color)
 end
 
 
