@@ -56,27 +56,20 @@ function explore(pt::PerftTree, chessboard::Chessboard,
     end
 
     new_color = change_color(color)
-    # b = deepcopy(board)
     for m in moves
-        # newb = deepcopy(board)
-        println(m)
-
         if color == "white"
             chessboard = move_piece(chessboard, m, color,
                 chessboard.white, chessboard.black)
         else
             chessboard = move_piece(chessboard, m, color,
-                chessboard.black, chessboard.whit)
+                chessboard.black, chessboard.white)
         end
         update_both_sides_attacked!(chessboard)
-        # board = update_attacked(board)
         chessboard = update_castling_rights(chessboard)
 
         if depth == 1
             move_name = m.piece_type*"-"*UINT2PGN[m.source]*UINT2PGN[m.target]
         end
-        #     pt.divide[move_name] += 1
-        # end
 
         pt = explore(pt, chessboard, max_depth, depth+1, new_color, move_name)
         if color == "white"
@@ -84,17 +77,10 @@ function explore(pt::PerftTree, chessboard::Chessboard,
                 chessboard.white, chessboard.black)
         else
             chessboard = unmove_piece(chessboard, m, color,
-                chessboard.black, chessboard.whit)
+                chessboard.black, chessboard.white)
         end
         update_both_sides_attacked!(chessboard)
         chessboard = update_castling_rights(chessboard)
-        # test_unmove(b, board)
-        # if ~test_unmove(b, board)
-        #     println(move_name)
-        #     ugly_print(b.white)
-        #     ugly_print(board.white)
-        # end
-        # board = update_castling_rights(board)
     end
 
     return pt
