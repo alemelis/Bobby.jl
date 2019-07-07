@@ -62,10 +62,10 @@ function explore(pt::PerftTree, chessboard::Chessboard,
         println(m)
 
         if color == "white"
-            chessboard = move_piece_(chessboard, m, color,
+            chessboard = move_piece(chessboard, m, color,
                 chessboard.white, chessboard.black)
         else
-            chessboard = move_piece_(chessboard, m, color,
+            chessboard = move_piece(chessboard, m, color,
                 chessboard.black, chessboard.whit)
         end
         update_both_sides_attacked!(chessboard)
@@ -80,10 +80,10 @@ function explore(pt::PerftTree, chessboard::Chessboard,
 
         pt = explore(pt, chessboard, max_depth, depth+1, new_color, move_name)
         if color == "white"
-            chessboard = unmove_piece_(chessboard, m, color,
+            chessboard = unmove_piece(chessboard, m, color,
                 chessboard.white, chessboard.black)
         else
-            chessboard = unmove_piece_(chessboard, m, color,
+            chessboard = unmove_piece(chessboard, m, color,
                 chessboard.black, chessboard.whit)
         end
         update_both_sides_attacked!(chessboard)

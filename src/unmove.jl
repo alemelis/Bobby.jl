@@ -1,4 +1,4 @@
-function unmove_piece_(chessboard::Chessboard, move::Move, player_color::String,
+function unmove_piece(chessboard::Chessboard, move::Move, player_color::String,
     friends::Bitboard, enemy::Bitboard)
     pop!(chessboard.game)
 

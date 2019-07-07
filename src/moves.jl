@@ -99,7 +99,7 @@ function update_both_sides_bitboard!(chessboard::Chessboard)
 end
 
 
-function move_piece_(chessboard::Chessboard, move::Move, player_color::String,
+function move_piece(chessboard::Chessboard, move::Move, player_color::String,
     friends::Bitboard, enemy::Bitboard)
     push!(chessboard.game, player_color*move.piece_type*UINT2PGN[move.source])
 
@@ -219,19 +219,19 @@ end
 
 function validate_move(chessboard::Chessboard, move::Move, player_color::String)
     if player_color == "white"
-        chessboard = move_piece_(chessboard, move, player_color,
+        chessboard = move_piece(chessboard, move, player_color,
             chessboard.white, chessboard.black)
     else
-        chessboard = move_piece_(chessboard, move, player_color,
+        chessboard = move_piece(chessboard, move, player_color,
             chessboard.black, chessboard.white)
     end
     update_both_sides_attacked!(chessboard)
     in_check = king_in_check(chessboard, player_color)
     if player_color == "white"
-        chessboard_ = unmove_piece_(chessboard, move, player_color,
+        chessboard_ = unmove_piece(chessboard, move, player_color,
             chessboard.white, chessboard.black)
     else
-        chessboard_ = unmove_piece_(chessboard, move, player_color,
+        chessboard_ = unmove_piece(chessboard, move, player_color,
             chessboard.black, chessboard.white)
     end
     update_both_sides_attacked!(chessboard)

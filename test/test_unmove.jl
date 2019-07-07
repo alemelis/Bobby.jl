@@ -38,8 +38,8 @@ end
 		Bobby.PGN2UINT["e4"], "pawn", 
 		"none", "none", Bobby.EMPTY, "none")
 	bm = deepcopy(b)
-	bm = Bobby.move_piece_(bm, m, "white", b.white, b.black)
-	bm = Bobby.unmove_piece_(bm, m, "white", b.white, b.black)
+	bm = Bobby.move_piece(bm, m, "white", b.white, b.black)
+	bm = Bobby.unmove_piece(bm, m, "white", b.white, b.black)
 	test_unmove(b, bm)
 
 	b = Bobby.fen_to_chessboard(
@@ -48,7 +48,7 @@ end
 		Bobby.PGN2UINT["f1"], "king", 
 		"none", "none", Bobby.EMPTY, "none")
 	bm = deepcopy(b)
-	bm = Bobby.move_piece_(bm, m, "white", b.white, b.black)
-	bm = Bobby.unmove_piece_(bm, m, "white", b.white, b.black)
+	bm = Bobby.move_piece(bm, m, "white", b.white, b.black)
+	bm = Bobby.unmove_piece(bm, m, "white", b.white, b.black)
 	test_unmove(b, bm)
 end
