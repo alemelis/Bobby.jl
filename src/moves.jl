@@ -119,14 +119,12 @@ function move_piece(chessboard::Chessboard, move::Move, player_color::String,
 
     if move.piece_type == "pawn"
         if move.target == chessboard.enpassant_square
-            enemy.P = remove_from_square(enemy.P, move.target >> 8)
+            enemy.P = remove_from_square(enemy.P, enemy.one_step[move.target])
             chessboard.enpassant_done = true
         else
             chessboard.enpassant_done = false
-            if move.enpassant_square != EMPTY
-                chessboard.enpassant_square = move.enpassant_square
-            end
         end
+        chessboard.enpassant_square = move.enpassant_square
         friends.P = update_from_to_squares(friends.P, move.source, move.target)
     elseif move.piece_type == "night"
         friends.N = update_from_to_squares(friends.N, move.source, move.target)
@@ -218,6 +216,7 @@ end
 
 
 function validate_move(chessboard::Chessboard, move::Move, player_color::String)
+    # cb = deepcopy(chessboard)
     if player_color == "white"
         chessboard = move_piece(chessboard, move, player_color,
             chessboard.white, chessboard.black)
@@ -228,13 +227,15 @@ function validate_move(chessboard::Chessboard, move::Move, player_color::String)
     update_both_sides_attacked!(chessboard)
     in_check = king_in_check(chessboard, player_color)
     if player_color == "white"
-        chessboard_ = unmove_piece(chessboard, move, player_color,
+        chessboard = unmove_piece(chessboard, move, player_color,
             chessboard.white, chessboard.black)
     else
-        chessboard_ = unmove_piece(chessboard, move, player_color,
+        chessboard = unmove_piece(chessboard, move, player_color,
             chessboard.black, chessboard.white)
     end
     update_both_sides_attacked!(chessboard)
+    # cc = check_unmove(chessboard, cb)
+    # println(chessboard.enpassant_square, " ", cb.enpassant_square)
     return ~in_check
 end
 

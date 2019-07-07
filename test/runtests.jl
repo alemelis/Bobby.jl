@@ -52,6 +52,6 @@ end
     include("test_unmove.jl")
 end
 
-# @testset "perft.jl" begin
-#     include("test_perft.jl")
-# end
+@testset "perft.jl" begin
+    include("test_perft.jl")
+end
