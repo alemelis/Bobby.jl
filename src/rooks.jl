@@ -120,4 +120,3 @@ function get_sliding_pieces_moves!(sliding_moves::Array{Move,1}, ui::UInt64,
         end
     end
 end
-

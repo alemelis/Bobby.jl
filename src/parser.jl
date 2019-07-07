@@ -296,19 +296,20 @@ function fen_to_chessboard(fen_string::String)
     white_board = Bitboard(white, P, R, N, B, Q, K, A, "white",
         MASK_RANK_2, MASK_RANK_7, WHITE_PAWN_ONESTEP_MOVES,
         WHITE_PAWN_TWOSTEPS_MOVES, WHITE_PAWN_ATTACK, MASK_RANK_6,
-        WHITE_KING_HOME, F1, G1, D1, C1, H1, A1)
+        WHITE_KING_HOME, F1, G1, D1, C1, H1, A1,
+        white_king_moved, white_can_castle_kingside, white_can_castle_queenside)
 
     black_board = Bitboard(black, p, r, n, b, q, k, a, "black",
         MASK_RANK_7, MASK_RANK_2, BLACK_PAWN_ONESTEP_MOVES,
         BLACK_PAWN_TWOSTEPS_MOVES, BLACK_PAWN_ATTACK, MASK_RANK_3,
-        BLACK_KING_HOME, F8, G8, D8, C8, H8, A8)
+        BLACK_KING_HOME, F8, G8, D8, C8, H8, A8,
+        black_king_moved, black_can_castle_kingside, black_can_castle_queenside)
 
     chessboard = Chessboard(white_board, black_board, free, taken,
-        white_attacks, black_attacks, player_color, white_can_castle_queenside,
-        white_can_castle_kingside, black_can_castle_queenside,
-        black_can_castle_kingside, white_king_moved, black_king_moved,
+        white_attacks, black_attacks, player_color,
         enpassant_square, enpassant_done, halfmove_clock, fullmove_clock,
         fen_string, game)
-    # return update_attacked(board)
+
+    update_both_sides_attacked!(chessboard)
     return chessboard
 end

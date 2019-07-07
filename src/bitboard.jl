@@ -34,6 +34,10 @@ mutable struct Bitboard
     queen_side_castling_sq :: UInt64
     king_side_rook_sq :: UInt64
     queen_side_rook_sq :: UInt64
+
+    king_moved :: Bool
+    can_castle_kingside  :: Bool
+    can_castle_queenside :: Bool
 end
 
 
@@ -48,13 +52,6 @@ mutable struct Chessboard
     black_attacks :: UInt64
 
     player_color :: String
-
-    white_can_castle_queenside :: Bool
-    white_can_castle_kingside  :: Bool
-    black_can_castle_queenside :: Bool
-    black_can_castle_kingside  :: Bool
-    white_king_moved :: Bool
-    black_king_moved :: Bool
 
     enpassant_square :: UInt64
     enpassant_done :: Bool

@@ -18,12 +18,12 @@ function test_unmove(b, bm)
 	@test b.white_attacks == bm.white_attacks
 	@test b.black_attacks == bm.black_attacks
 	@test b.player_color == bm.player_color
-	@test b.white_can_castle_queenside == bm.white_can_castle_queenside
-    @test b.white_can_castle_kingside  == bm.white_can_castle_kingside 
-    @test b.black_can_castle_queenside == bm.black_can_castle_queenside
-    @test b.black_can_castle_kingside  == bm.black_can_castle_kingside 
-    @test b.white_king_moved == bm.white_king_moved
-    @test b.black_king_moved == bm.black_king_moved
+	@test b.white.can_castle_queenside == bm.white.can_castle_queenside
+    @test b.white.can_castle_kingside  == bm.white.can_castle_kingside 
+    @test b.black.can_castle_queenside == bm.black.can_castle_queenside
+    @test b.black.can_castle_kingside  == bm.black.can_castle_kingside 
+    @test b.white.king_moved == bm.white.king_moved
+    @test b.black.king_moved == bm.black.king_moved
     @test b.enpassant_square == bm.enpassant_square
     @test b.enpassant_done == bm.enpassant_done
     @test b.halfmove_clock == bm.halfmove_clock

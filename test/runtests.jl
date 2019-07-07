@@ -12,13 +12,13 @@ function test_fen(fen, depth, result)
     end
 end
 
-# @testset "parser.jl" begin
-#     include("test_parser.jl")
-# end
+@testset "parser.jl" begin
+    include("test_parser.jl")
+end
 
-# @testset "converters.jl" begin
-#     include("test_converters.jl")
-# end
+@testset "converters.jl" begin
+    include("test_converters.jl")
+end
 
 @testset "nights.jl" begin
     include("test_nights.jl")
@@ -52,6 +52,6 @@ end
     include("test_unmove.jl")
 end
 
-@testset "perft.jl" begin
-    include("test_perft.jl")
-end
+# @testset "perft.jl" begin
+#     include("test_perft.jl")
+# end

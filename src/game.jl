@@ -43,6 +43,7 @@ function ask_for_promotion()
     end
 end
 
+
 function play(human_color::String="white")
     b = set_board()
     check = false
