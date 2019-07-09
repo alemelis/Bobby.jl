@@ -101,7 +101,7 @@ function check_unmove(b, bm)
         @assert b.white.king_moved == bm.white.king_moved
         @assert b.black.king_moved == bm.black.king_moved
         @assert b.enpassant_square == bm.enpassant_square
-        # @assert b.enpassant_done == bm.enpassant_done
+        @assert b.enpassant_done == bm.enpassant_done
         @assert b.halfmove_clock == bm.halfmove_clock
         @assert b.fullmove_clock == bm.fullmove_clock
         @assert b.fen == bm.fen
