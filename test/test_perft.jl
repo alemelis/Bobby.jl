@@ -11,10 +11,10 @@ end
     # [48, 2039, 97862, 4085603]
 end
 
-# @testset "perft3" begin
-#     @test test_fen("8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 1 1", 2, [14, 191])
-#     # [14, 191, 2812, 43238]
-# end
+@testset "perft3" begin
+    @test test_fen("8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 1 1", 2, [14, 191])
+    # [14, 191, 2812, 43238]
+end
 
 @testset "perft4" begin
     @test test_fen(

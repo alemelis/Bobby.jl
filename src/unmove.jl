@@ -29,12 +29,11 @@ function unmove_piece(chessboard::Chessboard, move::Move, player_color::String,
         end
     end
 
+    chessboard.enpassant_square = move.enpassant_square
     if move.piece_type == "pawn"
         if chessboard.enpassant_done
             enemy.P = add_to_square(enemy.P, enemy.one_step[move.target])
             chessboard.enpassant_square = move.target
-        else
-            chessboard.enpassant_square = move.enpassant_square
         end
         chessboard.enpassant_done = false
         friends.P = update_from_to_squares(friends.P, move.target, move.source)

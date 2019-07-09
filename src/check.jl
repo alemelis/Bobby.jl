@@ -1,60 +1,39 @@
+function is_in_check(board::Bitboard, ui::UInt64, taken::UInt64)
+    if ui & board.A[1] != EMPTY
+        return true
+    end
+    if ui & board.A[2] != EMPTY
+        return true
+    end
+    if ui & board.A[4] != EMPTY ||
+     ui & board.A[3] != EMPTY
+        squares, edges = orthogonal_attack(taken, ui)
+        for square in edges
+            if board.R & square != EMPTY || 
+                board.Q & square != EMPTY
+                return true
+            end
+        end
+    end
+    if ui & board.A[5] != EMPTY ||
+     ui & board.A[3] != EMPTY
+        squares, edges = cross_attack(taken, ui)
+        for square in edges
+            if board.B & square != EMPTY || 
+                board.Q & square != EMPTY
+                return true
+            end
+        end
+    end
+    return false
+end
+
+
 function is_in_check(chessboard::Chessboard, ui::UInt64, color::String)
     if color == "white"
-        if ui & chessboard.black.A[1] != EMPTY
-            return true
-        end
-        if ui & chessboard.black.A[2] != EMPTY
-            return true
-        end
-        if ui & chessboard.black.A[4] != EMPTY ||
-         ui & chessboard.black.A[3] != EMPTY
-            squares, edges = orthogonal_attack(chessboard.taken, ui)
-            for square in edges
-                if chessboard.black.R & square != EMPTY || 
-                    chessboard.black.Q & square != EMPTY
-                    return true
-                end
-            end
-        end
-        if ui & chessboard.black.A[5] != EMPTY ||
-         ui & chessboard.black.A[3] != EMPTY
-            squares, edges = cross_attack(chessboard.taken, ui)
-            for square in edges
-                if chessboard.black.B & square != EMPTY || 
-                    chessboard.black.Q & square != EMPTY
-                    return true
-                end
-            end
-        end
-        return false
+        return is_in_check(chessboard.black, ui, chessboard.taken)
     else
-        if ui & chessboard.white.A[1] != EMPTY
-            return true
-        end
-        if ui & chessboard.white.A[2] != EMPTY
-            return true
-        end
-        if ui & chessboard.white.A[4] != EMPTY ||
-         ui & chessboard.white.A[3] != EMPTY
-            squares, edges = orthogonal_attack(chessboard.taken, ui)
-            for square in edges
-                if chessboard.white.R & square != EMPTY || 
-                    chessboard.white.Q & square != EMPTY
-                    return true
-                end
-            end
-        end
-        if ui & chessboard.white.A[5] != EMPTY ||
-         ui & chessboard.white.A[3] != EMPTY
-            squares, edges = cross_attack(chessboard.taken, ui)
-            for square in edges
-                if chessboard.white.B & square != EMPTY || 
-                    chessboard.white.Q & square != EMPTY
-                    return true
-                end
-            end
-        end
-        return false
+        return is_in_check(chessboard.white, ui, chessboard.taken)
     end
 end
 

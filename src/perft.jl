@@ -52,6 +52,11 @@ function explore(pt::PerftTree, chessboard::Chessboard,
     end
 
     if depth == max_depth
+        # if move_name == "pawn-e2e4"
+        #     for m in moves
+        #         println(m.piece_type*"-"*UINT2PGN[m.source]*UINT2PGN[m.target])
+        #     end
+        # end
         return pt
     end
 
@@ -70,6 +75,7 @@ function explore(pt::PerftTree, chessboard::Chessboard,
         if depth == 1
             move_name = m.piece_type*"-"*UINT2PGN[m.source]*UINT2PGN[m.target]
         end
+        
 
         pt = explore(pt, chessboard, max_depth, depth+1, new_color, move_name)
         if color == "white"
