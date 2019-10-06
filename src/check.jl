@@ -53,20 +53,6 @@ function king_in_check(chessboard::Chessboard, color::String="white")
 end
 
 
-# function king_in_check(board::Bitboard, color::String="white")
-#     if color == "white"
-#         if board.K & board.black_attacks == EMPTY
-#             return false
-#         end
-#     else
-#         if board.k & board.white_attacks == EMPTY
-#             return false
-#         end
-#     end
-#     return kingtrace(board, color)
-# end
-
-
 function square_in_check(board::Bitboard, ui::UInt64, color::String="white")
     if color == "white"
         if ui & board.a[1] != EMPTY
@@ -138,23 +124,6 @@ function square_in_check(board::Bitboard, ui::UInt64, color::String="white")
         return false
     end
 end
-
-
-# function kingtrace(board::Bitboard, color::String="white")
-#     if color == "white"
-#         return square_in_check(board, board.K, color)
-#     else
-#         return square_in_check(board, board.k, color)
-#     end
-# end
-
-# function kingtrace(chessboard::Chessboard, color::String="white")
-#     if color == "white"
-#         return square_in_check(chessboard.white, chessboard.white.K, color)
-#     else
-#         return square_in_check(chessboard.black, chessboard.black.K, color)
-#     end
-# end
 
 
 function check_mate(board::Bitboard, color::String="white")

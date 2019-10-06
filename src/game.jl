@@ -45,6 +45,7 @@ function validate_promotion_type(promotion_type::String)
     return true
 end
 
+
 function ask_for_promotion()
     while true
         println("Promove to [queen], [rook], k[night], or [bishop]?")
