@@ -1,10 +1,22 @@
 function validate_uci_move(uci_move::String)
-    if  ~occursin(r"[a-h][1-8] [a-h][1-8] [queen, rook, night, bishop, none]", 
-        uci_move)
+    if split(uci_move, ' ') == 3
+        if  ~occursin(r"[a-h][1-8] [a-h][1-8] [queen, rook, night, bishop]", 
+            uci_move)
+            println("wrong move format, try again")
+            return false
+        end
+        return true
+    elseif split(uci_move, ' ') == 2
+        if  ~occursin(r"[a-h][1-8] [a-h][1-8]", 
+            uci_move)
+            println("wrong move format, try again")
+            return false
+        end
+        return true
+    else
         println("wrong move format, try again")
-        return false
+        return false 
     end
-    return true
 end
 
 
@@ -51,7 +63,7 @@ function play(human_color::String="white")
     while true
         pretty_print(b)
 
-        moves = get_all_valid_moves(b, b.player_color)
+        moves = get_all_legal_moves(b, b.player_color)
         if length(moves) == 0
             if check
                 println("check mate!")
