@@ -38,24 +38,37 @@ function get_king_moves!(king_moves::Array{Move,1}, ui::UInt64,
                 if chessboard.free & friends.king_side_1st_sq != EMPTY &&
                     chessboard.free & friends.king_side_castling_sq != EMPTY &&
                     rooks & friends.king_side_rook_sq != EMPTY
-                    if ~is_in_check(chessboard, friends.king_home_sq, player_color) && #!!!
-                        ~is_in_check(chessboard, friends.king_side_1st_sq, player_color) &&
-                        ~is_in_check(chessboard, friends.king_side_castling_sq, player_color)
-                        push!(king_moves, Move(ui, friends.king_side_castling_sq,
-                            "king", "none", "none", EMPTY, "K"))
+                    if ~is_in_check(
+                        chessboard, friends.king_home_sq, player_color) && #!!!
+                        ~is_in_check(
+                            chessboard, friends.king_side_1st_sq,
+                            player_color) &&
+                        ~is_in_check(
+                            chessboard, friends.king_side_castling_sq,
+                            player_color)
+                        push!(king_moves, Move(
+                            ui, friends.king_side_castling_sq, "king", "none",
+                            "none", EMPTY, "K"))
                     end
                 end
             end
             if friends.can_castle_queenside == true
                 if chessboard.free & friends.queen_side_1st_sq != EMPTY &&
                     chessboard.free & friends.queen_side_castling_sq != EMPTY &&
-                    chessboard.free & friends.queen_side_rook_sq >> 1 != EMPTY &&
+                    chessboard.free & 
+                    friends.queen_side_rook_sq >> 1 != EMPTY &&
                     rooks & friends.queen_side_rook_sq != EMPTY
-                    if ~is_in_check(chessboard, friends.king_home_sq, player_color) &&
-                        ~is_in_check(chessboard, friends.queen_side_1st_sq, player_color) &&
-                        ~is_in_check(chessboard, friends.queen_side_castling_sq, player_color)
-                        push!(king_moves, Move(ui, friends.queen_side_castling_sq,
-                            "king", "none", "none", EMPTY, "Q"))
+                    if ~is_in_check(
+                        chessboard, friends.king_home_sq, player_color) &&
+                        ~is_in_check(
+                            chessboard, friends.queen_side_1st_sq,
+                            player_color) &&
+                        ~is_in_check(
+                            chessboard, friends.queen_side_castling_sq,
+                            player_color)
+                        push!(king_moves, Move(
+                            ui, friends.queen_side_castling_sq, "king", "none",
+                            "none", EMPTY, "Q"))
                     end
                 end
             end

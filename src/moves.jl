@@ -18,7 +18,6 @@ end
 
 
 function find_all_semi_legal_moves(chessboard::Chessboard, player_color::String)
-    semi_legal_moves = Array{Move,1}()
     if player_color == "white"
         friends = chessboard.white
         enemy = chessboard.black
@@ -29,6 +28,7 @@ function find_all_semi_legal_moves(chessboard::Chessboard, player_color::String)
         rooks = chessboard.black.R
     end
 
+    semi_legal_moves = Array{Move,1}()
     for i in 1:64
         ui = INT2UINT[i]
 
