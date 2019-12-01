@@ -1,6 +1,7 @@
 function unmove_piece(chessboard::Chessboard, move::Move, player_color::String,
     friends::Bitboard, enemy::Bitboard)
     pop!(chessboard.game)
+    pop!(chessboard.enpassant_history)
 
     if move.capture_type != "none"
         if move.capture_type == "pawn"
@@ -29,13 +30,10 @@ function unmove_piece(chessboard::Chessboard, move::Move, player_color::String,
         end
     end
 
-    chessboard.enpassant_square = move.enpassant_square
     if move.piece_type == "pawn"
-        if chessboard.enpassant_done
+        if move.took_enpassant != EMPTY
             enemy.P = add_to_square(enemy.P, enemy.one_step[move.target])
-            chessboard.enpassant_square = move.target
         end
-        chessboard.enpassant_done = false
         friends.P = update_from_to_squares(friends.P, move.target, move.source)
     elseif move.piece_type == "night"
         friends.N = update_from_to_squares(friends.N, move.target, move.source)

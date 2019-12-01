@@ -25,7 +25,6 @@ function test_unmove(b, bm)
     @test b.white.king_moved == bm.white.king_moved
     @test b.black.king_moved == bm.black.king_moved
     @test b.enpassant_square == bm.enpassant_square
-    @test b.enpassant_done == bm.enpassant_done
     @test b.halfmove_clock == bm.halfmove_clock
     @test b.fullmove_clock == bm.fullmove_clock
     @test b.fen == bm.fen

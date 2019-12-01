@@ -55,13 +55,13 @@ mutable struct Chessboard
     player_color :: String
 
     enpassant_square :: UInt64 # the one available
-    enpassant_done :: Bool
 
     halfmove_clock :: Int64
     fullmove_clock :: Int64 # start at 1, increment for each black move
 
     fen :: String
     game :: Array{String,1}
+    enpassant_history :: Array{UInt64,1}
 end
 
 

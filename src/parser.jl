@@ -117,7 +117,6 @@ function fen_to_bitboard(fen_string::String)
     end
     
     enpassant_square = EMPTY
-    enpassant_done = false
     if fen[4] != "-"
         enpassant_square = PGN2UINT[fen[4]]
     end 
@@ -147,7 +146,6 @@ function fen_to_bitboard(fen_string::String)
                     black_can_castle_kingside,
                     white_king_moved, black_king_moved,
                     enpassant_square,
-                    enpassant_done,
                     halfmove_clock, fullmove_clock,
                     fen_string, game)
     return update_attacked(board)
@@ -273,7 +271,6 @@ function fen_to_chessboard(fen_string::String)
     end
     
     enpassant_square = EMPTY
-    enpassant_done = false
     if fen[4] != "-"
         enpassant_square = PGN2UINT[fen[4]]
     end 
@@ -289,6 +286,7 @@ function fen_to_chessboard(fen_string::String)
     end
 
     game = Array{String,1}[]
+    enpassant_history = Array{UInt64,1}[]
     
     A = [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY]
     a = [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY]
@@ -307,8 +305,8 @@ function fen_to_chessboard(fen_string::String)
 
     chessboard = Chessboard(white_board, black_board, free, taken,
         white_attacks, black_attacks, player_color,
-        enpassant_square, enpassant_done, halfmove_clock, fullmove_clock,
-        fen_string, game)
+        enpassant_square, halfmove_clock, fullmove_clock,
+        fen_string, game, enpassant_history)
 
     update_both_sides_attacked!(chessboard)
     return chessboard

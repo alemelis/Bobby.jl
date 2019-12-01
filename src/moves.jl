@@ -94,6 +94,11 @@ end
 function update_both_sides_bitboard!(chessboard::Chessboard)
     update_side_bitboards!(chessboard.white)
     update_side_bitboards!(chessboard.black)
+    if length(chessboard.enpassant_history) > 0
+        chessboard.enpassant_square = chessboard.enpassant_history[end]
+    else
+        chessboard.enpassant_square = EMPTY
+    end
     chessboard.taken = EMPTY | chessboard.white.pieces | chessboard.black.pieces
     chessboard.free = ~chessboard.taken
 end
@@ -102,6 +107,7 @@ end
 function move_piece(chessboard::Chessboard, move::Move, player_color::String,
     friends::Bitboard, enemy::Bitboard)
     push!(chessboard.game, player_color*move.piece_type*UINT2PGN[move.source])
+    push!(chessboard.enpassant_history, move.enpassant_square)
 
     if move.capture_type != "none"
         if move.capture_type == "pawn"
@@ -118,11 +124,8 @@ function move_piece(chessboard::Chessboard, move::Move, player_color::String,
     end
 
     if move.piece_type == "pawn"
-        if move.target == chessboard.enpassant_square
+        if move.took_enpassant != EMPTY
             enemy.P = remove_from_square(enemy.P, enemy.one_step[move.target])
-            chessboard.enpassant_done = true
-        else
-            chessboard.enpassant_done = false
         end
         friends.P = update_from_to_squares(friends.P, move.source, move.target)
     elseif move.piece_type == "night"
