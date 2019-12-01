@@ -29,6 +29,7 @@ function test_unmove(b, bm)
     @test b.fullmove_clock == bm.fullmove_clock
     @test b.fen == bm.fen
     @test b.game == bm.game
+    @test b.enpassant_history == bm.enpassant_history
 end
 
 @testset "unmove" begin
@@ -37,8 +38,8 @@ end
 		Bobby.PGN2UINT["e4"], "pawn", 
 		"none", "none", Bobby.EMPTY, "none", Bobby.EMPTY)
 	bm = deepcopy(b)
-	bm = Bobby.move_piece(bm, m, "white", b.white, b.black)
-	bm = Bobby.unmove_piece(bm, m, "white", b.white, b.black)
+	Bobby.move_piece!(bm, m, "white", b.white, b.black)
+	Bobby.unmove_piece!(bm, m, "white", b.white, b.black)
 	test_unmove(b, bm)
 
 	b = Bobby.fen_to_chessboard(
@@ -47,7 +48,7 @@ end
 		Bobby.PGN2UINT["f1"], "king", 
 		"none", "none", Bobby.EMPTY, "none", Bobby.EMPTY)
 	bm = deepcopy(b)
-	bm = Bobby.move_piece(bm, m, "white", b.white, b.black)
-	bm = Bobby.unmove_piece(bm, m, "white", b.white, b.black)
+	Bobby.move_piece!(bm, m, "white", b.white, b.black)
+	Bobby.unmove_piece!(bm, m, "white", b.white, b.black)
 	test_unmove(b, bm)
 end
