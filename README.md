@@ -54,5 +54,4 @@ Moves should be entered in UCI format, e.g. `e2 e4`. In case a pawn can be promo
 if you want to play a proper game try [Chess.jl](https://github.com/abahm/Chess.jl)
 
 ## Possible speed-ups
-- [ ] unmove (instead of `deepcopy`ing board)
 - [ ] [magic](http://pradu.us/old/Nov27_2008/Buzz/research/magic/Bitboards.pdf) [bitboards](https://www.chessprogramming.org/Magic_Bitboards)
