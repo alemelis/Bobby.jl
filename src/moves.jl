@@ -159,14 +159,6 @@ function move_piece!(chessboard::Chessboard, move::Move, player_color::String,
         end
     end
 
-    # if player_color == "white"
-    #     chessboard.white = friends
-    #     chessboard.black = enemy
-    # else
-    #     chessboard.white = enemy
-    #     chessboard.black = friends
-    # end
-
     update_both_sides_bitboard!(chessboard)
 end
 
@@ -248,24 +240,6 @@ end
 
 
 function update_castling_rights!(chessboard::Chessboard)
-    # if chessboard.white.K == E1
-    #     chessboard.white.king_moved = false
-    # end
-    # if A1 == chessboard.white.R
-    #     chessboard.white.can_castle_queenside = true
-    # end
-    # if H1 == chessboard.white.R
-    #     chessboard.white.can_castle_kingside = true
-    # end
-    # if chessboard.black.K == E8
-    #     chessboard.black.king_moved = false
-    # end
-    # if A8 == chessboard.black.R
-    #     chessboard.black.can_castle_queenside = true
-    # end
-    # if H8 == chessboard.black.R
-    #     chessboard.black.can_castle_kingside = true
-    # end
     for move in chessboard.game
         if move == "whitekinge1"
             chessboard.white.king_moved = true

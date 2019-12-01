@@ -58,13 +58,5 @@ function unmove_piece!(chessboard::Chessboard, move::Move, player_color::String,
         end
     end
 
-    # if player_color == "white"
-    #     chessboard.white = friends
-    #     chessboard.black = enemy
-    # else
-    #     chessboard.white = enemy
-    #     chessboard.black = friends
-    # end
-
     update_both_sides_bitboard!(chessboard)
 end
