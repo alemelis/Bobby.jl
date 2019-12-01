@@ -159,8 +159,9 @@ function get_pawn_moves!(pawn_moves::Array{Move,1}, ui::UInt64,
                 push!(pawn_moves, Move(ui, attack, "pawn",
                     get_piece_type(enemy, attack), "none", EMPTY, "-", EMPTY))
             end
-        elseif attack == enpassant_square &&
-            attack & friends.enpassant_rank != EMPTY # use enpassant square
+        elseif attack == enpassant_square
+         # &&
+            # attack & friends.enpassant_rank != EMPTY
             push!(pawn_moves, Move(ui, attack, "pawn", "none", "none",
                 EMPTY, "-", enemy.one_step[attack]))
         end
