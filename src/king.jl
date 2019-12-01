@@ -48,7 +48,7 @@ function get_king_moves!(king_moves::Array{Move,1}, ui::UInt64,
                             player_color)
                         push!(king_moves, Move(
                             ui, friends.king_side_castling_sq, "king", "none",
-                            "none", EMPTY, "K"))
+                            "none", EMPTY, "K", EMPTY))
                     end
                 end
             end
@@ -68,7 +68,7 @@ function get_king_moves!(king_moves::Array{Move,1}, ui::UInt64,
                             player_color)
                         push!(king_moves, Move(
                             ui, friends.queen_side_castling_sq, "king", "none",
-                            "none", EMPTY, "Q"))
+                            "none", EMPTY, "Q", EMPTY))
                     end
                 end
             end
@@ -78,10 +78,10 @@ function get_king_moves!(king_moves::Array{Move,1}, ui::UInt64,
     for move in KING_MOVES[ui]
         if move & friends.pieces == EMPTY && move & enemy.pieces == EMPTY
             push!(king_moves, Move(ui, move,
-                "king", "none", "none", EMPTY, "-"))
+                "king", "none", "none", EMPTY, "-", EMPTY))
         elseif move & friends.pieces == EMPTY && move & enemy.pieces != EMPTY
             push!(king_moves, Move(ui, move,
-                "king", get_piece_type(enemy, move), "none", EMPTY, "-"))
+                "king", get_piece_type(enemy, move), "none", EMPTY, "-", EMPTY))
         end
     end
 end

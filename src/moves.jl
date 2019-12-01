@@ -117,7 +117,6 @@ function move_piece(chessboard::Chessboard, move::Move, player_color::String,
         end
     end
 
-    
     if move.piece_type == "pawn"
         if move.target == chessboard.enpassant_square
             enemy.P = remove_from_square(enemy.P, enemy.one_step[move.target])

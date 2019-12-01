@@ -4,8 +4,9 @@ struct Move
     piece_type :: String
     capture_type :: String
     promotion_type :: String
-    enpassant_square :: UInt64
+    enpassant_square :: UInt64 # the one which becomes available
     castling_type :: String
+    took_enpassant :: UInt64 # the one used to take the opponent pawn
 end
 
 
@@ -53,7 +54,7 @@ mutable struct Chessboard
 
     player_color :: String
 
-    enpassant_square :: UInt64
+    enpassant_square :: UInt64 # the one available
     enpassant_done :: Bool
 
     halfmove_clock :: Int64

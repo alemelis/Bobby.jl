@@ -25,10 +25,10 @@ function get_night_moves!(night_moves::Array{Move,1}, ui::UInt64,
     for jump in NIGHT_MOVES[ui]
         if jump & friends == EMPTY && jump & enemy.pieces == EMPTY
             push!(night_moves, Move(
-                ui, jump, "night", "none", "none", EMPTY, "-"))
+                ui, jump, "night", "none", "none", EMPTY, "-", EMPTY))
         elseif jump & friends == EMPTY && jump & enemy.pieces != EMPTY
             push!(night_moves, Move(ui, jump, "night",
-                get_piece_type(enemy, jump), "none", EMPTY, "-"))
+                get_piece_type(enemy, jump), "none", EMPTY, "-", EMPTY))
         end
     end
 end

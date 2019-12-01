@@ -5,22 +5,18 @@ function is_in_check(board::Bitboard, ui::UInt64, taken::UInt64)
     if ui & board.A[2] != EMPTY
         return true
     end
-    if ui & board.A[4] != EMPTY ||
-     ui & board.A[3] != EMPTY
+    if ui & board.A[4] != EMPTY || ui & board.A[3] != EMPTY
         squares, edges = orthogonal_attack(taken, ui)
         for square in edges
-            if board.R & square != EMPTY || 
-                board.Q & square != EMPTY
+            if board.R & square != EMPTY || board.Q & square != EMPTY
                 return true
             end
         end
     end
-    if ui & board.A[5] != EMPTY ||
-     ui & board.A[3] != EMPTY
+    if ui & board.A[5] != EMPTY || ui & board.A[3] != EMPTY
         squares, edges = cross_attack(taken, ui)
         for square in edges
-            if board.B & square != EMPTY || 
-                board.Q & square != EMPTY
+            if board.B & square != EMPTY || board.Q & square != EMPTY
                 return true
             end
         end

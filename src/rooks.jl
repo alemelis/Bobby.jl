@@ -107,16 +107,16 @@ function get_sliding_pieces_moves!(sliding_moves::Array{Move,1}, ui::UInt64,
     moves, edges = attack_fun(moves, edges, taken, ui)
     while length(moves) > 0
         push!(sliding_moves, Move(ui, pop!(moves), piece_type,
-            "none", "none", EMPTY, "-"))
+            "none", "none", EMPTY, "-", EMPTY))
     end
     while length(edges) > 0
         edge = pop!(edges)
         if edge & friends == EMPTY && edge & enemy.pieces == EMPTY
             push!(sliding_moves, Move(ui, edge, piece_type, "none", "none",
-                EMPTY, "-"))
+                EMPTY, "-", EMPTY))
         elseif edge & friends == EMPTY && edge & enemy.pieces != EMPTY
             push!(sliding_moves, Move(ui, edge, piece_type,
-                get_piece_type(enemy, edge), "none", EMPTY, "-"))
+                get_piece_type(enemy, edge), "none", EMPTY, "-", EMPTY))
         end
     end
 end

@@ -46,7 +46,7 @@ end
 end
 
 @testset "perft7" begin
-    res = [60] #, 2608, 113742, 4812099]
+    res = [60, 2608] #, 113742, 4812099]
     @test test_fen(
         "r3k2r/1bp2pP1/5n2/1P1Q4/1pPq4/5N2/1B1P2p1/R3K2R b KQkq c3 0 1",
          length(res), res)

@@ -120,7 +120,7 @@ function add_promotions!(pawn_moves::Array{Move,1}, source::UInt64,
 
     for promotion_type in ["queen", "rook", "night", "bishop"]
         push!(pawn_moves, Move(source, target, "pawn", taken_piece,
-            promotion_type, EMPTY, "-"))
+            promotion_type, EMPTY, "-", EMPTY))
     end
 end
 
@@ -136,13 +136,13 @@ function get_pawn_moves!(pawn_moves::Array{Move,1}, ui::UInt64,
         else
             # move once
             push!(pawn_moves, Move(ui, friends.one_step[ui], "pawn", "none",
-                "none", EMPTY, "-"))
+                "none", EMPTY, "-", EMPTY))
 
             # move twice and take note of the en-passant square
             if ui & friends.home_rank != EMPTY
                 if friends.two_steps[ui] & taken == EMPTY
                     push!(pawn_moves, Move(ui, friends.two_steps[ui], "pawn",
-                        "none", "none", friends.one_step[ui], "-"))
+                        "none", "none", friends.one_step[ui], "-", EMPTY))
                 end
             end
         end
@@ -157,12 +157,12 @@ function get_pawn_moves!(pawn_moves::Array{Move,1}, ui::UInt64,
                     get_piece_type(enemy, attack))
             else
                 push!(pawn_moves, Move(ui, attack, "pawn",
-                    get_piece_type(enemy, attack), "none", EMPTY, "-"))
+                    get_piece_type(enemy, attack), "none", EMPTY, "-", EMPTY))
             end
         elseif attack == enpassant_square &&
             attack & friends.enpassant_rank != EMPTY # use enpassant square
             push!(pawn_moves, Move(ui, attack, "pawn", "none", "none",
-                EMPTY, "-"))
+                EMPTY, "-", enemy.one_step[attack]))
         end
     end
 end

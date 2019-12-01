@@ -36,7 +36,7 @@ end
 	b = Bobby.set_board()
 	m = Bobby.Move(Bobby.PGN2UINT["e2"], 
 		Bobby.PGN2UINT["e4"], "pawn", 
-		"none", "none", Bobby.EMPTY, "none")
+		"none", "none", Bobby.EMPTY, "none", Bobby.EMPTY)
 	bm = deepcopy(b)
 	bm = Bobby.move_piece(bm, m, "white", b.white, b.black)
 	bm = Bobby.unmove_piece(bm, m, "white", b.white, b.black)
@@ -46,7 +46,7 @@ end
 		"r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 1 1")
 	m = Bobby.Move(Bobby.PGN2UINT["e1"], 
 		Bobby.PGN2UINT["f1"], "king", 
-		"none", "none", Bobby.EMPTY, "none")
+		"none", "none", Bobby.EMPTY, "none", Bobby.EMPTY)
 	bm = deepcopy(b)
 	bm = Bobby.move_piece(bm, m, "white", b.white, b.black)
 	bm = Bobby.unmove_piece(bm, m, "white", b.white, b.black)
