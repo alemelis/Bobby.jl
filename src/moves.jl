@@ -30,11 +30,10 @@ function find_all_semi_legal_moves(chessboard::Chessboard, player_color::String)
 
     semi_legal_moves = Array{Move,1}()
     for i in 1:64
-        ui = INT2UINT[i]
-
-        if ui & chessboard.taken == EMPTY
+        if INT2UINT[i] & chessboard.taken == EMPTY
             continue
         end
+        ui = INT2UINT[i]
         
         piece_color = get_piece_color(chessboard, ui)
         if piece_color != player_color
@@ -123,7 +122,21 @@ function move_piece!(chessboard::Chessboard, move::Move, player_color::String,
         if move.took_enpassant != EMPTY
             enemy.P = remove_from_square(enemy.P, move.took_enpassant)            
         end
-        friends.P = update_from_to_squares(friends.P, move.source, move.target)
+        if move.promotion_type != "none"
+            friends.P = remove_from_square(friends.P, move.source)
+            if move.promotion_type == "queen"
+                friends.Q = add_to_square(friends.Q, move.target)
+            elseif move.promotion_type == "rook"
+                friends.R = add_to_square(friends.R, move.target)
+            elseif move.promotion_type == "night"
+                friends.N = add_to_square(friends.N, move.target)
+            elseif move.promotion_type == "bishop"
+                friends.B = add_to_square(friends.B, move.target)
+            end
+        else
+            friends.P = update_from_to_squares(friends.P, move.source,
+                move.target)
+        end
     elseif move.piece_type == "night"
         friends.N = update_from_to_squares(friends.N, move.source, move.target)
     elseif move.piece_type == "bishop"
@@ -146,26 +159,13 @@ function move_piece!(chessboard::Chessboard, move::Move, player_color::String,
         end
     end
 
-    if move.promotion_type != "none"
-        friends.P = remove_from_square(friends.P, move.target)
-        if move.promotion_type == "queen"
-            friends.Q = add_to_square(friends.Q, move.target)
-        elseif move.promotion_type == "rook"
-            friends.R = add_to_square(friends.R, move.target)
-        elseif move.promotion_type == "night"
-            friends.N = add_to_square(friends.N, move.target)
-        elseif move.promotion_type == "bishop"
-            friends.B = add_to_square(friends.B, move.target)
-        end
-    end
-    
-    if player_color == "white"
-        chessboard.white = friends
-        chessboard.black = enemy
-    else
-        chessboard.white = enemy
-        chessboard.black = friends
-    end
+    # if player_color == "white"
+    #     chessboard.white = friends
+    #     chessboard.black = enemy
+    # else
+    #     chessboard.white = enemy
+    #     chessboard.black = friends
+    # end
 
     update_both_sides_bitboard!(chessboard)
 end
@@ -248,24 +248,24 @@ end
 
 
 function update_castling_rights!(chessboard::Chessboard)
-    if chessboard.white.K == E1
-        chessboard.white.king_moved = false
-    end
-    if A1 == chessboard.white.R
-        chessboard.white.can_castle_queenside = true
-    end
-    if H1 == chessboard.white.R
-        chessboard.white.can_castle_kingside = true
-    end
-    if chessboard.black.K == E8
-        chessboard.black.king_moved = false
-    end
-    if A8 == chessboard.black.R
-        chessboard.black.can_castle_queenside = true
-    end
-    if H8 == chessboard.black.R
-        chessboard.black.can_castle_kingside = true
-    end
+    # if chessboard.white.K == E1
+    #     chessboard.white.king_moved = false
+    # end
+    # if A1 == chessboard.white.R
+    #     chessboard.white.can_castle_queenside = true
+    # end
+    # if H1 == chessboard.white.R
+    #     chessboard.white.can_castle_kingside = true
+    # end
+    # if chessboard.black.K == E8
+    #     chessboard.black.king_moved = false
+    # end
+    # if A8 == chessboard.black.R
+    #     chessboard.black.can_castle_queenside = true
+    # end
+    # if H8 == chessboard.black.R
+    #     chessboard.black.can_castle_kingside = true
+    # end
     for move in chessboard.game
         if move == "whitekinge1"
             chessboard.white.king_moved = true

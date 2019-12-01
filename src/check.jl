@@ -120,22 +120,3 @@ function square_in_check(board::Bitboard, ui::UInt64, color::String="white")
         return false
     end
 end
-
-
-function check_mate(board::Bitboard, color::String="white")
-    if color == "white"
-        king = board.K
-    else
-        king = board.k
-    end
-
-    if length(get_current_king_valid(board, color)) != 0
-        return false
-    else
-        if length(get_all_valid_moves(board, color)) == 0
-            return true
-        else
-            return false
-        end
-    end
-end
