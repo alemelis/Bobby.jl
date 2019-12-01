@@ -1,10 +1,10 @@
 using Test
 using Bobby
 
-function test_fen(fen, depth, result)
-    b = Bobby.fen_to_bitboard(fen)
+function test_fen(fen, depth, results)
+    b = Bobby.fen_to_chessboard(fen)
     pt = Bobby.perft(b, depth, b.player_color)
-    if pt.nodes == result
+    if pt.nodes == results
         return true
     else
         println(pt.nodes)
@@ -48,6 +48,10 @@ end
     include("test_check.jl")
 end
 
-# @testset "perft.jl" begin
-#     include("test_perft.jl")
-# end
+@testset "unmove.jl" begin
+    include("test_unmove.jl")
+end
+
+@testset "perft.jl" begin
+    include("test_perft.jl")
+end

@@ -4,3 +4,4 @@ docs/build/
 docs/site/
 benchmark/*.json
 benchmark/results/*
+Manifest.toml

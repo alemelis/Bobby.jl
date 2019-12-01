@@ -90,3 +90,33 @@ function gen_all_orthogonal_masks()
     return ortho_masks
 end
 const ORTHO_MASKS = gen_all_orthogonal_masks()
+
+
+function get_sliding_pieces_moves!(sliding_moves::Array{Move,1}, ui::UInt64,
+    friends::UInt64, enemy::Bitboard, taken::UInt64, piece_type::String)
+    if piece_type == "queen"
+        attack_fun = star_attack
+    elseif piece_type == "rook"
+        attack_fun = orthogonal_attack
+    elseif piece_type == "bishop"
+        attack_fun = cross_attack
+    end
+
+    moves = Array{UInt64,1}()
+    edges = Array{UInt64,1}()
+    moves, edges = attack_fun(moves, edges, taken, ui)
+    while length(moves) > 0
+        push!(sliding_moves, Move(ui, pop!(moves), piece_type,
+            "none", "none", EMPTY, "-", EMPTY))
+    end
+    while length(edges) > 0
+        edge = pop!(edges)
+        if edge & friends == EMPTY && edge & enemy.pieces == EMPTY
+            push!(sliding_moves, Move(ui, edge, piece_type, "none", "none",
+                EMPTY, "-", EMPTY))
+        elseif edge & friends == EMPTY && edge & enemy.pieces != EMPTY
+            push!(sliding_moves, Move(ui, edge, piece_type,
+                get_piece_type(enemy, edge), "none", EMPTY, "-", EMPTY))
+        end
+    end
+end

@@ -1,10 +1,22 @@
 function validate_uci_move(uci_move::String)
-    if  ~occursin(r"[a-h][1-8] [a-h][1-8] [queen, rook, night, bishop, none]", 
-        uci_move)
+    if split(uci_move, ' ') == 3
+        if  ~occursin(r"[a-h][1-8] [a-h][1-8] [queen, rook, night, bishop]", 
+            uci_move)
+            println("wrong move format, try again")
+            return false
+        end
+        return true
+    elseif split(uci_move, ' ') == 2
+        if  ~occursin(r"[a-h][1-8] [a-h][1-8]", 
+            uci_move)
+            println("wrong move format, try again")
+            return false
+        end
+        return true
+    else
         println("wrong move format, try again")
-        return false
+        return false 
     end
-    return true
 end
 
 
@@ -33,6 +45,7 @@ function validate_promotion_type(promotion_type::String)
     return true
 end
 
+
 function ask_for_promotion()
     while true
         println("Promove to [queen], [rook], k[night], or [bishop]?")
@@ -43,6 +56,7 @@ function ask_for_promotion()
     end
 end
 
+
 function play(human_color::String="white")
     b = set_board()
     check = false
@@ -50,7 +64,7 @@ function play(human_color::String="white")
     while true
         pretty_print(b)
 
-        moves = get_all_valid_moves(b, b.player_color)
+        moves = get_all_legal_moves(b, b.player_color)
         if length(moves) == 0
             if check
                 println("check mate!")
@@ -75,18 +89,18 @@ function play(human_color::String="white")
                             promotion_type = ask_for_promotion()
                         end
 
-                        b = move_piece(b, move, b.player_color)
+                        move_piece!(b, move, b.player_color)
                         b = update_attacked(b)
-                        b = update_castling_rights(b)
+                        update_castling_rights!(b)
                         @goto next_move
                     end
                 end
                 println("Move not available, try again")
             end
         else
-            b = move_piece(b, moves[rand(1:length(moves))], b.player_color)
+            move_piece!(b, moves[rand(1:length(moves))], b.player_color)
             b = update_attacked(b)
-            b = update_castling_rights(b)
+            update_castling_rights!(b)
         end
         
         @label next_move

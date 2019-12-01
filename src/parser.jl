@@ -1,19 +1,19 @@
-function fen_to_bitboard(fen_string::String)
+function fen_to_chessboard(fen_string::String)
     white = EMPTY
-    R = zeros(UInt64, 0)
-    N = zeros(UInt64, 0)
-    B = zeros(UInt64, 0)
-    Q = zeros(UInt64, 0)
+    R = EMPTY
+    N = EMPTY
+    B = EMPTY
+    Q = EMPTY
     K = EMPTY
-    P = zeros(UInt64, 0)
+    P = EMPTY
 
     black = EMPTY
-    r = zeros(UInt64, 0)
-    n = zeros(UInt64, 0)
-    b = zeros(UInt64, 0)
-    q = zeros(UInt64, 0)
+    r = EMPTY
+    n = EMPTY
+    b = EMPTY
+    q = EMPTY
     k = EMPTY
-    p = zeros(UInt64, 0)
+    p = EMPTY
 
     free = EMPTY
     taken = EMPTY
@@ -38,33 +38,33 @@ function fen_to_bitboard(fen_string::String)
                 # white
                 white |= INT2UINT[square_i]
                 if c == 'R'
-                    push!(R, INT2UINT[square_i])
+                    R |= INT2UINT[square_i]
                 elseif c == 'N'
-                    push!(N, INT2UINT[square_i])
+                    N |= INT2UINT[square_i]
                 elseif c == 'B'
-                    push!(B, INT2UINT[square_i])
+                    B |= INT2UINT[square_i]
                 elseif c == 'Q'
-                    push!(Q, INT2UINT[square_i])
+                    Q |= INT2UINT[square_i]
                 elseif c == 'K'
                     K |= INT2UINT[square_i]
                 elseif c == 'P'
-                    push!(P, INT2UINT[square_i])
+                    P |= INT2UINT[square_i]
                 end
             else
                 # black
                 black |= INT2UINT[square_i]
                 if c == 'r'
-                    push!(r, INT2UINT[square_i])
+                    r |= INT2UINT[square_i]
                 elseif c == 'n'
-                    push!(n, INT2UINT[square_i])
+                    n |= INT2UINT[square_i]
                 elseif c == 'b'
-                    push!(b, INT2UINT[square_i])
+                    b |= INT2UINT[square_i]
                 elseif c == 'q'
-                    push!(q, INT2UINT[square_i])
+                    q |= INT2UINT[square_i]
                 elseif c == 'k'
                     k |= INT2UINT[square_i]
                 elseif c == 'p'
-                    push!(p, INT2UINT[square_i])
+                    p |= INT2UINT[square_i]
                 end
             end
             square_i += 1
@@ -117,7 +117,6 @@ function fen_to_bitboard(fen_string::String)
     end
     
     enpassant_square = EMPTY
-    enpassant_done = false
     if fen[4] != "-"
         enpassant_square = PGN2UINT[fen[4]]
     end 
@@ -133,22 +132,28 @@ function fen_to_bitboard(fen_string::String)
     end
 
     game = Array{String,1}[]
+    enpassant_history = Array{UInt64,1}[]
     
     A = [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY]
     a = [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY]
-    board = Bitboard(white, P, R, N, B, Q, K, A,
-                    black, p, r, n, b, q, k, a,
-                    free, taken,
-                    white_attacks, black_attacks,
-                    player_color,
-                    white_can_castle_queenside,
-                    white_can_castle_kingside,
-                    black_can_castle_queenside,
-                    black_can_castle_kingside,
-                    white_king_moved, black_king_moved,
-                    enpassant_square,
-                    enpassant_done,
-                    halfmove_clock, fullmove_clock,
-                    fen_string, game)
-    return update_attacked(board)
+
+    white_board = Bitboard(white, P, R, N, B, Q, K, A, "white",
+        MASK_RANK_2, MASK_RANK_7, WHITE_PAWN_ONESTEP_MOVES,
+        WHITE_PAWN_TWOSTEPS_MOVES, WHITE_PAWN_ATTACK, MASK_RANK_6,
+        WHITE_KING_HOME, F1, G1, D1, C1, H1, A1,
+        white_king_moved, white_can_castle_kingside, white_can_castle_queenside)
+
+    black_board = Bitboard(black, p, r, n, b, q, k, a, "black",
+        MASK_RANK_7, MASK_RANK_2, BLACK_PAWN_ONESTEP_MOVES,
+        BLACK_PAWN_TWOSTEPS_MOVES, BLACK_PAWN_ATTACK, MASK_RANK_3,
+        BLACK_KING_HOME, F8, G8, D8, C8, H8, A8,
+        black_king_moved, black_can_castle_kingside, black_can_castle_queenside)
+
+    chessboard = Chessboard(white_board, black_board, free, taken,
+        white_attacks, black_attacks, player_color,
+        enpassant_square, halfmove_clock, fullmove_clock,
+        fen_string, game, enpassant_history)
+
+    update_both_sides_attacked!(chessboard)
+    return chessboard
 end

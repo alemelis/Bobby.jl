@@ -19,6 +19,15 @@ function ugly_print(valid_moves::Array{Any,1})
 end
 
 
+function ugly_print(valid_moves::Array{Move,1})
+    pieces = EMPTY
+    for move in valid_moves
+        pieces |= move.target
+    end
+    ugly_print(pieces)
+end
+
+
 function uglyPrint(b::BitArray)
 
     r_b = Int.(transpose(reshape(b, 8, :)))
@@ -37,26 +46,26 @@ function uglyPrint(b::BitArray)
 end
 
 
-function pretty_print(board::Bitboard, player_color::String="white")
+function pretty_print(board::Chessboard, player_color::String="white")
     ranks = ["8", "7", "6", "5", "4", "3", "2", "1"]
     
     free = transpose(reshape(cvt_to_bitarray(board.free), 8, :))
     taken = transpose(reshape(cvt_to_bitarray(board.taken), 8, :))
 
-    p = transpose(reshape(cvt_to_bitarray(board.p), 8, :))
-    r = transpose(reshape(cvt_to_bitarray(board.r), 8, :))
-    n = transpose(reshape(cvt_to_bitarray(board.n), 8, :))
-    b = transpose(reshape(cvt_to_bitarray(board.b), 8, :))
-    q = transpose(reshape(cvt_to_bitarray(board.q), 8, :))
-    k = transpose(reshape(cvt_to_bitarray(board.k), 8, :))
-    P = transpose(reshape(cvt_to_bitarray(board.P), 8, :))
-    R = transpose(reshape(cvt_to_bitarray(board.R), 8, :))
-    N = transpose(reshape(cvt_to_bitarray(board.N), 8, :))
-    B = transpose(reshape(cvt_to_bitarray(board.B), 8, :))
-    Q = transpose(reshape(cvt_to_bitarray(board.Q), 8, :))
-    K = transpose(reshape(cvt_to_bitarray(board.K), 8, :))
-    white = transpose(reshape(cvt_to_bitarray(board.white), 8, :))
-    black = transpose(reshape(cvt_to_bitarray(board.black), 8, :))
+    p = transpose(reshape(cvt_to_bitarray(board.black.P), 8, :))
+    r = transpose(reshape(cvt_to_bitarray(board.black.R), 8, :))
+    n = transpose(reshape(cvt_to_bitarray(board.black.N), 8, :))
+    b = transpose(reshape(cvt_to_bitarray(board.black.B), 8, :))
+    q = transpose(reshape(cvt_to_bitarray(board.black.Q), 8, :))
+    k = transpose(reshape(cvt_to_bitarray(board.black.K), 8, :))
+    P = transpose(reshape(cvt_to_bitarray(board.white.P), 8, :))
+    R = transpose(reshape(cvt_to_bitarray(board.white.R), 8, :))
+    N = transpose(reshape(cvt_to_bitarray(board.white.N), 8, :))
+    B = transpose(reshape(cvt_to_bitarray(board.white.B), 8, :))
+    Q = transpose(reshape(cvt_to_bitarray(board.white.Q), 8, :))
+    K = transpose(reshape(cvt_to_bitarray(board.white.K), 8, :))
+    white = transpose(reshape(cvt_to_bitarray(board.white.pieces), 8, :))
+    black = transpose(reshape(cvt_to_bitarray(board.black.pieces), 8, :))
     
     pieces = Dict("pawn"=>" o",
         "rook"=>" Π",
