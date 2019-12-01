@@ -1,10 +1,10 @@
 using Test
 using Bobby
 
-function test_fen(fen, depth, result)
+function test_fen(fen, depth, results)
     b = Bobby.fen_to_chessboard(fen)
     pt = Bobby.perft(b, depth, b.player_color)
-    if pt.nodes == result
+    if pt.nodes == results
         return true
     else
         println(pt.nodes)
