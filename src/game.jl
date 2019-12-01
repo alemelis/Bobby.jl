@@ -89,18 +89,18 @@ function play(human_color::String="white")
                             promotion_type = ask_for_promotion()
                         end
 
-                        b = move_piece(b, move, b.player_color)
+                        move_piece!(b, move, b.player_color)
                         b = update_attacked(b)
-                        b = update_castling_rights(b)
+                        update_castling_rights!(b)
                         @goto next_move
                     end
                 end
                 println("Move not available, try again")
             end
         else
-            b = move_piece(b, moves[rand(1:length(moves))], b.player_color)
+            move_piece!(b, moves[rand(1:length(moves))], b.player_color)
             b = update_attacked(b)
-            b = update_castling_rights(b)
+            update_castling_rights!(b)
         end
         
         @label next_move

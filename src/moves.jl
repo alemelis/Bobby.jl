@@ -99,7 +99,7 @@ function update_both_sides_bitboard!(chessboard::Chessboard)
 end
 
 
-function move_piece(chessboard::Chessboard, move::Move, player_color::String,
+function move_piece!(chessboard::Chessboard, move::Move, player_color::String,
     friends::Bitboard, enemy::Bitboard)
     push!(chessboard.game, player_color*move.piece_type*UINT2PGN[move.source])
     push!(chessboard.enpassant_history, move.enpassant_square)
@@ -168,8 +168,6 @@ function move_piece(chessboard::Chessboard, move::Move, player_color::String,
     end
 
     update_both_sides_bitboard!(chessboard)
-    
-    return chessboard
 end
 
 
@@ -214,10 +212,10 @@ end
 
 function validate_move(chessboard::Chessboard, move::Move, player_color::String)
     if player_color == "white"
-        chessboard = move_piece(chessboard, move, player_color,
+        move_piece!(chessboard, move, player_color,
             chessboard.white, chessboard.black)
     else
-        chessboard = move_piece(chessboard, move, player_color,
+        move_piece!(chessboard, move, player_color,
             chessboard.black, chessboard.white)
     end
     update_both_sides_attacked!(chessboard)
@@ -225,10 +223,10 @@ function validate_move(chessboard::Chessboard, move::Move, player_color::String)
     in_check = king_in_check(chessboard, player_color)
 
     if player_color == "white"
-        chessboard = unmove_piece(chessboard, move, player_color,
+        unmove_piece!(chessboard, move, player_color,
             chessboard.white, chessboard.black)
     else
-        chessboard = unmove_piece(chessboard, move, player_color,
+        unmove_piece!(chessboard, move, player_color,
             chessboard.black, chessboard.white)
     end
     update_both_sides_attacked!(chessboard)
@@ -249,7 +247,7 @@ function get_all_legal_moves(chessboard::Chessboard, player_color::String)
 end
 
 
-function update_castling_rights(chessboard::Chessboard)
+function update_castling_rights!(chessboard::Chessboard)
     if chessboard.white.K == E1
         chessboard.white.king_moved = false
     end
@@ -283,5 +281,4 @@ function update_castling_rights(chessboard::Chessboard)
             chessboard.black.can_castle_kingside = false
         end
     end
-    return chessboard
 end

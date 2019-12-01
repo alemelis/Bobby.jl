@@ -1,12 +1,8 @@
-function unmove_piece(chessboard::Chessboard, move::Move, player_color::String,
+function unmove_piece!(chessboard::Chessboard, move::Move, player_color::String,
     friends::Bitboard, enemy::Bitboard)
     pop!(chessboard.game)
+    chessboard.enpassant_square = chessboard.enpassant_history[end]
     pop!(chessboard.enpassant_history)
-    if length(chessboard.enpassant_history) > 0
-        chessboard.enpassant_square = chessboard.enpassant_history[end]
-    else
-        chessboard.enpassant_square = EMPTY
-    end
 
     if move.capture_type != "none"
         if move.capture_type == "pawn"
@@ -72,7 +68,6 @@ function unmove_piece(chessboard::Chessboard, move::Move, player_color::String,
     end
 
     update_both_sides_bitboard!(chessboard)
-    return chessboard
 end
 
 

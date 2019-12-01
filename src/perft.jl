@@ -34,6 +34,7 @@ function explore(pt::PerftTree, chessboard::Chessboard,
     move_name::String="")
 
     moves = get_all_legal_moves(chessboard, color)
+    pt.nodes[depth] += length(moves)
 
     if length(moves) == 0
         return pt
@@ -46,47 +47,40 @@ function explore(pt::PerftTree, chessboard::Chessboard,
         end
     end
 
-    pt.nodes[depth] += length(moves)
     if depth > 1
         pt.divide[move_name] += length(moves)
     end
 
     if depth == max_depth
-        # if move_name == "pawn-e2e4"
-        #     for m in moves
-        #         println(m.piece_type*"-"*UINT2PGN[m.source]*UINT2PGN[m.target])
-        #     end
-        # end
         return pt
     end
 
     new_color = change_color(color)
     for m in moves
         if color == "white"
-            chessboard = move_piece(chessboard, m, color,
+            move_piece!(chessboard, m, color,
                 chessboard.white, chessboard.black)
         else
-            chessboard = move_piece(chessboard, m, color,
+            move_piece!(chessboard, m, color,
                 chessboard.black, chessboard.white)
         end
         update_both_sides_attacked!(chessboard)
-        chessboard = update_castling_rights(chessboard)
+        update_castling_rights!(chessboard)
 
         if depth == 1
             move_name = m.piece_type*"-"*UINT2PGN[m.source]*UINT2PGN[m.target]
         end
         
-
         pt = explore(pt, chessboard, max_depth, depth+1, new_color, move_name)
         if color == "white"
-            chessboard = unmove_piece(chessboard, m, color,
+            unmove_piece!(chessboard, m, color,
                 chessboard.white, chessboard.black)
         else
-            chessboard = unmove_piece(chessboard, m, color,
+            unmove_piece!(chessboard, m, color,
                 chessboard.black, chessboard.white)
         end
         update_both_sides_attacked!(chessboard)
-        chessboard = update_castling_rights(chessboard)
+        update_castling_rights!(chessboard)
     end
 
     return pt
