@@ -1,35 +1,18 @@
-@testset "king" begin
-    b = Bobby.set_board()
-    
-    kv = Bobby.gen_king_valid(Bobby.INT2UINT[61])
-    @test length(kv) == 5
-    kvw = [0,0,0,0,0,0,0,0,
-           0,0,0,0,0,0,0,0,
-           0,0,0,0,0,0,0,0,
-           0,0,0,0,0,0,0,0,
-           0,0,0,0,0,0,0,0,
-           0,0,0,0,0,0,0,0,
-           0,0,0,1,1,1,0,0,
-           0,0,0,1,0,1,0,0]
-    @test all(Int.(Bobby.cvt_to_bitarray(kv)) .== kvw)
-    
-    akv = Bobby.gen_all_king_valid_moves()
-    @test all(Int.(Bobby.cvt_to_bitarray(akv[Bobby.INT2UINT[61]])) .== kvw)
+@testset "king.jl" begin
+    @printf("> king\n")
 
-    @test test_fen("k7/8/8/8/8/8/8/4K3 w - - 0 1", 1, [5])
-    @test test_fen("k7/8/8/8/8/8/8/4K2R w - - 0 1", 1, [14])
-    @test test_fen("k7/8/8/8/8/8/8/4K2R w K - 0 1", 1, [15])
-    @test test_fen("1k6/8/8/8/8/8/8/R3K3 w K - 0 1", 1, [15])
-    @test test_fen("1k6/8/8/8/8/8/8/R3K3 w Q - 0 1", 1, [16])
-    @test test_fen("1k6/8/8/8/8/3r4/8/R3K3 w Q - 0 1", 1, [13])
-    @test test_fen("1k6/8/8/8/8/2r5/8/R3K3 w Q - 0 1", 1, [15])
-    @test test_fen("1k6/8/8/8/8/5r2/8/4K2R w Q - 0 1", 1, [12])
-    @test test_fen("r3k3/8/8/8/8/8/8/6K1 b - - 0 1", 1, [15])
-    @test test_fen("r3k3/8/8/8/8/8/8/6K1 b q - 0 1", 1, [16])
-    @test test_fen("r3k3/8/8/8/8/8/8/1R4K1 b q - 0 1", 1, [16])
-    @test test_fen("r3k3/8/8/8/8/8/8/2R3K1 b q - 0 1", 1, [15])
-    @test test_fen("r3k3/8/8/8/8/8/8/3R2K1 b q - 0 1", 1, [13])
-    @test test_fen("r3k3/8/8/8/8/8/8/4R1K1 b q - 0 1", 1, [4])
-    @test test_fen("k3r3/8/8/8/8/8/8/4K2R w K - 0 1", 1, [4])
-    @test test_fen("k7/8/8/8/6p1/6Pp/6PP/r6K w - - 0 1", 1, [0])
+    #corners
+    @test Bb.KING[p2u["a1"]] == p2u["a2"] | p2u["b2"] | p2u["b1"]
+    @test Bb.KING[p2u["a8"]] == p2u["a7"] | p2u["b7"] | p2u["b8"]
+    @test Bb.KING[p2u["h1"]] == p2u["g1"] | p2u["g2"] | p2u["h2"]
+    @test Bb.KING[p2u["h8"]] == p2u["g8"] | p2u["g7"] | p2u["h7"]
+
+    #sides
+    @test Bb.KING[p2u["a4"]] == reduce(|, [p2u[s] for s=["a3","a5","b3","b4","b5"]])
+    @test Bb.KING[p2u["h5"]] == reduce(|, [p2u[s] for s=["h4","h6","g4","g5","g6"]])
+    @test Bb.KING[p2u["e1"]] == reduce(|, [p2u[s] for s=["e2","d1","d2","f1","f2"]])
+    @test Bb.KING[p2u["c8"]] == reduce(|, [p2u[s] for s=["c7","b8","b7","d8","d7"]])
+
+    #center
+    @test Bb.KING[p2u["e4"]] == reduce(|, [p2u[s] for s=["e3","e5","d3","d4","d5", "f3","f4","f5"]])
 end
