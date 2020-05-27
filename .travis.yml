@@ -2,7 +2,7 @@ language: julia
 os:
   - linux
 julia:
-  - latest
+  - 1
 notifications:
   email: false
 after_success:
