@@ -1,9 +1,8 @@
 language: julia
 os:
   - linux
-  - osx
 julia:
-  - 1.1
+  - latest
 notifications:
   email: false
 after_success:
