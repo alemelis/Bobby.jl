@@ -1,5 +1,6 @@
-function getPieceMoves!(moves::Array{Move,1}, bitboard::UInt64, type::Symbol,
-                        friends::UInt64, enemy::ChessSet, white::Bool, b::Board)
+function getPieceMoves!(moves::Moves, bitboard::UInt64, type::Symbol,
+                        friends::UInt64, enemy::ChessSet, white::Bool, b::Board,
+                        k_in_check::Bool=false)
     if bitboard == EMPTY; return end
     if type == :pawn
         getPawnMoves!(moves, bitboard, b.taken, friends, enemy, white, b.enpassant)
@@ -14,7 +15,7 @@ function getPieceMoves!(moves::Array{Move,1}, bitboard::UInt64, type::Symbol,
                     piece_moves = KNIGHT[src]
                 elseif type == :king
                     piece_moves = KING[src]
-                    getCastlingMoves!(moves, src, b, white)
+                    if ~k_in_check; getCastlingMoves!(moves, src, b, white) end
                 elseif type == :rook
                     piece_moves = getMagicAttack(src, b.taken, true)
                 elseif type == :bishop
@@ -32,6 +33,7 @@ function getPieceMoves!(moves::Array{Move,1}, bitboard::UInt64, type::Symbol,
                     if b0_m<<j & piece_moves != EMPTY
                         target = b0_m<<j
                         enemy_type = getTypeAt(enemy, target)
+                        if enemy_type == :king; continue end
                         target & enemy.friends != EMPTY ? take = Piece(enemy_type, target) : take = NONE
                         push!(moves, Move(type, src, target, take, EMPTY, :none, NOCASTLING))
                     end
@@ -41,24 +43,58 @@ function getPieceMoves!(moves::Array{Move,1}, bitboard::UInt64, type::Symbol,
     end
 end
 
+function getAttack(attack::UInt64, b::UInt64, type::Symbol, taken::UInt64)
+    if b == EMPTY; return attack end
+    b0, d = bitshift(b)
+    for i = 0:d
+        if b0<<i & b != EMPTY
+            src = b0<<i
+            if type == :knight
+                return attack |= KNIGHT[src]
+            elseif type == :rook
+                return attack |= getMagicAttack(src, taken, true)
+            elseif type == :bishop
+                return attack |= getMagicAttack(src, taken, false)
+            elseif type == :queen
+                attack |= getMagicAttack(src, taken, false)
+                return attack |= getMagicAttack(src, taken, true)
+            end
+        end
+    end
+end
+
+function getAttack(b::Board, white::Bool)
+    white ? cs = b.white : cs = b.black
+    attack = KING[cs.K]
+    attack = getAttack(attack, cs.R, :rook, b.taken)
+    attack = getAttack(attack, cs.B, :bishop, b.taken)
+    attack = getAttack(attack, cs.Q, :queen, b.taken)
+    return getPawnAttack(attack, cs.P, white)
+end
+
 function getMoves(b::Board, white::Bool)
     white ? friends = b.white.friends : friends = b.black.friends
     white ? enemy = b.black : enemy = b.white
     white ? cs = b.white : cs = b.black
 
-    moves = Array{Move,1}()
+    moves = Moves()
+    king_in_check = inCheck(b, ~b.active)
     for (bitboard, s) in zip([cs.P, cs.N, cs.B, cs.R, cs.Q, cs.K],
                              [:pawn, :knight, :bishop, :rook, :queen, :king])
-        getPieceMoves!(moves, bitboard, s, friends, enemy, white, b)
+        getPieceMoves!(moves, bitboard, s, friends, enemy, white, b, king_in_check)
     end
     return filterMoves(b, moves)
 end
 
-function filterMoves(b::Board, moves::Array{Move,1})
-    filtered = Array{Move,1}()
-    for m in moves
+function filterMoves(b::Board, moves::Moves)
+    filtered = Moves()
+    for m in moves.moves
+        if m.type == :none || m.take.type == :king; continue end
         b1 = makeMove(b, m)
-        if ~inCheck(b1, b.active); push!(filtered, m) end
+        king_in_check = inCheck(b1, b.active)
+        if ~king_in_check
+            push!(filtered, m)
+        end
     end
     return filtered
 end

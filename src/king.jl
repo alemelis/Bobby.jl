@@ -29,12 +29,8 @@ function kingMovesGen()
 end
 const KING = kingMovesGen()
 
-function inCheck(b::Board, white::Bool, sq::UInt64=EMPTY)
-    if sq != EMPTY
-        K = sq
-    else
-        white ? K = b.white.K : K = b.black.K
-    end
+function inCheck(b::Board, white::Bool, K::UInt64=EMPTY)
+    if K == EMPTY; white ? K = b.white.K : K = b.black.K end
     white ? enemy = b.black : enemy = b.white
 
     if KNIGHT[K] & enemy.N != EMPTY; return true end
@@ -53,7 +49,7 @@ function inCheck(b::Board, white::Bool, sq::UInt64=EMPTY)
     return false
 end
 
-function getCastlingMoves!(moves::Array{Move,1}, K::UInt64, b::Board, white::Bool)
+function getCastlingMoves!(moves::Moves, K::UInt64, b::Board, white::Bool)
     if b.castling == NOCASTLING || inCheck(b, white); return end
     if white
         if CQ&b.castling != NOCASTLING && A1&b.white.R != EMPTY

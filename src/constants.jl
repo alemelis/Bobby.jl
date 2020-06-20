@@ -1,5 +1,3 @@
-const EMPTY = UInt64(0)
-
 const MASK_RANKS = [0x00000000000000ff,
                     0x000000000000ff00,
                     0x0000000000ff0000,

@@ -1,4 +1,13 @@
-function getPawnMoves!(moves::Array{Move,1}, bitboard::UInt64, taken::UInt64, friends::UInt64,
+function getPawnAttack(attack::UInt64, b::UInt64, white::Bool)
+    white ? lx_clear = CLEAR_FILE_A : lx_clear = CLEAR_FILE_H
+    white ? lx_shift = 9 : lx_shift = -9
+    attack |= (b & lx_clear) << lx_shift
+    white ? rx_shift = 7 : rx_shift = -7
+    white ? rx_clear = CLEAR_FILE_H : rx_clear = CLEAR_FILE_A
+    return attack |= (b & rx_clear) << rx_shift
+end
+
+function getPawnMoves!(moves::Moves, bitboard::UInt64, taken::UInt64, friends::UInt64,
                        enemy::ChessSet, white::Bool, enpassant::UInt64)
     white ? shift = 8 : shift = -8
     white ? home = MASK_RANKS[2] : home = MASK_RANKS[7]

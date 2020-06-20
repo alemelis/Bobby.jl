@@ -12,5 +12,6 @@ Bb = Bobby
     include("test_bishop.jl")
     include("test_magic.jl")
     include("test_move.jl")
+
     @printf("\n")
 end

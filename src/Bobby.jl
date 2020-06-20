@@ -4,6 +4,7 @@ module Bobby
     using Printf
     using Crayons
 
+    include("structs.jl")
     include("constants.jl")
     include("cvt.jl")
     include("bitboard.jl")
@@ -16,3 +17,4 @@ module Bobby
     include("move.jl")
     include("perft.jl")
 end
+
