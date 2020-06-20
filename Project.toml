@@ -1,7 +1,7 @@
 name = "Bobby"
 uuid = "bd34264e-e812-11e8-1ee8-bfb20fea2fb4"
 authors = ["Alessandro Melis <alessandro_melis@rocketmail.com>"]
-version = "1.0.2"
+version = "1.0.0"
 
 [deps]
 Crayons = "a8cc5b0e-0ffa-5ad4-8c14-923d3ee1735f"
