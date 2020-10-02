@@ -40,20 +40,7 @@ julia> pt.nodes
 You can also import the position from its FEN
 
 ```
-julia> b = Bobby.loadFen("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 0")
-
-   ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
- 8 █Π███████+█████Π██
- 7 █o███o█o█Ψ█o█Δ████
- 6 █Δ█ζ█████o█ζ█o████
- 5 ███████o█ζ████████
- 4 ███o█████o████████
- 3 █████ζ█████Ψ███o██
- 2 █o█o█o█Δ█Δ█o█o█o██
- 1 █Π███████+█████Π██
-   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
-    a b c d e f g h
-
+julia> b = Bobby.loadFen("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 0");
 julia> pt = Bobby.perft(b, 4).nodes
 4-element Array{Int64,1}:
       48
