@@ -75,6 +75,38 @@ function Base.show(io::IO, b::Board)
     @printf("    a b c d e f g h\n")
 end
 
+function plainPrint(b::Board)
+    border = "\n   " * '▄'^18 * "\n"
+    @printf("%s", border)
+    dark = false
+    for rank = 8:-1:1
+        @printf(" %s █", rank)
+        for file = 1:8
+            i = (8-rank)*8+file
+            if b.taken & INT2UINT[i] != EMPTY
+                c = getSymbol(b.white, INT2UINT[i])
+                if c != ' '
+                    color = :red
+                else
+                    color = :dark_gray
+                    c = getSymbol(b.black, INT2UINT[i])
+                end
+                @printf("%s", c)
+            else
+                @printf("⋅")
+            end
+            @printf(" ")
+            file != 8 ? dark = !dark : continue
+        end
+        @printf("█")
+        rank != 1 ? @printf("\n") : continue
+    end
+    lower_border = "\n   " * '▀'^18 * "\n"
+    @printf("%s", lower_border)
+    @printf("    a b c d e f g h\n")
+end
+
+
 function loadFen(fen::String)
     board, active_str, castling_str, enpassant, halfmove, fullmove = split(fen)
     active = active_str == "w"
