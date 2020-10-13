@@ -68,3 +68,17 @@ julia> pt = Bobby.perft(b, 4).nodes
    97862
  4085603
 ```
+
+## Benchmarks
+
+```
+julia> ]activate .
+
+julia> using Bobby
+
+julia> using PkgBenchmark
+
+julia> bm = benchmarkpkg(Bobby)
+
+julia> export_markdown("benchmark.md", bm)
+```
