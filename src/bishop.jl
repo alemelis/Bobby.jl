@@ -1,5 +1,5 @@
 function diagoSlide(square::UInt64)
-    visited = UInt64(0)
+    visited = EMPTY
 
     #NW
     for shift = 9:9:54
@@ -34,7 +34,7 @@ end
 const BISHOP_MASKS = bishopMasksGen()
 
 function diagoAttack(square::UInt64, occupancy::UInt64)
-    visited = UInt64(0)
+    visited = EMPTY
 
     #NW
     for shift = 9:9:63
