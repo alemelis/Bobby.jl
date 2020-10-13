@@ -2,8 +2,8 @@ function getOccupancyString(n::Int64)
     return Tuple([bitstring(i)[end-n+1:end] for i = 0:2^n-1])
 end
 
-const ROOK_SHIFTS = [8, -8, -1, 1] #N, S, W, E
-const BISHOP_SHIFTS = [9, 7, -7, -9] #NE, NW, SE, SW
+const ROOK_SHIFTS = (8, -8, -1, 1) #N, S, W, E
+const BISHOP_SHIFTS = (9, 7, -7, -9) #NE, NW, SE, SW
 function getNumberOfSquares(square::UInt64, rook::Bool, d::Int64)
     rook ? mask = ROOK_MASKS[square] : mask = BISHOP_MASKS[square]
     rook ? shifts = ROOK_SHIFTS : shifts = BISHOP_SHIFTS
