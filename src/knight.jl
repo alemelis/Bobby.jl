@@ -20,4 +20,3 @@ function knightMovesGen()
 end
 const KNIGHT = knightMovesGen()
 
-

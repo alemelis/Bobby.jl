@@ -27,17 +27,17 @@ const ROOK_BITS = bitsGen(true)
 const BISHOP_BITS = bitsGen(false)
 
 function occupancyGen(rook::Bool)
-    occupancies = Dict{UInt64,Array{UInt64,1}}()
+    occupancies = Dict{UInt64, Tuple{Vararg{UInt64}}}()
     rook ? shifts = ROOK_SHIFTS : shifts = BISHOP_SHIFTS
     for sq in values(PGN2UINT)
         square_occs = []
         occs = [getOccupancyString(getNumberOfSquares(sq, rook, i)) for i=1:4]
         for ds in Iterators.product(occs...)
-            occ = UInt64(0)
+            occ = EMPTY
             [[if ds[j][i] == '1'; occ |= (sq<<(shifts[j]*i)) end for i=1:length(ds[j])] for j=1:4]
             push!(square_occs, occ) 
         end
-        push!(occupancies, sq=>square_occs)
+        push!(occupancies, sq=>tuple(square_occs...))
     end
     return occupancies
 end
@@ -67,14 +67,14 @@ function magicSquareGen(square::UInt64, rook::Bool, bits::Int64)
                 break
             end
         end
-        collision ? continue : return magic, targets
+        collision ? continue : return magic, tuple(targets...)
     end
 end
 
 function magicTableGen(rook::Bool)
     rook ? bits = ROOK_BITS : bits = BISHOP_BITS
     magic_table = Dict{UInt64, UInt64}()
-    attacks = Dict{UInt64, Array{UInt64,1}}()
+    attacks = Dict{UInt64, Tuple{Vararg{UInt64}}}()
     for s in values(PGN2UINT)
         magic, attack = magicSquareGen(s, rook, bits[s])
         push!(magic_table, s=>magic)

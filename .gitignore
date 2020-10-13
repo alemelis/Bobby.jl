@@ -1,4 +1,5 @@
 **/.DS_Store
+**/*.swp
 README.html
 Manifest.toml
 benchmark/tune.json
