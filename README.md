@@ -78,5 +78,7 @@ julia> using Bobby
 
 julia> using PkgBenchmark
 
-julia> benchmarkpkg(Bobby)
+julia> bm = benchmarkpkg(Bobby)
+
+julia> export_markdown("benchmark.md", bm)
 ```
