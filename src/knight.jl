@@ -1,8 +1,8 @@
-const N_CLEAR_FILES = [0x3f3f3f3f3f3f3f3f, 0x7f7f7f7f7f7f7f7f,
+const N_CLEAR_FILES = (0x3f3f3f3f3f3f3f3f, 0x7f7f7f7f7f7f7f7f,
                        0xfefefefefefefefe, 0xfcfcfcfcfcfcfcfc,
                        0xfcfcfcfcfcfcfcfc, 0xfefefefefefefefe,
-                       0x7f7f7f7f7f7f7f7f, 0x3f3f3f3f3f3f3f3f]
-const N_SHIFTS = [-10, -17, -15, -6, 10, 17, 15, 6]
+                       0x7f7f7f7f7f7f7f7f, 0x3f3f3f3f3f3f3f3f)
+const N_SHIFTS = (-10, -17, -15, -6, 10, 17, 15, 6)
 
 function knightMovesGen()
     knight_moves = Dict{UInt64,UInt64}()
@@ -19,5 +19,4 @@ function knightMovesGen()
     return knight_moves
 end
 const KNIGHT = knightMovesGen()
-
 

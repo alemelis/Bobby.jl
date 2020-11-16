@@ -32,7 +32,7 @@ struct Piece
 end
 const NONE = Piece(:none, EMPTY)
 
-mutable struct Move
+struct Move
     type::Symbol
     from::UInt64
     to::UInt64

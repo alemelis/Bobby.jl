@@ -1,13 +1,13 @@
 #http://pages.cs.wisc.edu/~psilord/blog/data/chess-pages/nonsliding.html
-const K_CLEAR_FILES = [0x7f7f7f7f7f7f7f7f, 0xffffffffffffffff, 
+const K_CLEAR_FILES = (0x7f7f7f7f7f7f7f7f, 0xffffffffffffffff, 
                        0xfefefefefefefefe, 0xfefefefefefefefe,
                        0xfefefefefefefefe, 0xffffffffffffffff,
-                       0x7f7f7f7f7f7f7f7f, 0x7f7f7f7f7f7f7f7f]
-const K_MASK_FILES = [0x8080808080808080, 0xffffffffffffffff,
+                       0x7f7f7f7f7f7f7f7f, 0x7f7f7f7f7f7f7f7f)
+const K_MASK_FILES = (0x8080808080808080, 0xffffffffffffffff,
                       0x0101010101010101, 0x0101010101010101,
                       0x0101010101010101, 0xffffffffffffffff,
-                      0x8080808080808080, 0x8080808080808080]
-const K_SHIFTS = [9, 8, 7, -1, -9, -8, -7, 1]
+                      0x8080808080808080, 0x8080808080808080)
+const K_SHIFTS = (9, 8, 7, -1, -9, -8, -7, 1)
 
 #pseudo moves
 function kingMovesGen()

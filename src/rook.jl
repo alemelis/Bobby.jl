@@ -1,5 +1,5 @@
 function orthoSlide(square::UInt64)
-    visited = UInt64(0)
+    visited = EMPTY
 
     #vertical
     for shift = 8:8:48
@@ -32,7 +32,7 @@ end
 const ROOK_MASKS = rookMasksGen()
 
 function orthoAttack(square::UInt64, occupancy::UInt64)
-    visited = UInt64(0)
+    visited = EMPTY
 
     #vertical
     for shift = 8:8:56
