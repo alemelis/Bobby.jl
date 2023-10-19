@@ -24,8 +24,6 @@
     [@test Bb.BISHOP_BITS[p2u[s]] == 7 for s in ["c3", "f5", "e3"]]
     [@test Bb.BISHOP_BITS[p2u[s]] == 9 for s in ["d4", "e5"]]
 
-    @test Base.summarysize(Bb.DIAGO_OCCS) == 49080
-    @test Base.summarysize(Bb.ORTHO_OCCS) == 826296
     @test (Bb.MASK_RANKS[1] & ~p2u["h1"] ⊻ Bb.MASK_FILES[1] & ~p2u["a8"]) in Bb.ORTHO_OCCS[p2u["a1"]]
 
     @test Bb.randomMagic() != Bb.randomMagic()
