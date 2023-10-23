@@ -1,8 +1,9 @@
 module Bobby
-    
+
     export Bitboard
     using Printf
     using Crayons
+    using Random
 
     include("structs.jl")
     include("constants.jl")
@@ -17,4 +18,3 @@ module Bobby
     include("move.jl")
     include("perft.jl")
 end
-
