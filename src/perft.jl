@@ -27,17 +27,17 @@ function explore(pt::PerftTree, b::Board, max_depth::Int64,
     end
 
     for m in moves.moves
-        if m.type == :none; break end
+        if m.type == PIECE_NONE; break end
         if depth == 1
             root_move = UINT2PGN[m.from]*UINT2PGN[m.to]
-            if m.promotion != :none
-                if m.promotion == :queen
+            if m.promotion != PIECE_NONE
+                if m.promotion == PIECE_QUEEN
                     root_move *= "q"
-                elseif m.promotion == :rook
+                elseif m.promotion == PIECE_ROOK
                     root_move *= "r"
-                elseif m.promotion == :bishop
+                elseif m.promotion == PIECE_BISHOP
                     root_move *= "b"
-                elseif m.promotion == :knight
+                elseif m.promotion == PIECE_KNIGHT
                     root_move *= "n"
                 end
             end

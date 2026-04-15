@@ -157,35 +157,47 @@ function loadFen(fen::String)
 
     halfmove = parse(Int64, halfmove)
     fullmove = parse(Int64, fullmove)
-    
-    return Board(white, black, taken, active, castling, enpassant, halfmove, fullmove)
+
+    b = Board(white, black, taken, active, castling, enpassant, halfmove, fullmove, UInt64(0))
+    return Board(white, black, taken, active, castling, enpassant, halfmove, fullmove, computeHash(b))
 end
 
 function setBoard()
     return loadFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
 end
 
-function getTypeAt(pieces::ChessSet, square::UInt64)
-    if pieces.P & square != EMPTY
-        return :pawn
-    elseif pieces.N & square != EMPTY
-        return :knight
-    elseif pieces.B & square != EMPTY
-        return :bishop
-    elseif pieces.R & square != EMPTY
-        return :rook
-    elseif pieces.Q & square != EMPTY
-        return :queen
-    elseif pieces.K & square != EMPTY
-        return :king
-    else
-        return :none
+function computeHash(b::Board)::UInt64
+    h = UInt64(0)
+    for (cs, color) in ((b.white, 1), (b.black, 2))
+        for (bb, pt) in ((cs.P, PIECE_PAWN), (cs.N, PIECE_KNIGHT), (cs.B, PIECE_BISHOP),
+                         (cs.R, PIECE_ROOK), (cs.Q, PIECE_QUEEN), (cs.K, PIECE_KING))
+            bbt = bb
+            while bbt != EMPTY
+                sq = lsb(bbt); bbt = popbit(bbt)
+                h ⊻= ZOBRIST_PIECES[pt, color, sq2idx(sq)]
+            end
+        end
     end
+    h ⊻= ZOBRIST_CASTLING[b.castling + 1]
+    if b.enpassant != EMPTY
+        h ⊻= ZOBRIST_EP[((trailing_zeros(b.enpassant) % 8) + 1)]
+    else
+        h ⊻= ZOBRIST_EP[9]
+    end
+    if !b.active
+        h ⊻= ZOBRIST_SIDE
+    end
+    return h
 end
 
-function bitshift(p::UInt64)
-    rx = 64-trailing_zeros(p)
-    return INT2UINT[rx], abs(leading_zeros(p)+1-rx)    
+function getTypeAt(pieces::ChessSet, square::UInt64)::UInt8
+    pieces.P & square != EMPTY && return PIECE_PAWN
+    pieces.N & square != EMPTY && return PIECE_KNIGHT
+    pieces.B & square != EMPTY && return PIECE_BISHOP
+    pieces.R & square != EMPTY && return PIECE_ROOK
+    pieces.Q & square != EMPTY && return PIECE_QUEEN
+    pieces.K & square != EMPTY && return PIECE_KING
+    return PIECE_NONE
 end
 
 

@@ -5,7 +5,7 @@ end
 const ROOK_SHIFTS = (8, -8, -1, 1) #N, S, W, E
 const BISHOP_SHIFTS = (9, 7, -7, -9) #NE, NW, SE, SW
 function getNumberOfSquares(square::UInt64, rook::Bool, d::Int64)
-    rook ? mask = ROOK_MASKS[square] : mask = BISHOP_MASKS[square]
+    rook ? mask = ROOK_MASKS[sq2idx(square)] : mask = BISHOP_MASKS[sq2idx(square)]
     rook ? shifts = ROOK_SHIFTS : shifts = BISHOP_SHIFTS
     c = 0
     while true
@@ -19,8 +19,8 @@ function getNumberOfBits(square::UInt64, rook::Bool)
 end
 
 function bitsGen(rook::Bool)
-    bits = Dict{UInt64,Int64}()
-    [push!(bits, sq=>getNumberOfBits(sq, rook)) for sq in values(PGN2UINT)]
+    bits = Vector{Int64}(undef, 64)
+    [bits[sq2idx(sq)] = getNumberOfBits(sq, rook) for sq in values(PGN2UINT)]
     return bits
 end
 const ROOK_BITS = bitsGen(true)
@@ -67,18 +67,19 @@ function magicSquareGen(square::UInt64, rook::Bool, bits::Int64)
                 break
             end
         end
-        collision ? continue : return magic, tuple(targets...)
+        collision ? continue : return magic, copy(targets)
     end
 end
 
 function magicTableGen(rook::Bool)
     rook ? bits = ROOK_BITS : bits = BISHOP_BITS
-    magic_table = Dict{UInt64, UInt64}()
-    attacks = Dict{UInt64, Tuple{Vararg{UInt64}}}()
+    magic_table = Vector{UInt64}(undef, 64)
+    attacks = Vector{Vector{UInt64}}(undef, 64)
     for s in values(PGN2UINT)
-        magic, attack = magicSquareGen(s, rook, bits[s])
-        push!(magic_table, s=>magic)
-        push!(attacks, s=>attack)
+        idx = sq2idx(s)
+        magic, attack = magicSquareGen(s, rook, bits[idx])
+        magic_table[idx] = magic
+        attacks[idx]     = attack
     end
     return magic_table, attacks
 end
@@ -86,10 +87,10 @@ const ROOK_MAGICS, ROOK_X = magicTableGen(true)
 const BISHOP_MAGICS, BISHOP_X = magicTableGen(false)
 
 function getMagicAttack(square::UInt64, blockers::UInt64, rook::Bool)
-    rook ? magic = ROOK_MAGICS[square] : magic = BISHOP_MAGICS[square]
-    rook ? bits = ROOK_BITS[square] : bits = BISHOP_BITS[square]
-    rook ? attacks = ROOK_X[square] : attacks = BISHOP_X[square]
-    rook ? mask = ROOK_MASKS[square] : mask = BISHOP_MASKS[square]
-    i = ((blockers&mask)*magic) >> (64-bits)
-    return attacks[i+1]
+    idx     = sq2idx(square)
+    magic   = rook ? ROOK_MAGICS[idx]  : BISHOP_MAGICS[idx]
+    bits    = rook ? ROOK_BITS[idx]    : BISHOP_BITS[idx]
+    attacks = rook ? ROOK_X[idx]       : BISHOP_X[idx]
+    mask    = rook ? ROOK_MASKS[idx]   : BISHOP_MASKS[idx]
+    return attacks[Int(((blockers & mask) * magic) >> (64 - bits)) + 1]
 end

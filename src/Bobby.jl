@@ -8,6 +8,7 @@ module Bobby
     include("structs.jl")
     include("constants.jl")
     include("cvt.jl")
+    include("zobrist.jl")
     include("bitboard.jl")
     include("king.jl")
     include("knight.jl")
@@ -17,4 +18,5 @@ module Bobby
     include("pawn.jl")
     include("move.jl")
     include("perft.jl")
+    include("game.jl")
 end

@@ -2,6 +2,9 @@ function toInt(i::String)
     return parse(UInt64, i; base=2)
 end
 
+# Convert a single-bit UInt64 square bitmask to a 1-based array index (0-63 trailing zeros + 1)
+@inline sq2idx(sq::UInt64) = Int(trailing_zeros(sq)) + 1
+
 function pgn2uintGen()
     pgn =  Dict{String,UInt64}()
     uint = Dict{UInt64,String}()

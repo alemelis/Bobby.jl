@@ -5,7 +5,7 @@ const N_CLEAR_FILES = (0x3f3f3f3f3f3f3f3f, 0x7f7f7f7f7f7f7f7f,
 const N_SHIFTS = (-10, -17, -15, -6, 10, 17, 15, 6)
 
 function knightMovesGen()
-    knight_moves = Dict{UInt64,UInt64}()
+    knight_moves = Vector{UInt64}(undef, 64)
 
     for square in values(PGN2UINT)
         targets = EMPTY
@@ -14,7 +14,7 @@ function knightMovesGen()
                 targets |= (square & clear) >> shift
             end
         end
-        push!(knight_moves, square=>targets)
+        knight_moves[sq2idx(square)] = targets
     end
     return knight_moves
 end
