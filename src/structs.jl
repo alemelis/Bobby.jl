@@ -66,7 +66,16 @@ function Moves()
     return Moves(Array{Move,1}())
 end
 
+function Moves(capacity::Int)
+    m = Array{Move,1}(undef, 0)
+    sizehint!(m, capacity)
+    return Moves(m)
+end
+
 import Base.push!
 function push!(list::Moves, move::Move)
     push!(list.moves, move)
 end
+
+import Base.empty!
+@inline empty!(list::Moves) = empty!(list.moves)

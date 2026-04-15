@@ -96,73 +96,166 @@ function filterMoves(b::Board, moves::Moves)
     return filtered
 end
 
+# ---------------------------------------------------------------------------
+# Pin detection and check mask computation
+# ---------------------------------------------------------------------------
+
+# Returns (pinned::UInt64, check_mask::UInt64, n_checkers::Int).
+# Writes per-square pin-ray masks into the pre-allocated pin_ray vector (indexed 1..64).
+# A piece on square sq is pinned iff (pinned & sq) != EMPTY; it may only move to squares
+# in pin_ray[sq2idx(sq)].  check_mask is ~EMPTY when not in check; in single check it is
+# the set of squares (between king and checker, inclusive) a non-king piece must target.
+function computePinData!(pin_ray::Vector{UInt64}, b::Board, white::Bool)
+    if white
+        king = b.white.K; own = b.white; opp = b.black
+    else
+        king = b.black.K; own = b.black; opp = b.white
+    end
+
+    fill!(pin_ray, EMPTY)
+    pinned = EMPTY
+
+    # --- diagonal pins (enemy bishop or queen on an empty-board diagonal) ---
+    diag_pinners = getMagicAttack(king, EMPTY, false) & (opp.B | opp.Q)
+    bb = diag_pinners
+    while bb != EMPTY
+        pinner = lsb(bb); bb = popbit(bb)
+        between = getMagicAttack(king, pinner, false) & getMagicAttack(pinner, king, false)
+        blocking = between & b.taken
+        if count_ones(blocking) == 1 && (blocking & own.friends) != EMPTY
+            pinned |= blocking
+            @inbounds pin_ray[sq2idx(blocking)] = between | pinner
+        end
+    end
+
+    # --- orthogonal pins (enemy rook or queen) ---
+    ortho_pinners = getMagicAttack(king, EMPTY, true) & (opp.R | opp.Q)
+    bb = ortho_pinners
+    while bb != EMPTY
+        pinner = lsb(bb); bb = popbit(bb)
+        between = getMagicAttack(king, pinner, true) & getMagicAttack(pinner, king, true)
+        blocking = between & b.taken
+        if count_ones(blocking) == 1 && (blocking & own.friends) != EMPTY
+            pinned |= blocking
+            @inbounds pin_ray[sq2idx(blocking)] = between | pinner
+        end
+    end
+
+    # --- checkers ---
+    kidx     = sq2idx(king)
+    checkers = EMPTY
+    checkers |= KNIGHT[kidx] & opp.N
+    checkers |= (white ? PAWN_X_WHITE[kidx] : PAWN_X_BLACK[kidx]) & opp.P
+    checkers |= getMagicAttack(king, b.taken, true)  & (opp.R | opp.Q)
+    checkers |= getMagicAttack(king, b.taken, false) & (opp.B | opp.Q)
+
+    n_checkers = count_ones(checkers)
+
+    check_mask = ~EMPTY
+    if n_checkers == 1
+        checker = lsb(checkers)
+        if (checker & (opp.N | opp.P)) != EMPTY
+            # Knight or pawn: can only capture, no blocking square
+            check_mask = checker
+        elseif getMagicAttack(king, b.taken, true) & checker != EMPTY
+            # Orthogonal slider (rook or queen on rank/file)
+            between   = getMagicAttack(king, checker, true) & getMagicAttack(checker, king, true)
+            check_mask = between | checker
+        else
+            # Diagonal slider (bishop or queen on diagonal)
+            between   = getMagicAttack(king, checker, false) & getMagicAttack(checker, king, false)
+            check_mask = between | checker
+        end
+    end
+
+    return pinned, check_mask, n_checkers
+end
+
+# ---------------------------------------------------------------------------
+# Zero-allocation variants for the perft hot loop
+# ---------------------------------------------------------------------------
+
+function filterMoves!(filtered::Moves, raw::Moves,
+                      board_stack::Vector{Board}, depth::Int, active::Bool)
+    empty!(filtered)
+    b = board_stack[depth]
+    for m in raw.moves
+        if m.type == PIECE_NONE || m.take.type == PIECE_KING; continue end
+        board_stack[depth + 1] = makeMove(b, m)
+        if !inCheck(board_stack[depth + 1], active)
+            push!(filtered, m)
+        end
+    end
+end
+
+function getMoves!(raw::Moves, filtered::Moves,
+                   board_stack::Vector{Board}, depth::Int, white::Bool)
+    b = board_stack[depth]
+    white ? (friends = b.white.friends; enemy = b.black; cs = b.white) :
+            (friends = b.black.friends; enemy = b.white; cs = b.black)
+    empty!(raw)
+    king_in_check = inCheck(b, ~b.active)
+    for (bitboard, s) in ((cs.P, PIECE_PAWN),   (cs.N, PIECE_KNIGHT),
+                           (cs.B, PIECE_BISHOP), (cs.R, PIECE_ROOK),
+                           (cs.Q, PIECE_QUEEN),  (cs.K, PIECE_KING))
+        getPieceMoves!(raw, bitboard, s, friends, enemy, white, b, king_in_check)
+    end
+    filterMoves!(filtered, raw, board_stack, depth, b.active)
+end
+
 function moveFromTo(bitboard, move)
     return bitboard ⊻= move.from | move.to
 end
 
-function updateSet(cs::ChessSet, move::Move)
-    newp = cs.P
-    newn = cs.N
-    newb = cs.B
-    newr = cs.R
-    newq = cs.Q
-    newk = cs.K
+@inline function updateSet(cs::ChessSet, move::Move)
+    ft   = move.from | move.to
+    newf = (cs.friends ⊻ move.from) | move.to   # incremental: remove from, add to
     if move.type == PIECE_PAWN
         if move.promotion != PIECE_NONE
-            newp = removeFrom(newp, move.from)
-            if move.promotion == PIECE_QUEEN
-                newq |= move.to
-            elseif move.promotion == PIECE_ROOK
-                newr |= move.to
-            elseif move.promotion == PIECE_KNIGHT
-                newn |= move.to
-            elseif move.promotion == PIECE_BISHOP
-                newb |= move.to
-            end
+            promo = move.promotion
+            newf  = cs.friends ⊻ move.from | move.to
+            return ChessSet(cs.P ⊻ move.from,
+                promo == PIECE_KNIGHT ? cs.N | move.to : cs.N,
+                promo == PIECE_BISHOP ? cs.B | move.to : cs.B,
+                promo == PIECE_ROOK   ? cs.R | move.to : cs.R,
+                promo == PIECE_QUEEN  ? cs.Q | move.to : cs.Q,
+                cs.K, newf)
         else
-            newp = moveFromTo(newp, move)
+            return ChessSet(cs.P ⊻ ft, cs.N, cs.B, cs.R, cs.Q, cs.K, newf)
         end
     elseif move.type == PIECE_KNIGHT
-        newn = moveFromTo(newn, move)
+        return ChessSet(cs.P, cs.N ⊻ ft, cs.B, cs.R, cs.Q, cs.K, newf)
     elseif move.type == PIECE_BISHOP
-        newb = moveFromTo(newb, move)
+        return ChessSet(cs.P, cs.N, cs.B ⊻ ft, cs.R, cs.Q, cs.K, newf)
     elseif move.type == PIECE_ROOK
-        newr = moveFromTo(newr, move)
+        return ChessSet(cs.P, cs.N, cs.B, cs.R ⊻ ft, cs.Q, cs.K, newf)
     elseif move.type == PIECE_QUEEN
-        newq = moveFromTo(newq, move)
-    elseif move.type == PIECE_KING
-        newk = moveFromTo(newk, move)
+        return ChessSet(cs.P, cs.N, cs.B, cs.R, cs.Q ⊻ ft, cs.K, newf)
+    else # PIECE_KING
+        return ChessSet(cs.P, cs.N, cs.B, cs.R, cs.Q, cs.K ⊻ ft, newf)
     end
-    newf = newp|newn|newb|newr|newq|newk
-    return ChessSet(newp, newn, newb, newr, newq, newk, newf)
 end
 
-function removeFrom(bitboard::UInt64, square::UInt64)
-    return bitboard ⊻= square
+@inline function removeFrom(bitboard::UInt64, square::UInt64)
+    return bitboard ⊻ square
 end
 
-function updateSet(cs::ChessSet, piece::Piece)
-    newp = cs.P
-    newn = cs.N
-    newb = cs.B
-    newr = cs.R
-    newq = cs.Q
-    newk = cs.K
+@inline function updateSet(cs::ChessSet, piece::Piece)
+    sq   = piece.square
+    newf = cs.friends ⊻ sq
     if piece.type == PIECE_PAWN
-        newp = removeFrom(newp, piece.square)
+        return ChessSet(cs.P ⊻ sq, cs.N, cs.B, cs.R, cs.Q, cs.K, newf)
     elseif piece.type == PIECE_KNIGHT
-        newn = removeFrom(newn, piece.square)
+        return ChessSet(cs.P, cs.N ⊻ sq, cs.B, cs.R, cs.Q, cs.K, newf)
     elseif piece.type == PIECE_BISHOP
-        newb = removeFrom(newb, piece.square)
+        return ChessSet(cs.P, cs.N, cs.B ⊻ sq, cs.R, cs.Q, cs.K, newf)
     elseif piece.type == PIECE_ROOK
-        newr = removeFrom(newr, piece.square)
+        return ChessSet(cs.P, cs.N, cs.B, cs.R ⊻ sq, cs.Q, cs.K, newf)
     elseif piece.type == PIECE_QUEEN
-        newq = removeFrom(newq, piece.square)
-    elseif piece.type == PIECE_KING
-        newk = removeFrom(newk, piece.square)
+        return ChessSet(cs.P, cs.N, cs.B, cs.R, cs.Q ⊻ sq, cs.K, newf)
+    else # PIECE_KING — shouldn't happen, but safe
+        return ChessSet(cs.P, cs.N, cs.B, cs.R, cs.Q, cs.K ⊻ sq, newf)
     end
-    newf = newp|newn|newb|newr|newq|newk
-    return ChessSet(newp, newn, newb, newr, newq, newk, newf)
 end
 
 function makeMove(board::Board, move::Move)
