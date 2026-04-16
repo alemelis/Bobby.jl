@@ -61,15 +61,25 @@ end
 const PGN2INT, INT2PGN = pgn2intGen()
 
 function int2uintGen()
-    int = Dict{Int64,UInt64}()
     uint = Dict{UInt64,Int64}()
-
     for i = 1:64
         pgn = INT2PGN[i]
         pgnuint = PGN2UINT[pgn]
-        push!(int, i=>pgnuint)
-        push!(uint, pgnuint=>i) 
+        push!(uint, pgnuint=>i)
     end
-    return int, uint
+    return uint
 end
-const INT2UINT, UINT2INT = int2uintGen()
+# INT2UINT[i]: 1-based board index → single-bit UInt64 square mask.
+# Layout: i=1 → a8 (MSB), i=64 → h1 (LSB), so bit position = 64-i.
+const INT2UINT = ntuple(i -> UInt64(1) << (64 - i), 64)
+const UINT2INT = int2uintGen()
+
+# Convert a single-bit UInt64 square to its algebraic name (e.g. e2).
+# Avoids a Dict lookup in hot paths like perft root-move labelling.
+@inline function sq2pgn(sq::UInt64)::String
+    tz   = Int(trailing_zeros(sq))  # 0 = h1, 63 = a8
+    i    = 63 - tz                  # 0-based board index matching pgn2uintGen
+    file = i % 8                    # 0 = a … 7 = h
+    rank = 8 - i ÷ 8               # 1 … 8
+    return string(Char(Int('a') + file)) * string(rank)
+end

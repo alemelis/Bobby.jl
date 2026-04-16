@@ -5,8 +5,8 @@ end
 const ROOK_SHIFTS = (8, -8, -1, 1) #N, S, W, E
 const BISHOP_SHIFTS = (9, 7, -7, -9) #NE, NW, SE, SW
 function getNumberOfSquares(square::UInt64, rook::Bool, d::Int64)
-    rook ? mask = ROOK_MASKS[sq2idx(square)] : mask = BISHOP_MASKS[sq2idx(square)]
-    rook ? shifts = ROOK_SHIFTS : shifts = BISHOP_SHIFTS
+    mask   = rook ? ROOK_MASKS[sq2idx(square)] : BISHOP_MASKS[sq2idx(square)]
+    shifts = rook ? ROOK_SHIFTS : BISHOP_SHIFTS
     c = 0
     while true
         (square << (shifts[d]*(c+1)) & mask) == EMPTY ? break : c+=1
@@ -20,7 +20,9 @@ end
 
 function bitsGen(rook::Bool)
     bits = Vector{Int64}(undef, 64)
-    [bits[sq2idx(sq)] = getNumberOfBits(sq, rook) for sq in values(PGN2UINT)]
+    for sq in values(PGN2UINT)
+        bits[sq2idx(sq)] = getNumberOfBits(sq, rook)
+    end
     return bits
 end
 const ROOK_BITS = bitsGen(true)
@@ -28,13 +30,17 @@ const BISHOP_BITS = bitsGen(false)
 
 function occupancyGen(rook::Bool)
     occupancies = Dict{UInt64, Tuple{Vararg{UInt64}}}()
-    rook ? shifts = ROOK_SHIFTS : shifts = BISHOP_SHIFTS
+    shifts = rook ? ROOK_SHIFTS : BISHOP_SHIFTS
     for sq in values(PGN2UINT)
         square_occs = []
         occs = [getOccupancyString(getNumberOfSquares(sq, rook, i)) for i=1:4]
         for ds in Iterators.product(occs...)
             occ = EMPTY
-            [[if ds[j][i] == '1'; occ |= (sq<<(shifts[j]*i)) end for i=1:length(ds[j])] for j=1:4]
+            for j = 1:4, i = 1:length(ds[j])
+                if ds[j][i] == '1'
+                    occ |= (sq << (shifts[j]*i))
+                end
+            end
             push!(square_occs, occ) 
         end
         push!(occupancies, sq=>tuple(square_occs...))
@@ -49,8 +55,8 @@ function randomMagic()
 end
 
 function magicSquareGen(square::UInt64, rook::Bool, bits::Int64)
-    rook ? occupancies = ORTHO_OCCS : occupancies = DIAGO_OCCS
-    rook ? slider = orthoAttack : slider = diagoAttack
+    occupancies = rook ? ORTHO_OCCS : DIAGO_OCCS
+    slider      = rook ? orthoAttack : diagoAttack
     attacks = [slider(square, var) for var in values(occupancies[square])]
     while true
         magic = randomMagic()
@@ -72,7 +78,7 @@ function magicSquareGen(square::UInt64, rook::Bool, bits::Int64)
 end
 
 function magicTableGen(rook::Bool)
-    rook ? bits = ROOK_BITS : bits = BISHOP_BITS
+    bits = rook ? ROOK_BITS : BISHOP_BITS
     magic_table = Vector{UInt64}(undef, 64)
     attacks = Vector{Vector{UInt64}}(undef, 64)
     for s in values(PGN2UINT)

@@ -30,8 +30,8 @@ end
 const KING = kingMovesGen()
 
 function inCheck(b::Board, white::Bool, K::UInt64=EMPTY)
-    if K == EMPTY; white ? K = b.white.K : K = b.black.K end
-    white ? enemy = b.black : enemy = b.white
+    if K == EMPTY; K = white ? b.white.K : b.black.K end
+    enemy = white ? b.black : b.white
 
     kidx = sq2idx(K)
     if KNIGHT[kidx] & enemy.N != EMPTY; return true end
@@ -44,7 +44,7 @@ function inCheck(b::Board, white::Bool, K::UInt64=EMPTY)
     diago = getMagicAttack(K, b.taken, false)
     if diago & enemy.B != EMPTY || diago & enemy.Q != EMPTY; return true end
 
-    white ? x_pawn = PAWN_X_WHITE : x_pawn = PAWN_X_BLACK
+    x_pawn = white ? PAWN_X_WHITE : PAWN_X_BLACK
     if x_pawn[kidx] & enemy.P != EMPTY; return true end
 
     return false

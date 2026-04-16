@@ -55,7 +55,7 @@ const NOCASTLING = UInt8(0)
 const NOTAMOVE = Move(PIECE_NONE, EMPTY, EMPTY, NONE,
     EMPTY, PIECE_NONE, NOCASTLING)
 
-mutable struct Moves
+struct Moves
     moves::Array{Move,1}
 end
 

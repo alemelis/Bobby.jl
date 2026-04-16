@@ -69,7 +69,7 @@ function getAttack(attack::UInt64, b::UInt64, type::UInt8, taken::UInt64)
 end
 
 function getAttack(b::Board, white::Bool)
-    white ? cs = b.white : cs = b.black
+    cs = white ? b.white : b.black
     attack = KING[sq2idx(cs.K)]
     attack = getAttack(attack, cs.R, PIECE_ROOK, b.taken)
     attack = getAttack(attack, cs.B, PIECE_BISHOP, b.taken)
@@ -78,12 +78,14 @@ function getAttack(b::Board, white::Bool)
 end
 
 function getMoves(b::Board, white::Bool)
-    white ? friends = b.white.friends : friends = b.black.friends
-    white ? enemy = b.black : enemy = b.white
-    white ? cs = b.white : cs = b.black
+    if white
+        friends, enemy, cs = b.white.friends, b.black, b.white
+    else
+        friends, enemy, cs = b.black.friends, b.white, b.black
+    end
 
     moves = Moves()
-    king_in_check = inCheck(b, !b.active)
+    king_in_check = inCheck(b, b.active)
     for (bitboard, s) in zip([cs.P, cs.N, cs.B, cs.R, cs.Q, cs.K],
         [PIECE_PAWN, PIECE_KNIGHT, PIECE_BISHOP, PIECE_ROOK, PIECE_QUEEN, PIECE_KING])
         getPieceMoves!(moves, bitboard, s, friends, enemy, white, b, king_in_check)
@@ -209,10 +211,13 @@ end
 function getMoves!(raw::Moves, filtered::Moves,
     board_stack::Vector{Board}, depth::Int, white::Bool)
     b = board_stack[depth]
-    white ? (friends = b.white.friends; enemy = b.black; cs = b.white) :
-    (friends = b.black.friends; enemy = b.white; cs = b.black)
+    if white
+        friends, enemy, cs = b.white.friends, b.black, b.white
+    else
+        friends, enemy, cs = b.black.friends, b.white, b.black
+    end
     empty!(raw)
-    king_in_check = inCheck(b, !b.active)
+    king_in_check = inCheck(b, b.active)
     for (bitboard, s) in ((cs.P, PIECE_PAWN), (cs.N, PIECE_KNIGHT),
         (cs.B, PIECE_BISHOP), (cs.R, PIECE_ROOK),
         (cs.Q, PIECE_QUEEN), (cs.K, PIECE_KING))

@@ -1,12 +1,12 @@
 mutable struct PerftTree
     tot::Int64
     nodes::Array{Int64,1}
-    div::Dict{AbstractString,Array{Int64,1}}
+    div::Dict{String,Array{Int64,1}}
 end
 
 function perft(b::Board, max_depth::Int64)
     pt = PerftTree(0, zeros(max_depth),
-                   Dict{AbstractString,Array{Int64,1}}())
+                   Dict{String,Array{Int64,1}}())
 
     board_stack    = Vector{Board}(undef, max_depth + 2)
     board_stack[1] = b
@@ -25,12 +25,16 @@ function explore!(pt::PerftTree,
                   pin_ray_stack::Vector{Vector{UInt64}},
                   max_depth::Int64,
                   depth::Int64,
-                  root_move::AbstractString = "")
+                  root_move::String = "")
 
     b = board_stack[depth]
 
-    # --- generate pseudo-legal moves ---
+    # --- compute pin/check data first (gives us n_checkers to skip the inCheck call) ---
     white = b.active
+    pin_ray = pin_ray_stack[depth]
+    pinned, check_mask, n_checkers = computePinData!(pin_ray, b, white)
+
+    # --- generate pseudo-legal moves ---
     if white
         friends = b.white.friends; enemy = b.black; cs = b.white
     else
@@ -38,16 +42,12 @@ function explore!(pt::PerftTree,
     end
     raw = raw_stack[depth]
     empty!(raw)
-    king_in_check = inCheck(b, !b.active)
+    king_in_check = n_checkers > 0
     for (bitboard, s) in ((cs.P, PIECE_PAWN),   (cs.N, PIECE_KNIGHT),
                            (cs.B, PIECE_BISHOP), (cs.R, PIECE_ROOK),
                            (cs.Q, PIECE_QUEEN),  (cs.K, PIECE_KING))
         getPieceMoves!(raw, bitboard, s, friends, enemy, white, b, king_in_check)
     end
-
-    # --- compute pin data once for this position ---
-    pin_ray = pin_ray_stack[depth]
-    pinned, check_mask, n_checkers = computePinData!(pin_ray, b, white)
 
     # --- filter: use pin data to skip makeMove+inCheck for most moves ---
     filtered = filtered_stack[depth]
@@ -103,7 +103,7 @@ function explore!(pt::PerftTree,
         @inbounds m = filtered.moves[i]
 
         if depth == 1
-            root_move = UINT2PGN[m.from] * UINT2PGN[m.to]
+            root_move = sq2pgn(m.from) * sq2pgn(m.to)
             if m.promotion != PIECE_NONE
                 root_move *= m.promotion == PIECE_QUEEN  ? "q" :
                              m.promotion == PIECE_ROOK   ? "r" :

@@ -1,17 +1,22 @@
 function getPawnAttack(attack::UInt64, b::UInt64, white::Bool)
-    white ? lx_clear = CLEAR_FILE_A : lx_clear = CLEAR_FILE_H
-    white ? lx_shift = 9 : lx_shift = -9
+    if white
+        lx_clear, lx_shift = CLEAR_FILE_A, 9
+        rx_shift, rx_clear = 7, CLEAR_FILE_H
+    else
+        lx_clear, lx_shift = CLEAR_FILE_H, -9
+        rx_shift, rx_clear = -7, CLEAR_FILE_A
+    end
     attack |= (b & lx_clear) << lx_shift
-    white ? rx_shift = 7 : rx_shift = -7
-    white ? rx_clear = CLEAR_FILE_H : rx_clear = CLEAR_FILE_A
     return attack |= (b & rx_clear) << rx_shift
 end
 
 function getPawnMoves!(moves::Moves, bitboard::UInt64, taken::UInt64, friends::UInt64,
                        enemy::ChessSet, white::Bool, enpassant::UInt64)
-    white ? shift = 8 : shift = -8
-    white ? home = MASK_RANKS[2] : home = MASK_RANKS[7]
-    white ? prom = MASK_RANKS[8] : prom = MASK_RANKS[1]
+    if white
+        shift, home, prom = 8, MASK_RANKS[2], MASK_RANKS[8]
+    else
+        shift, home, prom = -8, MASK_RANKS[7], MASK_RANKS[1]
+    end
 
     one_step = (bitboard << shift) & ~taken
     bb = one_step
@@ -34,8 +39,7 @@ function getPawnMoves!(moves::Moves, bitboard::UInt64, taken::UInt64, friends::U
         push!(moves, Move(PIECE_PAWN, target >> (shift*2), target, NONE, target >> shift, PIECE_NONE, NOCASTLING))
     end
 
-    white ? lx_clear = CLEAR_FILE_A : lx_clear = CLEAR_FILE_H
-    white ? lx_shift = 9 : lx_shift = -9
+    lx_clear, lx_shift = white ? (CLEAR_FILE_A, 9) : (CLEAR_FILE_H, -9)
     x_lx = (((bitboard & lx_clear) << lx_shift) & taken) & ~friends
     bb = x_lx
     while bb != EMPTY
@@ -60,8 +64,7 @@ function getPawnMoves!(moves::Moves, bitboard::UInt64, taken::UInt64, friends::U
         push!(moves, Move(PIECE_PAWN, src, enpassant, take, EMPTY, PIECE_NONE, NOCASTLING))
     end
 
-    white ? rx_shift = 7 : rx_shift = -7
-    white ? rx_clear = CLEAR_FILE_H : rx_clear = CLEAR_FILE_A
+    rx_shift, rx_clear = white ? (7, CLEAR_FILE_H) : (-7, CLEAR_FILE_A)
     x_rx = (((bitboard & rx_clear) << rx_shift) & taken) & ~friends
     bb = x_rx
     while bb != EMPTY
@@ -91,9 +94,11 @@ function pawnMovesGen(white::Bool)
     pawn_moves   = Vector{UInt64}(undef, 64)
     pawn_attacks = Vector{UInt64}(undef, 64)
 
-    white ? home = MASK_RANKS[2] : home = MASK_RANKS[7]
-    white ? lx_clear = CLEAR_FILE_A : lx_clear = CLEAR_FILE_H
-    white ? rx_clear = CLEAR_FILE_H : rx_clear = CLEAR_FILE_A
+    if white
+        home, lx_clear, rx_clear = MASK_RANKS[2], CLEAR_FILE_A, CLEAR_FILE_H
+    else
+        home, lx_clear, rx_clear = MASK_RANKS[7], CLEAR_FILE_H, CLEAR_FILE_A
+    end
 
     for square in values(PGN2UINT)
         targets = EMPTY

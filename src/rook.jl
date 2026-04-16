@@ -25,7 +25,9 @@ end
 
 function rookMasksGen()
     masks = Vector{UInt64}(undef, 64)
-    [masks[sq2idx(s)] = orthoSlide(s) for s in values(PGN2UINT)]
+    for s in values(PGN2UINT)
+        masks[sq2idx(s)] = orthoSlide(s)
+    end
     return masks
 end
 #orthogonal masks

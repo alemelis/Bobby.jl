@@ -27,7 +27,9 @@ end
 
 function bishopMasksGen()
     masks = Vector{UInt64}(undef, 64)
-    [masks[sq2idx(s)] = diagoSlide(s) for s in values(PGN2UINT)]
+    for s in values(PGN2UINT)
+        masks[sq2idx(s)] = diagoSlide(s)
+    end
     return masks
 end
 #diagonal masks
