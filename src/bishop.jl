@@ -26,8 +26,10 @@ function diagoSlide(square::UInt64)
 end
 
 function bishopMasksGen()
-    masks = Dict{UInt64,UInt64}()
-    [push!(masks, s=>diagoSlide(s)) for s in values(PGN2UINT)]
+    masks = Vector{UInt64}(undef, 64)
+    for s in values(PGN2UINT)
+        masks[sq2idx(s)] = diagoSlide(s)
+    end
     return masks
 end
 #diagonal masks

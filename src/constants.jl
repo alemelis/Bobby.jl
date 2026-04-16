@@ -1,3 +1,7 @@
+# Bit manipulation helpers for pop-LSB iteration
+@inline lsb(bb::UInt64)    = bb & (typemax(UInt64) - bb + UInt64(1))  # isolate lowest set bit
+@inline popbit(bb::UInt64) = bb & (bb - UInt64(1))                    # clear lowest set bit
+
 const MASK_RANKS = (0x00000000000000ff,
                     0x000000000000ff00,
                     0x0000000000ff0000,

@@ -1,20 +1,20 @@
 module Bobby
+using Printf
+using Crayons
+using Random
 
-    export Bitboard
-    using Printf
-    using Crayons
-    using Random
-
-    include("structs.jl")
-    include("constants.jl")
-    include("cvt.jl")
-    include("bitboard.jl")
-    include("king.jl")
-    include("knight.jl")
-    include("rook.jl")
-    include("bishop.jl")
-    include("magic.jl")
-    include("pawn.jl")
-    include("move.jl")
-    include("perft.jl")
+include("structs.jl")
+include("constants.jl")
+include("cvt.jl")
+include("zobrist.jl")
+include("bitboard.jl")
+include("king.jl")
+include("knight.jl")
+include("rook.jl")
+include("bishop.jl")
+include("magic.jl")
+include("pawn.jl")
+include("move.jl")
+include("perft.jl")
+include("game.jl")
 end

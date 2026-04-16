@@ -24,8 +24,10 @@ function orthoSlide(square::UInt64)
 end
 
 function rookMasksGen()
-    masks = Dict{UInt64,UInt64}()
-    [push!(masks, s=>orthoSlide(s)) for s in values(PGN2UINT)]
+    masks = Vector{UInt64}(undef, 64)
+    for s in values(PGN2UINT)
+        masks[sq2idx(s)] = orthoSlide(s)
+    end
     return masks
 end
 #orthogonal masks
