@@ -17,4 +17,5 @@ include("pawn.jl")
 include("move.jl")
 include("perft.jl")
 include("game.jl")
+include("tensor.jl")
 end
