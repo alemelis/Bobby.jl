@@ -38,7 +38,7 @@ function explore!(pt::PerftTree,
     end
     raw = raw_stack[depth]
     empty!(raw)
-    king_in_check = inCheck(b, ~b.active)
+    king_in_check = inCheck(b, !b.active)
     for (bitboard, s) in ((cs.P, PIECE_PAWN),   (cs.N, PIECE_KNIGHT),
                            (cs.B, PIECE_BISHOP), (cs.R, PIECE_ROOK),
                            (cs.Q, PIECE_QUEEN),  (cs.K, PIECE_KING))

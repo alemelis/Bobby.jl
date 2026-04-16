@@ -73,11 +73,11 @@ end
 function isCheckmate(g::Game)
     b = currentBoard(g)
     moves = getMoves(b, b.active)
-    return length(moves.moves) == 0 && inCheck(b, ~b.active)
+    return length(moves.moves) == 0 && inCheck(b, !b.active)
 end
 
 function isStalemate(g::Game)
     b = currentBoard(g)
     moves = getMoves(b, b.active)
-    return length(moves.moves) == 0 && !inCheck(b, ~b.active)
+    return length(moves.moves) == 0 && !inCheck(b, !b.active)
 end

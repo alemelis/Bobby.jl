@@ -15,7 +15,7 @@ function getPieceMoves!(moves::Moves, bitboard::UInt64, type::UInt8,
                 piece_moves = KNIGHT[sq2idx(src)]
             elseif type == PIECE_KING
                 piece_moves = KING[sq2idx(src)]
-                if ~k_in_check; getCastlingMoves!(moves, src, b, white) end
+                if !k_in_check; getCastlingMoves!(moves, src, b, white) end
             elseif type == PIECE_ROOK
                 piece_moves = getMagicAttack(src, b.taken, true)
             elseif type == PIECE_BISHOP
@@ -75,7 +75,7 @@ function getMoves(b::Board, white::Bool)
     white ? cs = b.white : cs = b.black
 
     moves = Moves()
-    king_in_check = inCheck(b, ~b.active)
+    king_in_check = inCheck(b, !b.active)
     for (bitboard, s) in zip([cs.P, cs.N, cs.B, cs.R, cs.Q, cs.K],
                              [PIECE_PAWN, PIECE_KNIGHT, PIECE_BISHOP, PIECE_ROOK, PIECE_QUEEN, PIECE_KING])
         getPieceMoves!(moves, bitboard, s, friends, enemy, white, b, king_in_check)
@@ -89,7 +89,7 @@ function filterMoves(b::Board, moves::Moves)
         if m.type == PIECE_NONE || m.take.type == PIECE_KING; continue end
         b1 = makeMove(b, m)
         king_in_check = inCheck(b1, b.active)
-        if ~king_in_check
+        if !king_in_check
             push!(filtered, m)
         end
     end
@@ -194,7 +194,7 @@ function getMoves!(raw::Moves, filtered::Moves,
     white ? (friends = b.white.friends; enemy = b.black; cs = b.white) :
             (friends = b.black.friends; enemy = b.white; cs = b.black)
     empty!(raw)
-    king_in_check = inCheck(b, ~b.active)
+    king_in_check = inCheck(b, !b.active)
     for (bitboard, s) in ((cs.P, PIECE_PAWN),   (cs.N, PIECE_KNIGHT),
                            (cs.B, PIECE_BISHOP), (cs.R, PIECE_ROOK),
                            (cs.Q, PIECE_QUEEN),  (cs.K, PIECE_KING))
@@ -380,7 +380,7 @@ function makeMove(board::Board, move::Move)
     h ⊻= ZOBRIST_SIDE
 
     taken = new_white.friends | new_black.friends
-    return Board(new_white, new_black, taken, ~board.active, castling,
+    return Board(new_white, new_black, taken, !board.active, castling,
                  move.enpassant, board.halfmove, board.fullmove, h)
 end
 

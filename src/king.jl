@@ -55,14 +55,14 @@ function getCastlingMoves!(moves::Moves, K::UInt64, b::Board, white::Bool)
     if white
         if CQ&b.castling != NOCASTLING && A1&b.white.R != EMPTY
             if B1C1D1 & b.taken == EMPTY
-                if ~inCheck(b, white, D1) && ~inCheck(b, white, C1)
+                if !inCheck(b, white, D1) && !inCheck(b, white, C1)
                     push!(moves, Move(PIECE_KING, K, C1, NONE, EMPTY, PIECE_NONE, CQ))
                 end
             end
         end
         if CK&b.castling != NOCASTLING && H1&b.white.R != EMPTY
             if F1G1 & b.taken == EMPTY
-                if ~inCheck(b, white, F1) && ~inCheck(b, white, G1)
+                if !inCheck(b, white, F1) && !inCheck(b, white, G1)
                     push!(moves, Move(PIECE_KING, K, G1, NONE, EMPTY, PIECE_NONE, CK))
                 end
             end
@@ -70,14 +70,14 @@ function getCastlingMoves!(moves::Moves, K::UInt64, b::Board, white::Bool)
     else
         if Cq&b.castling != NOCASTLING && A8&b.black.R != EMPTY
             if B8C8D8 & b.taken == EMPTY
-                if ~inCheck(b, white, D8) && ~inCheck(b, white, C8)
+                if !inCheck(b, white, D8) && !inCheck(b, white, C8)
                     push!(moves, Move(PIECE_KING, K, C8, NONE, EMPTY, PIECE_NONE, Cq))
                 end
             end
         end
         if Ck&b.castling != NOCASTLING && H8&b.black.R != EMPTY
             if F8G8 & b.taken == EMPTY
-                if ~inCheck(b, white, F8) && ~inCheck(b, white, G8)
+                if !inCheck(b, white, F8) && !inCheck(b, white, G8)
                     push!(moves, Move(PIECE_KING, K, G8, NONE, EMPTY, PIECE_NONE, Ck))
                 end
             end
