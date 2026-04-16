@@ -152,8 +152,7 @@ function loadFen(fen::String)
                      pieces['r'], pieces['q'], pieces['k'],
                      blacks)
 
-    taken = EMPTY
-    taken = whites |= blacks
+    taken = whites | blacks
 
     halfmove = parse(Int64, halfmove)
     fullmove = parse(Int64, fullmove)

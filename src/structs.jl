@@ -1,12 +1,12 @@
 const EMPTY = UInt64(0)
 
-const PIECE_NONE   = UInt8(0)
-const PIECE_PAWN   = UInt8(1)
+const PIECE_NONE = UInt8(0)
+const PIECE_PAWN = UInt8(1)
 const PIECE_KNIGHT = UInt8(2)
 const PIECE_BISHOP = UInt8(3)
-const PIECE_ROOK   = UInt8(4)
-const PIECE_QUEEN  = UInt8(5)
-const PIECE_KING   = UInt8(6)
+const PIECE_ROOK = UInt8(4)
+const PIECE_QUEEN = UInt8(5)
+const PIECE_KING = UInt8(6)
 
 struct ChessSet
     P::UInt64
@@ -16,9 +16,6 @@ struct ChessSet
     Q::UInt64
     K::UInt64
     friends::UInt64
-end
-
-function Base.show(io::IO, b::ChessSet)
 end
 
 struct Board
@@ -56,7 +53,7 @@ const Ck = UInt8(2)
 const Cq = UInt8(1)
 const NOCASTLING = UInt8(0)
 const NOTAMOVE = Move(PIECE_NONE, EMPTY, EMPTY, NONE,
-                      EMPTY, PIECE_NONE, NOCASTLING)
+    EMPTY, PIECE_NONE, NOCASTLING)
 
 mutable struct Moves
     moves::Array{Move,1}

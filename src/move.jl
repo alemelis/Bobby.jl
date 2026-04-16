@@ -1,21 +1,25 @@
 function getPieceMoves!(moves::Moves, bitboard::UInt64, type::UInt8,
-                        friends::UInt64, enemy::ChessSet, white::Bool, b::Board,
-                        k_in_check::Bool=false)
-    if bitboard == EMPTY; return end
+    friends::UInt64, enemy::ChessSet, white::Bool, b::Board,
+    k_in_check::Bool=false)
+    if bitboard == EMPTY
+        return
+    end
     if type == PIECE_PAWN
         getPawnMoves!(moves, bitboard, b.taken, friends, enemy, white, b.enpassant)
     else
         bb = bitboard
         while bb != EMPTY
             src = lsb(bb)
-            bb  = popbit(bb)
+            bb = popbit(bb)
             piece_moves = EMPTY
 
             if type == PIECE_KNIGHT
                 piece_moves = KNIGHT[sq2idx(src)]
             elseif type == PIECE_KING
                 piece_moves = KING[sq2idx(src)]
-                if !k_in_check; getCastlingMoves!(moves, src, b, white) end
+                if !k_in_check
+                    getCastlingMoves!(moves, src, b, white)
+                end
             elseif type == PIECE_ROOK
                 piece_moves = getMagicAttack(src, b.taken, true)
             elseif type == PIECE_BISHOP
@@ -26,14 +30,18 @@ function getPieceMoves!(moves::Moves, bitboard::UInt64, type::UInt8,
             end
             piece_moves &= ~friends
 
-            if piece_moves == EMPTY; continue end
+            if piece_moves == EMPTY
+                continue
+            end
 
             pm = piece_moves
             while pm != EMPTY
                 target = lsb(pm)
                 pm = popbit(pm)
                 enemy_type = getTypeAt(enemy, target)
-                if enemy_type == PIECE_KING; continue end
+                if enemy_type == PIECE_KING
+                    continue
+                end
                 target & enemy.friends != EMPTY ? take = Piece(enemy_type, target) : take = NONE
                 push!(moves, Move(type, src, target, take, EMPTY, PIECE_NONE, NOCASTLING))
             end
@@ -45,7 +53,7 @@ function getAttack(attack::UInt64, b::UInt64, type::UInt8, taken::UInt64)
     bb = b
     while bb != EMPTY
         src = lsb(bb)
-        bb  = popbit(bb)
+        bb = popbit(bb)
         if type == PIECE_KNIGHT
             attack |= KNIGHT[sq2idx(src)]
         elseif type == PIECE_ROOK
@@ -77,7 +85,7 @@ function getMoves(b::Board, white::Bool)
     moves = Moves()
     king_in_check = inCheck(b, !b.active)
     for (bitboard, s) in zip([cs.P, cs.N, cs.B, cs.R, cs.Q, cs.K],
-                             [PIECE_PAWN, PIECE_KNIGHT, PIECE_BISHOP, PIECE_ROOK, PIECE_QUEEN, PIECE_KING])
+        [PIECE_PAWN, PIECE_KNIGHT, PIECE_BISHOP, PIECE_ROOK, PIECE_QUEEN, PIECE_KING])
         getPieceMoves!(moves, bitboard, s, friends, enemy, white, b, king_in_check)
     end
     return filterMoves(b, moves)
@@ -86,7 +94,9 @@ end
 function filterMoves(b::Board, moves::Moves)
     filtered = Moves()
     for m in moves.moves
-        if m.type == PIECE_NONE || m.take.type == PIECE_KING; continue end
+        if m.type == PIECE_NONE || m.take.type == PIECE_KING
+            continue
+        end
         b1 = makeMove(b, m)
         king_in_check = inCheck(b1, b.active)
         if !king_in_check
@@ -107,9 +117,13 @@ end
 # the set of squares (between king and checker, inclusive) a non-king piece must target.
 function computePinData!(pin_ray::Vector{UInt64}, b::Board, white::Bool)
     if white
-        king = b.white.K; own = b.white; opp = b.black
+        king = b.white.K
+        own = b.white
+        opp = b.black
     else
-        king = b.black.K; own = b.black; opp = b.white
+        king = b.black.K
+        own = b.black
+        opp = b.white
     end
 
     fill!(pin_ray, EMPTY)
@@ -119,7 +133,8 @@ function computePinData!(pin_ray::Vector{UInt64}, b::Board, white::Bool)
     diag_pinners = getMagicAttack(king, EMPTY, false) & (opp.B | opp.Q)
     bb = diag_pinners
     while bb != EMPTY
-        pinner = lsb(bb); bb = popbit(bb)
+        pinner = lsb(bb)
+        bb = popbit(bb)
         between = getMagicAttack(king, pinner, false) & getMagicAttack(pinner, king, false)
         blocking = between & b.taken
         if count_ones(blocking) == 1 && (blocking & own.friends) != EMPTY
@@ -132,7 +147,8 @@ function computePinData!(pin_ray::Vector{UInt64}, b::Board, white::Bool)
     ortho_pinners = getMagicAttack(king, EMPTY, true) & (opp.R | opp.Q)
     bb = ortho_pinners
     while bb != EMPTY
-        pinner = lsb(bb); bb = popbit(bb)
+        pinner = lsb(bb)
+        bb = popbit(bb)
         between = getMagicAttack(king, pinner, true) & getMagicAttack(pinner, king, true)
         blocking = between & b.taken
         if count_ones(blocking) == 1 && (blocking & own.friends) != EMPTY
@@ -142,11 +158,11 @@ function computePinData!(pin_ray::Vector{UInt64}, b::Board, white::Bool)
     end
 
     # --- checkers ---
-    kidx     = sq2idx(king)
+    kidx = sq2idx(king)
     checkers = EMPTY
     checkers |= KNIGHT[kidx] & opp.N
     checkers |= (white ? PAWN_X_WHITE[kidx] : PAWN_X_BLACK[kidx]) & opp.P
-    checkers |= getMagicAttack(king, b.taken, true)  & (opp.R | opp.Q)
+    checkers |= getMagicAttack(king, b.taken, true) & (opp.R | opp.Q)
     checkers |= getMagicAttack(king, b.taken, false) & (opp.B | opp.Q)
 
     n_checkers = count_ones(checkers)
@@ -159,11 +175,11 @@ function computePinData!(pin_ray::Vector{UInt64}, b::Board, white::Bool)
             check_mask = checker
         elseif getMagicAttack(king, b.taken, true) & checker != EMPTY
             # Orthogonal slider (rook or queen on rank/file)
-            between   = getMagicAttack(king, checker, true) & getMagicAttack(checker, king, true)
+            between = getMagicAttack(king, checker, true) & getMagicAttack(checker, king, true)
             check_mask = between | checker
         else
             # Diagonal slider (bishop or queen on diagonal)
-            between   = getMagicAttack(king, checker, false) & getMagicAttack(checker, king, false)
+            between = getMagicAttack(king, checker, false) & getMagicAttack(checker, king, false)
             check_mask = between | checker
         end
     end
@@ -176,49 +192,48 @@ end
 # ---------------------------------------------------------------------------
 
 function filterMoves!(filtered::Moves, raw::Moves,
-                      board_stack::Vector{Board}, depth::Int, active::Bool)
+    board_stack::Vector{Board}, depth::Int, active::Bool)
     empty!(filtered)
     b = board_stack[depth]
     for m in raw.moves
-        if m.type == PIECE_NONE || m.take.type == PIECE_KING; continue end
-        board_stack[depth + 1] = makeMove(b, m)
-        if !inCheck(board_stack[depth + 1], active)
+        if m.type == PIECE_NONE || m.take.type == PIECE_KING
+            continue
+        end
+        board_stack[depth+1] = makeMove(b, m)
+        if !inCheck(board_stack[depth+1], active)
             push!(filtered, m)
         end
     end
 end
 
 function getMoves!(raw::Moves, filtered::Moves,
-                   board_stack::Vector{Board}, depth::Int, white::Bool)
+    board_stack::Vector{Board}, depth::Int, white::Bool)
     b = board_stack[depth]
     white ? (friends = b.white.friends; enemy = b.black; cs = b.white) :
-            (friends = b.black.friends; enemy = b.white; cs = b.black)
+    (friends = b.black.friends; enemy = b.white; cs = b.black)
     empty!(raw)
     king_in_check = inCheck(b, !b.active)
-    for (bitboard, s) in ((cs.P, PIECE_PAWN),   (cs.N, PIECE_KNIGHT),
-                           (cs.B, PIECE_BISHOP), (cs.R, PIECE_ROOK),
-                           (cs.Q, PIECE_QUEEN),  (cs.K, PIECE_KING))
+    for (bitboard, s) in ((cs.P, PIECE_PAWN), (cs.N, PIECE_KNIGHT),
+        (cs.B, PIECE_BISHOP), (cs.R, PIECE_ROOK),
+        (cs.Q, PIECE_QUEEN), (cs.K, PIECE_KING))
         getPieceMoves!(raw, bitboard, s, friends, enemy, white, b, king_in_check)
     end
     filterMoves!(filtered, raw, board_stack, depth, b.active)
 end
 
-function moveFromTo(bitboard, move)
-    return bitboard ⊻= move.from | move.to
-end
 
 @inline function updateSet(cs::ChessSet, move::Move)
-    ft   = move.from | move.to
+    ft = move.from | move.to
     newf = (cs.friends ⊻ move.from) | move.to   # incremental: remove from, add to
     if move.type == PIECE_PAWN
         if move.promotion != PIECE_NONE
             promo = move.promotion
-            newf  = cs.friends ⊻ move.from | move.to
+            newf = cs.friends ⊻ move.from | move.to
             return ChessSet(cs.P ⊻ move.from,
                 promo == PIECE_KNIGHT ? cs.N | move.to : cs.N,
                 promo == PIECE_BISHOP ? cs.B | move.to : cs.B,
-                promo == PIECE_ROOK   ? cs.R | move.to : cs.R,
-                promo == PIECE_QUEEN  ? cs.Q | move.to : cs.Q,
+                promo == PIECE_ROOK ? cs.R | move.to : cs.R,
+                promo == PIECE_QUEEN ? cs.Q | move.to : cs.Q,
                 cs.K, newf)
         else
             return ChessSet(cs.P ⊻ ft, cs.N, cs.B, cs.R, cs.Q, cs.K, newf)
@@ -241,7 +256,7 @@ end
 end
 
 @inline function updateSet(cs::ChessSet, piece::Piece)
-    sq   = piece.square
+    sq = piece.square
     newf = cs.friends ⊻ sq
     if piece.type == PIECE_PAWN
         return ChessSet(cs.P ⊻ sq, cs.N, cs.B, cs.R, cs.Q, cs.K, newf)
@@ -288,10 +303,10 @@ function makeMove(board::Board, move::Move)
                 castling ⊻= CK
             end
         end
-        if castling&CK != NOCASTLING && (move.type == PIECE_KING || (move.type == PIECE_ROOK && move.from == H1))
+        if castling & CK != NOCASTLING && (move.type == PIECE_KING || (move.type == PIECE_ROOK && move.from == H1))
             castling ⊻= CK
         end
-        if castling&CQ != NOCASTLING && (move.type == PIECE_KING || (move.type == PIECE_ROOK && move.from == A1))
+        if castling & CQ != NOCASTLING && (move.type == PIECE_KING || (move.type == PIECE_ROOK && move.from == A1))
             castling ⊻= CQ
         end
     else
@@ -319,10 +334,10 @@ function makeMove(board::Board, move::Move)
                 castling ⊻= Ck
             end
         end
-        if castling&Ck != NOCASTLING && (move.type == PIECE_KING || (move.type == PIECE_ROOK && move.from == H8))
+        if castling & Ck != NOCASTLING && (move.type == PIECE_KING || (move.type == PIECE_ROOK && move.from == H8))
             castling ⊻= Ck
         end
-        if castling&Cq != NOCASTLING && (move.type == PIECE_KING || (move.type == PIECE_ROOK && move.from == A8))
+        if castling & Cq != NOCASTLING && (move.type == PIECE_KING || (move.type == PIECE_ROOK && move.from == A8))
             castling ⊻= Cq
         end
     end
@@ -331,17 +346,17 @@ function makeMove(board::Board, move::Move)
     color = board.active ? 1 : 2
 
     # castling rights delta
-    h ⊻= ZOBRIST_CASTLING[board.castling + 1]
-    h ⊻= ZOBRIST_CASTLING[castling + 1]
+    h ⊻= ZOBRIST_CASTLING[board.castling+1]
+    h ⊻= ZOBRIST_CASTLING[castling+1]
 
     # en passant delta
     if board.enpassant != EMPTY
-        h ⊻= ZOBRIST_EP[(trailing_zeros(board.enpassant) % 8) + 1]
+        h ⊻= ZOBRIST_EP[(trailing_zeros(board.enpassant)%8)+1]
     else
         h ⊻= ZOBRIST_EP[9]
     end
     if move.enpassant != EMPTY
-        h ⊻= ZOBRIST_EP[(trailing_zeros(move.enpassant) % 8) + 1]
+        h ⊻= ZOBRIST_EP[(trailing_zeros(move.enpassant)%8)+1]
     else
         h ⊻= ZOBRIST_EP[9]
     end
@@ -381,7 +396,7 @@ function makeMove(board::Board, move::Move)
 
     taken = new_white.friends | new_black.friends
     return Board(new_white, new_black, taken, !board.active, castling,
-                 move.enpassant, board.halfmove, board.fullmove, h)
+        move.enpassant, board.halfmove, board.fullmove, h)
 end
 
 # ---------------------------------------------------------------------------
@@ -390,10 +405,10 @@ end
 
 function moveToUCI(m::Move)::String
     from_str = UINT2PGN[m.from]
-    to_str   = UINT2PGN[m.to]
+    to_str = UINT2PGN[m.to]
     if m.promotion != PIECE_NONE
-        promo_char = m.promotion == PIECE_QUEEN  ? 'q' :
-                     m.promotion == PIECE_ROOK   ? 'r' :
+        promo_char = m.promotion == PIECE_QUEEN ? 'q' :
+                     m.promotion == PIECE_ROOK ? 'r' :
                      m.promotion == PIECE_BISHOP ? 'b' : 'n'
         return from_str * to_str * promo_char
     end
@@ -402,11 +417,11 @@ end
 
 function uciMoveToMove(b::Board, uci::String)::Move
     from_sq = PGN2UINT[uci[1:2]]
-    to_sq   = PGN2UINT[uci[3:4]]
-    promo   = PIECE_NONE
+    to_sq = PGN2UINT[uci[3:4]]
+    promo = PIECE_NONE
     if length(uci) == 5
-        promo = uci[5] == 'q' ? PIECE_QUEEN  :
-                uci[5] == 'r' ? PIECE_ROOK   :
+        promo = uci[5] == 'q' ? PIECE_QUEEN :
+                uci[5] == 'r' ? PIECE_ROOK :
                 uci[5] == 'b' ? PIECE_BISHOP : PIECE_KNIGHT
     end
     moves = getMoves(b, b.active)
@@ -417,4 +432,3 @@ function uciMoveToMove(b::Board, uci::String)::Move
     end
     error("Illegal UCI move: $uci")
 end
-
