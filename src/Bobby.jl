@@ -18,4 +18,7 @@ include("move.jl")
 include("perft.jl")
 include("game.jl")
 include("tensor.jl")
+include("pgn.jl")
+
+export read_pgn, san_to_uci, move_to_uci
 end
