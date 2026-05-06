@@ -101,53 +101,48 @@ end
 # Silently skips games that produce parse errors so a malformed game doesn't
 # abort the whole file.
 function read_pgn(io::IO)::Channel{Tuple{Dict{String,String},Vector{String}}}
-    Channel{Tuple{Dict{String,String},Vector{String}}}(; ctype=Tuple{Dict{String,String},Vector{String}}, csize=0) do ch
+    Channel{Tuple{Dict{String,String},Vector{String}}}(0) do ch
         headers   = Dict{String,String}()
         movetext  = IOBuffer()
         in_header = false
 
         flush_game = function()
-            isempty(headers) && seekstart(movetext) == nothing && return
-            mt = String(take!(copy(movetext)))
+            (isempty(headers) && position(movetext) == 0) && return
+            mt = String(take!(movetext))   # drains + resets the IOBuffer
+            isempty(strip(mt)) && (empty!(headers); return)
             uci_moves = try
                 _parse_movetext(mt, get(headers, "FEN", nothing))
-            catch e
+            catch
                 String[]
             end
             if !isempty(uci_moves)
                 put!(ch, (copy(headers), uci_moves))
             end
             empty!(headers)
-            take!(movetext)  # reset buffer
         end
 
         for raw_line in eachline(io)
             line = strip(raw_line)
 
             if startswith(line, "[")
-                # Entering header section
                 m = match(r"^\[(\w+)\s+\"(.*)\"\]$", line)
-                if m !== nothing
-                    # If we had movetext buffered, flush the previous game
-                    if position(movetext) > 0
-                        flush_game()
-                    end
-                    headers[m.captures[1]] = m.captures[2]
+                m === nothing && continue
+                # A header tag after accumulated movetext means a new game starts.
+                if position(movetext) > 0
+                    flush_game()
                 end
+                headers[m.captures[1]] = m.captures[2]
 
             elseif isempty(line)
-                # Blank line ends movetext block
                 if position(movetext) > 0
                     flush_game()
                 end
 
             else
-                # Movetext line
                 print(movetext, " ", line)
             end
         end
 
-        # Flush last game
         if position(movetext) > 0
             flush_game()
         end
