@@ -21,12 +21,12 @@ function getPieceMoves!(moves::Moves, bitboard::UInt64, type::UInt8,
                     getCastlingMoves!(moves, src, b, white)
                 end
             elseif type == PIECE_ROOK
-                piece_moves = getMagicAttack(src, b.taken, true)
+                piece_moves = getSliderAttack(src, b.taken, true)
             elseif type == PIECE_BISHOP
-                piece_moves = getMagicAttack(src, b.taken, false)
+                piece_moves = getSliderAttack(src, b.taken, false)
             elseif type == PIECE_QUEEN
-                piece_moves = getMagicAttack(src, b.taken, true)
-                piece_moves |= getMagicAttack(src, b.taken, false)
+                piece_moves = getSliderAttack(src, b.taken, true)
+                piece_moves |= getSliderAttack(src, b.taken, false)
             end
             piece_moves &= ~friends
 
@@ -57,12 +57,12 @@ function getAttack(attack::UInt64, b::UInt64, type::UInt8, taken::UInt64)
         if type == PIECE_KNIGHT
             attack |= KNIGHT[sq2idx(src)]
         elseif type == PIECE_ROOK
-            attack |= getMagicAttack(src, taken, true)
+            attack |= getSliderAttack(src, taken, true)
         elseif type == PIECE_BISHOP
-            attack |= getMagicAttack(src, taken, false)
+            attack |= getSliderAttack(src, taken, false)
         elseif type == PIECE_QUEEN
-            attack |= getMagicAttack(src, taken, false)
-            attack |= getMagicAttack(src, taken, true)
+            attack |= getSliderAttack(src, taken, false)
+            attack |= getSliderAttack(src, taken, true)
         end
     end
     return attack
@@ -132,12 +132,12 @@ function computePinData!(pin_ray::Vector{UInt64}, b::Board, white::Bool)
     pinned = EMPTY
 
     # --- diagonal pins (enemy bishop or queen on an empty-board diagonal) ---
-    diag_pinners = getMagicAttack(king, EMPTY, false) & (opp.B | opp.Q)
+    diag_pinners = getSliderAttack(king, EMPTY, false) & (opp.B | opp.Q)
     bb = diag_pinners
     while bb != EMPTY
         pinner = lsb(bb)
         bb = popbit(bb)
-        between = getMagicAttack(king, pinner, false) & getMagicAttack(pinner, king, false)
+        between = getSliderAttack(king, pinner, false) & getSliderAttack(pinner, king, false)
         blocking = between & b.taken
         if count_ones(blocking) == 1 && (blocking & own.friends) != EMPTY
             pinned |= blocking
@@ -146,12 +146,12 @@ function computePinData!(pin_ray::Vector{UInt64}, b::Board, white::Bool)
     end
 
     # --- orthogonal pins (enemy rook or queen) ---
-    ortho_pinners = getMagicAttack(king, EMPTY, true) & (opp.R | opp.Q)
+    ortho_pinners = getSliderAttack(king, EMPTY, true) & (opp.R | opp.Q)
     bb = ortho_pinners
     while bb != EMPTY
         pinner = lsb(bb)
         bb = popbit(bb)
-        between = getMagicAttack(king, pinner, true) & getMagicAttack(pinner, king, true)
+        between = getSliderAttack(king, pinner, true) & getSliderAttack(pinner, king, true)
         blocking = between & b.taken
         if count_ones(blocking) == 1 && (blocking & own.friends) != EMPTY
             pinned |= blocking
@@ -164,8 +164,8 @@ function computePinData!(pin_ray::Vector{UInt64}, b::Board, white::Bool)
     checkers = EMPTY
     checkers |= KNIGHT[kidx] & opp.N
     checkers |= (white ? PAWN_X_WHITE[kidx] : PAWN_X_BLACK[kidx]) & opp.P
-    checkers |= getMagicAttack(king, b.taken, true) & (opp.R | opp.Q)
-    checkers |= getMagicAttack(king, b.taken, false) & (opp.B | opp.Q)
+    checkers |= getSliderAttack(king, b.taken, true) & (opp.R | opp.Q)
+    checkers |= getSliderAttack(king, b.taken, false) & (opp.B | opp.Q)
 
     n_checkers = count_ones(checkers)
 
@@ -175,13 +175,13 @@ function computePinData!(pin_ray::Vector{UInt64}, b::Board, white::Bool)
         if (checker & (opp.N | opp.P)) != EMPTY
             # Knight or pawn: can only capture, no blocking square
             check_mask = checker
-        elseif getMagicAttack(king, b.taken, true) & checker != EMPTY
+        elseif getSliderAttack(king, b.taken, true) & checker != EMPTY
             # Orthogonal slider (rook or queen on rank/file)
-            between = getMagicAttack(king, checker, true) & getMagicAttack(checker, king, true)
+            between = getSliderAttack(king, checker, true) & getSliderAttack(checker, king, true)
             check_mask = between | checker
         else
             # Diagonal slider (bishop or queen on diagonal)
-            between = getMagicAttack(king, checker, false) & getMagicAttack(checker, king, false)
+            between = getSliderAttack(king, checker, false) & getSliderAttack(checker, king, false)
             check_mask = between | checker
         end
     end

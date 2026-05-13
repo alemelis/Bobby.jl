@@ -38,10 +38,10 @@ function inCheck(b::Board, white::Bool, K::UInt64=EMPTY)
 
     if KING[kidx] & enemy.K != EMPTY; return true end
 
-    ortho = getMagicAttack(K, b.taken, true)
+    ortho = getSliderAttack(K, b.taken, true)
     if ortho & enemy.R != EMPTY || ortho & enemy.Q != EMPTY; return true end
 
-    diago = getMagicAttack(K, b.taken, false)
+    diago = getSliderAttack(K, b.taken, false)
     if diago & enemy.B != EMPTY || diago & enemy.Q != EMPTY; return true end
 
     x_pawn = white ? PAWN_X_WHITE : PAWN_X_BLACK
