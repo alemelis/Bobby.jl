@@ -12,6 +12,26 @@ const CASTLING_DELTA = let arr = zeros(UInt8, 64)
     Tuple(arr)
 end
 
+# Squares strictly between two collinear squares (same rank/file/diagonal).
+# EMPTY for non-collinear pairs and when a == b. 64×64 UInt64 = 32 KiB (fits in L1d).
+# Indexed BETWEEN[a_idx, b_idx]; symmetric.
+const BETWEEN = let arr = zeros(UInt64, 64, 64)
+    for a_sq in values(PGN2UINT), b_sq in values(PGN2UINT)
+        a_sq == b_sq && continue
+        a_idx = sq2idx(a_sq); b_idx = sq2idx(b_sq)
+        ro = orthoAttack(a_sq, b_sq)
+        if (ro & b_sq) != EMPTY
+            arr[a_idx, b_idx] = ro & orthoAttack(b_sq, a_sq)
+        else
+            di = diagoAttack(a_sq, b_sq)
+            if (di & b_sq) != EMPTY
+                arr[a_idx, b_idx] = di & diagoAttack(b_sq, a_sq)
+            end
+        end
+    end
+    arr
+end
+
 function getPieceMoves!(moves::Moves, bitboard::UInt64, type::UInt8,
     friends::UInt64, enemy::ChessSet, white::Bool, b::Board,
     k_in_check::Bool=false)
@@ -145,13 +165,15 @@ function computePinData!(pin_ray::Vector{UInt64}, b::Board, white::Bool)
     fill!(pin_ray, EMPTY)
     pinned = EMPTY
 
+    king_idx = sq2idx(king)
+
     # --- diagonal pins (enemy bishop or queen on an empty-board diagonal) ---
     diag_pinners = getSliderAttack(king, EMPTY, false) & (opp.B | opp.Q)
     bb = diag_pinners
     while bb != EMPTY
         pinner = lsb(bb)
         bb = popbit(bb)
-        between = getSliderAttack(king, pinner, false) & getSliderAttack(pinner, king, false)
+        @inbounds between = BETWEEN[king_idx, sq2idx(pinner)]
         blocking = between & b.taken
         if count_ones(blocking) == 1 && (blocking & own.friends) != EMPTY
             pinned |= blocking
@@ -165,7 +187,7 @@ function computePinData!(pin_ray::Vector{UInt64}, b::Board, white::Bool)
     while bb != EMPTY
         pinner = lsb(bb)
         bb = popbit(bb)
-        between = getSliderAttack(king, pinner, true) & getSliderAttack(pinner, king, true)
+        @inbounds between = BETWEEN[king_idx, sq2idx(pinner)]
         blocking = between & b.taken
         if count_ones(blocking) == 1 && (blocking & own.friends) != EMPTY
             pinned |= blocking
@@ -174,11 +196,10 @@ function computePinData!(pin_ray::Vector{UInt64}, b::Board, white::Bool)
     end
 
     # --- checkers ---
-    kidx = sq2idx(king)
     checkers = EMPTY
-    checkers |= KNIGHT[kidx] & opp.N
-    checkers |= (white ? PAWN_X_WHITE[kidx] : PAWN_X_BLACK[kidx]) & opp.P
-    checkers |= getSliderAttack(king, b.taken, true) & (opp.R | opp.Q)
+    @inbounds checkers |= KNIGHT[king_idx] & opp.N
+    @inbounds checkers |= (white ? PAWN_X_WHITE[king_idx] : PAWN_X_BLACK[king_idx]) & opp.P
+    checkers |= getSliderAttack(king, b.taken, true)  & (opp.R | opp.Q)
     checkers |= getSliderAttack(king, b.taken, false) & (opp.B | opp.Q)
 
     n_checkers = count_ones(checkers)
@@ -189,14 +210,9 @@ function computePinData!(pin_ray::Vector{UInt64}, b::Board, white::Bool)
         if (checker & (opp.N | opp.P)) != EMPTY
             # Knight or pawn: can only capture, no blocking square
             check_mask = checker
-        elseif getSliderAttack(king, b.taken, true) & checker != EMPTY
-            # Orthogonal slider (rook or queen on rank/file)
-            between = getSliderAttack(king, checker, true) & getSliderAttack(checker, king, true)
-            check_mask = between | checker
         else
-            # Diagonal slider (bishop or queen on diagonal)
-            between = getSliderAttack(king, checker, false) & getSliderAttack(checker, king, false)
-            check_mask = between | checker
+            # Slider (rook/bishop/queen): blocking or capture squares
+            @inbounds check_mask = BETWEEN[king_idx, sq2idx(checker)] | checker
         end
     end
 
