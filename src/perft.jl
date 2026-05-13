@@ -48,18 +48,27 @@ function explore!(pt::PerftTree,
     else
         friends = b.black.friends; enemy = b.white; cs = b.black
     end
-    raw = raw_stack[depth]
-    empty!(raw)
     king_in_check = n_checkers > 0
-    for (bitboard, s) in ((cs.P, PIECE_PAWN),   (cs.N, PIECE_KNIGHT),
-                           (cs.B, PIECE_BISHOP), (cs.R, PIECE_ROOK),
-                           (cs.Q, PIECE_QUEEN),  (cs.K, PIECE_KING))
-        getPieceMoves!(raw, bitboard, s, friends, enemy, white, b, king_in_check)
-    end
-
-    # --- filter: use pin data to skip makeMove+inCheck for most moves ---
     filtered = filtered_stack[depth]
     empty!(filtered)
+
+    # --- KNBRQ legal moves go directly into `filtered`; pawn + king pseudo-legal go to `raw` ---
+    raw = raw_stack[depth]
+    empty!(raw)
+    if n_checkers < 2
+        getLegalPieceMoves!(filtered, cs.N, PIECE_KNIGHT, friends, enemy, b.taken,
+                            pinned, pin_ray, check_mask)
+        getLegalPieceMoves!(filtered, cs.B, PIECE_BISHOP, friends, enemy, b.taken,
+                            pinned, pin_ray, check_mask)
+        getLegalPieceMoves!(filtered, cs.R, PIECE_ROOK,   friends, enemy, b.taken,
+                            pinned, pin_ray, check_mask)
+        getLegalPieceMoves!(filtered, cs.Q, PIECE_QUEEN,  friends, enemy, b.taken,
+                            pinned, pin_ray, check_mask)
+        getPawnMoves!(raw, cs.P, b.taken, friends, enemy, white, b.enpassant)
+    end
+    getPieceMoves!(raw, cs.K, PIECE_KING, friends, enemy, white, b, king_in_check)
+
+    # --- filter `raw` (only pawn + king moves end up here) ---
     for m in raw.moves
         if m.type == PIECE_NONE || m.take.type == PIECE_KING; continue end
 
@@ -72,12 +81,9 @@ function explore!(pt::PerftTree,
             continue
         end
 
-        if n_checkers >= 2
-            continue  # double check: only king can resolve it
-        end
-
+        # Remaining: pawn moves
         # En passant: always full check (horizontal pin edge case)
-        if m.type == PIECE_PAWN && m.take != NONE && m.take.square != m.to
+        if m.take != NONE && m.take.square != m.to
             @inbounds board_stack[depth + 1] = makeMove(b, m)
             if !inCheck(board_stack[depth + 1], b.active)
                 push!(filtered, m)
@@ -85,14 +91,11 @@ function explore!(pt::PerftTree,
             continue
         end
 
-        # Single check: move must block or capture the checker
+        # Regular pawn move: pin/check_mask filter
         if (m.to & check_mask) == EMPTY; continue end
-
-        # Pinned piece: move must stay on the pin ray
         if (m.from & pinned) != EMPTY
             @inbounds if (m.to & pin_ray[sq2idx(m.from)]) == EMPTY; continue end
         end
-
         push!(filtered, m)
     end
 

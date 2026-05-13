@@ -35,6 +35,8 @@ end
 function getPieceMoves!(moves::Moves, bitboard::UInt64, type::UInt8,
     friends::UInt64, enemy::ChessSet, white::Bool, b::Board,
     k_in_check::Bool=false)
+    # Backward-compatible (pseudo-legal) entry point — used by the public getMoves API.
+    # Perft's hot path uses getLegalPieceMoves! below which inlines pin/check filtering.
     if bitboard == EMPTY
         return
     end
@@ -79,6 +81,53 @@ function getPieceMoves!(moves::Moves, bitboard::UInt64, type::UInt8,
                 target & enemy.friends != EMPTY ? take = Piece(enemy_type, target) : take = NONE
                 push!(moves, Move(type, src, target, take, EMPTY, PIECE_NONE, NOCASTLING))
             end
+        end
+    end
+end
+
+# Legal-move generation for non-king, non-pawn pieces (KNBRQ).
+# Emits ONLY moves that survive pin and check_mask filtering, directly into `moves`.
+# Caller must skip this entirely when n_checkers >= 2 (only king moves are legal).
+#
+# This is the perft hot-path move generator — avoids the second-pass filter loop
+# that pushes each legal KNBRQ move twice (raw → filtered).
+@inline function getLegalPieceMoves!(moves::Moves, bitboard::UInt64, type::UInt8,
+    friends::UInt64, enemy::ChessSet, taken::UInt64,
+    pinned::UInt64, pin_ray::Vector{UInt64}, check_mask::UInt64)
+    bb = bitboard
+    while bb != EMPTY
+        src = lsb(bb)
+        bb = popbit(bb)
+
+        if type == PIECE_KNIGHT
+            @inbounds piece_moves = KNIGHT[sq2idx(src)]
+        elseif type == PIECE_ROOK
+            piece_moves = getSliderAttack(src, taken, true)
+        elseif type == PIECE_BISHOP
+            piece_moves = getSliderAttack(src, taken, false)
+        else # PIECE_QUEEN
+            piece_moves = getSliderAttack(src, taken, true) | getSliderAttack(src, taken, false)
+        end
+        piece_moves &= ~friends & check_mask
+        if (src & pinned) != EMPTY
+            @inbounds piece_moves &= pin_ray[sq2idx(src)]
+        end
+        # A knight on a pin ray can never move; the AND zeroes it out — no special case needed.
+        piece_moves == EMPTY && continue
+
+        pm = piece_moves
+        while pm != EMPTY
+            target = lsb(pm)
+            pm = popbit(pm)
+            if (target & enemy.friends) != EMPTY
+                enemy_type = getTypeAt(enemy, target)
+                # King captures are impossible in legal positions; guard kept for safety.
+                enemy_type == PIECE_KING && continue
+                take = Piece(enemy_type, target)
+            else
+                take = NONE
+            end
+            push!(moves, Move(type, src, target, take, EMPTY, PIECE_NONE, NOCASTLING))
         end
     end
 end
