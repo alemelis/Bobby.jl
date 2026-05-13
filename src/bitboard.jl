@@ -173,7 +173,7 @@ function computeHash(b::Board)::UInt64
             bbt = bb
             while bbt != EMPTY
                 sq = lsb(bbt); bbt = popbit(bbt)
-                h ⊻= ZOBRIST_PIECES[pt, color, sq2idx(sq)]
+                h ⊻= zobristPiece(pt, color, sq2idx(sq))
             end
         end
     end
