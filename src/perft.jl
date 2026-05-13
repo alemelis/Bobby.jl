@@ -64,39 +64,18 @@ function explore!(pt::PerftTree,
                             pinned, pin_ray, check_mask)
         getLegalPieceMoves!(filtered, cs.Q, PIECE_QUEEN,  friends, enemy, b.taken,
                             pinned, pin_ray, check_mask)
-        getPawnMoves!(raw, cs.P, b.taken, friends, enemy, white, b.enpassant)
+        getLegalPawnMoves!(filtered, raw, cs.P, b.taken, friends, enemy, white,
+                           b.enpassant, pinned, pin_ray, check_mask)
     end
     getPieceMoves!(raw, cs.K, PIECE_KING, friends, enemy, white, b, king_in_check)
 
-    # --- filter `raw` (only pawn + king moves end up here) ---
+    # --- `raw` now holds only king moves + en passant moves: filter via makeMove+inCheck ---
     for m in raw.moves
         if m.type == PIECE_NONE || m.take.type == PIECE_KING; continue end
-
-        if m.type == PIECE_KING
-            # King moves always need full check (x-ray attacks)
-            @inbounds board_stack[depth + 1] = makeMove(b, m)
-            if !inCheck(board_stack[depth + 1], b.active)
-                push!(filtered, m)
-            end
-            continue
+        @inbounds board_stack[depth + 1] = makeMove(b, m)
+        if !inCheck(board_stack[depth + 1], b.active)
+            push!(filtered, m)
         end
-
-        # Remaining: pawn moves
-        # En passant: always full check (horizontal pin edge case)
-        if m.take != NONE && m.take.square != m.to
-            @inbounds board_stack[depth + 1] = makeMove(b, m)
-            if !inCheck(board_stack[depth + 1], b.active)
-                push!(filtered, m)
-            end
-            continue
-        end
-
-        # Regular pawn move: pin/check_mask filter
-        if (m.to & check_mask) == EMPTY; continue end
-        if (m.from & pinned) != EMPTY
-            @inbounds if (m.to & pin_ray[sq2idx(m.from)]) == EMPTY; continue end
-        end
-        push!(filtered, m)
     end
 
     n = length(filtered.moves)
