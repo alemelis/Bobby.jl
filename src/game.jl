@@ -4,12 +4,12 @@ mutable struct Game
     result::UInt8             # 0=ongoing, 1=white wins, 2=black wins, 3=draw
 end
 
-function newGame()
+function Game()
     b = setBoard()
     return Game([b], Move[], UInt8(0))
 end
 
-function newGame(fen::String)
+function Game(fen::String)
     b = loadFen(fen)
     return Game([b], Move[], UInt8(0))
 end
@@ -58,8 +58,8 @@ function isInsufficientMaterial(g::Game)
     black_minor = count_ones(b.black.N | b.black.B)
     white_only_minor = (b.white.friends == b.white.K | (b.white.N | b.white.B)) && count_ones(b.white.N | b.white.B) == 1 && b.white.R == EMPTY && b.white.Q == EMPTY && b.white.P == EMPTY
     black_only_minor = (b.black.friends == b.black.K | (b.black.N | b.black.B)) && count_ones(b.black.N | b.black.B) == 1 && b.black.R == EMPTY && b.black.Q == EMPTY && b.black.P == EMPTY
-    white_king_only  = b.white.friends == b.white.K
-    black_king_only  = b.black.friends == b.black.K
+    white_king_only = b.white.friends == b.white.K
+    black_king_only = b.black.friends == b.black.K
     if (white_only_minor && black_king_only) || (black_only_minor && white_king_only)
         return true
     end
