@@ -18,7 +18,7 @@ struct ChessSet
     friends::UInt64
 end
 
-struct Board
+mutable struct Board
     white::ChessSet
     black::ChessSet
 
@@ -29,6 +29,18 @@ struct Board
     enpassant::UInt64
     halfmove::Int64
     fullmove::Int64
+    hash::UInt64
+end
+
+# Snapshot of the fields modified by makeMove!, stack-allocated (isbits).
+# Returned by makeMove! and consumed by unmakeMove! to restore Board in place.
+struct Undo
+    white::ChessSet
+    black::ChessSet
+    taken::UInt64
+    active::Bool
+    castling::UInt8
+    enpassant::UInt64
     hash::UInt64
 end
 

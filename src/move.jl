@@ -191,6 +191,49 @@ function filterMoves(b::Board, moves::Moves)
     return filtered
 end
 
+# Allocation-free move generation for the search. Writes into pre-allocated
+# `legal` and `scratch` Moves buffers (both cleared on entry). `pin_ray` is a
+# 64-element UInt64 scratch vector owned by the caller. Returns nothing;
+# legal moves are in `legal` on return.
+#
+# Uses the same fast path as perft: getLegalPieceMoves!/getLegalPawnMoves! for
+# KNBRQ and regular pawns, then makeMove!/unmakeMove! only for king and EP moves.
+function getMoves!(legal::Moves, scratch::Moves, pin_ray::Vector{UInt64},
+                   b::Board, white::Bool)
+    empty!(legal); empty!(scratch)
+
+    pinned, check_mask, n_checkers = computePinData!(pin_ray, b, white)
+
+    if white
+        friends = b.white.friends; enemy = b.black; cs = b.white
+    else
+        friends = b.black.friends; enemy = b.white; cs = b.black
+    end
+
+    if n_checkers < 2
+        getLegalPieceMoves!(legal, cs.N, PIECE_KNIGHT, friends, enemy, b.taken,
+                            pinned, pin_ray, check_mask)
+        getLegalPieceMoves!(legal, cs.B, PIECE_BISHOP, friends, enemy, b.taken,
+                            pinned, pin_ray, check_mask)
+        getLegalPieceMoves!(legal, cs.R, PIECE_ROOK,   friends, enemy, b.taken,
+                            pinned, pin_ray, check_mask)
+        getLegalPieceMoves!(legal, cs.Q, PIECE_QUEEN,  friends, enemy, b.taken,
+                            pinned, pin_ray, check_mask)
+        getLegalPawnMoves!(legal, scratch, cs.P, b.taken, friends, enemy, white,
+                           b.enpassant, pinned, pin_ray, check_mask)
+    end
+    king_in_check = n_checkers > 0
+    getPieceMoves!(scratch, cs.K, PIECE_KING, friends, enemy, white, b, king_in_check)
+
+    mover = b.active
+    for m in scratch.moves
+        if m.type == PIECE_NONE || m.take.type == PIECE_KING; continue end
+        undo = makeMove!(b, m)
+        !inCheck(b, mover) && push!(legal, m)
+        unmakeMove!(b, undo)
+    end
+end
+
 # ---------------------------------------------------------------------------
 # Pin detection and check mask computation
 # ---------------------------------------------------------------------------
@@ -442,6 +485,101 @@ function makeMove(board::Board, move::Move)
     taken = new_white.friends | new_black.friends
     return Board(new_white, new_black, taken, !board.active, castling,
         move.enpassant, board.halfmove, board.fullmove, h)
+end
+
+# In-place variant: mutates board and returns an Undo token.
+# The Undo is isbits (stack-allocated) — no heap allocation.
+function makeMove!(board::Board, move::Move)::Undo
+    undo = Undo(board.white, board.black, board.taken, board.active,
+                board.castling, board.enpassant, board.hash)
+
+    h        = board.hash
+    from_idx = sq2idx(move.from)
+    to_idx   = sq2idx(move.to)
+
+    if board.active
+        new_white = updateSet(board.white, move)
+        new_black = move.take != NONE ? updateSet(board.black, move.take) : board.black
+        if move.castling == CQ
+            new_white = updateSet(new_white, Move(PIECE_ROOK, A1, D1, NONE, EMPTY, PIECE_NONE, NOCASTLING))
+        elseif move.castling == CK
+            new_white = updateSet(new_white, Move(PIECE_ROOK, H1, F1, NONE, EMPTY, PIECE_NONE, NOCASTLING))
+        end
+    else
+        new_black = updateSet(board.black, move)
+        new_white = move.take != NONE ? updateSet(board.white, move.take) : board.white
+        if move.castling == Cq
+            new_black = updateSet(new_black, Move(PIECE_ROOK, A8, D8, NONE, EMPTY, PIECE_NONE, NOCASTLING))
+        elseif move.castling == Ck
+            new_black = updateSet(new_black, Move(PIECE_ROOK, H8, F8, NONE, EMPTY, PIECE_NONE, NOCASTLING))
+        end
+    end
+
+    @inbounds new_castling = board.castling & ~(CASTLING_DELTA[from_idx] | CASTLING_DELTA[to_idx])
+
+    color = board.active ? 1 : 2
+    h ⊻= ZOBRIST_CASTLING[board.castling + 1]
+    h ⊻= ZOBRIST_CASTLING[new_castling + 1]
+
+    if board.enpassant != EMPTY
+        h ⊻= ZOBRIST_EP[(trailing_zeros(board.enpassant) % 8) + 1]
+    else
+        h ⊻= ZOBRIST_EP[9]
+    end
+    if move.enpassant != EMPTY
+        h ⊻= ZOBRIST_EP[(trailing_zeros(move.enpassant) % 8) + 1]
+    else
+        h ⊻= ZOBRIST_EP[9]
+    end
+
+    moved_type  = move.type
+    h ⊻= zobristPiece(moved_type, color, from_idx)
+    promo       = move.promotion
+    placed_type = promo != PIECE_NONE ? promo : moved_type
+    h ⊻= zobristPiece(placed_type, color, to_idx)
+
+    if move.take != NONE
+        opp = board.active ? 2 : 1
+        h ⊻= zobristPiece(move.take.type, opp, sq2idx(move.take.square))
+    end
+
+    if move.castling != NOCASTLING
+        if move.castling == CQ
+            h ⊻= zobristPiece(PIECE_ROOK, color, sq2idx(A1))
+            h ⊻= zobristPiece(PIECE_ROOK, color, sq2idx(D1))
+        elseif move.castling == CK
+            h ⊻= zobristPiece(PIECE_ROOK, color, sq2idx(H1))
+            h ⊻= zobristPiece(PIECE_ROOK, color, sq2idx(F1))
+        elseif move.castling == Cq
+            h ⊻= zobristPiece(PIECE_ROOK, color, sq2idx(A8))
+            h ⊻= zobristPiece(PIECE_ROOK, color, sq2idx(D8))
+        elseif move.castling == Ck
+            h ⊻= zobristPiece(PIECE_ROOK, color, sq2idx(H8))
+            h ⊻= zobristPiece(PIECE_ROOK, color, sq2idx(F8))
+        end
+    end
+
+    h ⊻= ZOBRIST_SIDE
+
+    board.white     = new_white
+    board.black     = new_black
+    board.taken     = new_white.friends | new_black.friends
+    board.active    = !board.active
+    board.castling  = new_castling
+    board.enpassant = move.enpassant
+    board.hash      = h
+
+    return undo
+end
+
+@inline function unmakeMove!(board::Board, undo::Undo)
+    board.white     = undo.white
+    board.black     = undo.black
+    board.taken     = undo.taken
+    board.active    = undo.active
+    board.castling  = undo.castling
+    board.enpassant = undo.enpassant
+    board.hash      = undo.hash
 end
 
 # ---------------------------------------------------------------------------

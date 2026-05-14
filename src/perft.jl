@@ -8,16 +8,14 @@ function perft(b::Board, max_depth::Int64; divide::Bool=false)
     pt = PerftTree(0, zeros(max_depth),
                    Dict{String,Array{Int64,1}}())
 
-    board_stack    = Vector{Board}(undef, max_depth + 2)
-    board_stack[1] = b
     raw_stack      = [Moves(320) for _ in 1:max_depth + 1]
     filtered_stack = [Moves(320) for _ in 1:max_depth + 1]
     pin_ray_stack  = [zeros(UInt64, 64) for _ in 1:max_depth + 1]
 
     if divide
-        explore!(pt, board_stack, raw_stack, filtered_stack, pin_ray_stack, max_depth, 1, Val(true))
+        explore!(pt, b, raw_stack, filtered_stack, pin_ray_stack, max_depth, 1, Val(true))
     else
-        explore!(pt, board_stack, raw_stack, filtered_stack, pin_ray_stack, max_depth, 1, Val(false))
+        explore!(pt, b, raw_stack, filtered_stack, pin_ray_stack, max_depth, 1, Val(false))
     end
     return pt
 end
@@ -26,7 +24,7 @@ end
 # string concatenation, Dict allocation, and per-node Dict lookup are dead code
 # and get eliminated. Saves ~30–40% of perft time when divide info is not wanted.
 function explore!(pt::PerftTree,
-                  board_stack::Vector{Board},
+                  b::Board,
                   raw_stack::Vector{Moves},
                   filtered_stack::Vector{Moves},
                   pin_ray_stack::Vector{Vector{UInt64}},
@@ -34,8 +32,6 @@ function explore!(pt::PerftTree,
                   depth::Int64,
                   ::Val{divide},
                   root_move::String = "") where {divide}
-
-    b = board_stack[depth]
 
     # --- compute pin/check data first (gives us n_checkers to skip the inCheck call) ---
     white = b.active
@@ -69,13 +65,14 @@ function explore!(pt::PerftTree,
     end
     getPieceMoves!(raw, cs.K, PIECE_KING, friends, enemy, white, b, king_in_check)
 
-    # --- `raw` now holds only king moves + en passant moves: filter via makeMove+inCheck ---
+    # --- `raw` holds king moves + en passant: filter via makeMove!/inCheck/unmakeMove! ---
+    mover = b.active
     for m in raw.moves
         if m.type == PIECE_NONE || m.take.type == PIECE_KING; continue end
-        @inbounds board_stack[depth + 1] = makeMove(b, m)
-        if !inCheck(board_stack[depth + 1], b.active)
-            push!(filtered, m)
-        end
+        undo = makeMove!(b, m)
+        legal = !inCheck(b, mover)
+        unmakeMove!(b, undo)
+        legal && push!(filtered, m)
     end
 
     n = length(filtered.moves)
@@ -102,8 +99,9 @@ function explore!(pt::PerftTree,
             pt.div[root_move] = zeros(max_depth)
         end
 
-        @inbounds board_stack[depth + 1] = makeMove(b, m)
-        explore!(pt, board_stack, raw_stack, filtered_stack, pin_ray_stack,
+        undo = makeMove!(b, m)
+        explore!(pt, b, raw_stack, filtered_stack, pin_ray_stack,
                  max_depth, depth + 1, Val(divide), root_move)
+        unmakeMove!(b, undo)
     end
 end
