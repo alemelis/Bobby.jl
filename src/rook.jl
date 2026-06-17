@@ -60,3 +60,10 @@ function orthoAttack(square::UInt64, occupancy::UInt64)
     end
     return visited
 end
+
+const ORTHO_RAYS = let arr = Vector{UInt64}(undef, 64)
+    for s in values(PGN2UINT)
+        arr[sq2idx(s)] = orthoAttack(s, EMPTY)
+    end
+    Tuple(arr)
+end

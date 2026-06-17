@@ -78,7 +78,7 @@ function getPieceMoves!(moves::Moves, bitboard::UInt64, type::UInt8,
                 if enemy_type == PIECE_KING
                     continue
                 end
-                target & enemy.friends != EMPTY ? take = Piece(enemy_type, target) : take = NONE
+                take = target & enemy.friends != EMPTY ? Piece(enemy_type, target) : NONE
                 push!(moves, Move(type, src, target, take, EMPTY, PIECE_NONE, NOCASTLING))
             end
         end
@@ -178,8 +178,9 @@ end
 
 function filterMoves(b::Board, moves::Moves)
     filtered = Moves()
-    for m in moves.moves
-        if m.type == PIECE_NONE || m.take.type == PIECE_KING
+    for i in 1:moves.count
+        @inbounds m = moves.data[i]
+        if mpiece(m) == PIECE_NONE || mcapture(m) == PIECE_KING
             continue
         end
         b1 = makeMove(b, m)
@@ -226,8 +227,9 @@ function getMoves!(legal::Moves, scratch::Moves, pin_ray::Vector{UInt64},
     getPieceMoves!(scratch, cs.K, PIECE_KING, friends, enemy, white, b, king_in_check)
 
     mover = b.active
-    for m in scratch.moves
-        if m.type == PIECE_NONE || m.take.type == PIECE_KING; continue end
+    for i in 1:scratch.count
+        @inbounds m = scratch.data[i]
+        if mpiece(m) == PIECE_NONE || mcapture(m) == PIECE_KING; continue end
         undo = makeMove!(b, m)
         !inCheck(b, mover) && push!(legal, m)
         unmakeMove!(b, undo)
@@ -260,7 +262,7 @@ function computePinData!(pin_ray::Vector{UInt64}, b::Board, white::Bool)
     king_idx = sq2idx(king)
 
     # --- diagonal pins (enemy bishop or queen on an empty-board diagonal) ---
-    diag_pinners = getSliderAttack(king, EMPTY, false) & (opp.B | opp.Q)
+    diag_pinners = @inbounds DIAG_RAYS[king_idx] & (opp.B | opp.Q)
     bb = diag_pinners
     while bb != EMPTY
         pinner = lsb(bb)
@@ -274,7 +276,7 @@ function computePinData!(pin_ray::Vector{UInt64}, b::Board, white::Bool)
     end
 
     # --- orthogonal pins (enemy rook or queen) ---
-    ortho_pinners = getSliderAttack(king, EMPTY, true) & (opp.R | opp.Q)
+    ortho_pinners = @inbounds ORTHO_RAYS[king_idx] & (opp.R | opp.Q)
     bb = ortho_pinners
     while bb != EMPTY
         pinner = lsb(bb)
@@ -312,15 +314,16 @@ function computePinData!(pin_ray::Vector{UInt64}, b::Board, white::Bool)
 end
 
 # ---------------------------------------------------------------------------
-# Zero-allocation variants for the perft hot loop
+# Zero-allocation variants for the perft hot loop (legacy board-stack API)
 # ---------------------------------------------------------------------------
 
 function filterMoves!(filtered::Moves, raw::Moves,
     board_stack::Vector{Board}, depth::Int, active::Bool)
     empty!(filtered)
     b = board_stack[depth]
-    for m in raw.moves
-        if m.type == PIECE_NONE || m.take.type == PIECE_KING
+    for i in 1:raw.count
+        @inbounds m = raw.data[i]
+        if mpiece(m) == PIECE_NONE || mcapture(m) == PIECE_KING
             continue
         end
         board_stack[depth+1] = makeMove(b, m)
@@ -350,28 +353,31 @@ end
 
 
 @inline function updateSet(cs::ChessSet, move::Move)
-    ft = move.from | move.to
-    newf = (cs.friends ⊻ move.from) | move.to   # incremental: remove from, add to
-    if move.type == PIECE_PAWN
-        if move.promotion != PIECE_NONE
-            promo = move.promotion
-            newf = cs.friends ⊻ move.from | move.to
-            return ChessSet(cs.P ⊻ move.from,
-                promo == PIECE_KNIGHT ? cs.N | move.to : cs.N,
-                promo == PIECE_BISHOP ? cs.B | move.to : cs.B,
-                promo == PIECE_ROOK ? cs.R | move.to : cs.R,
-                promo == PIECE_QUEEN ? cs.Q | move.to : cs.Q,
+    from_sq = mfrom_sq(move)
+    to_sq   = mto_sq(move)
+    ft      = from_sq | to_sq
+    newf    = (cs.friends ⊻ from_sq) | to_sq
+    type    = mpiece(move)
+    promo   = mpromo(move)
+    if type == PIECE_PAWN
+        if promo != PIECE_NONE
+            newf = cs.friends ⊻ from_sq | to_sq
+            return ChessSet(cs.P ⊻ from_sq,
+                promo == PIECE_KNIGHT ? cs.N | to_sq : cs.N,
+                promo == PIECE_BISHOP ? cs.B | to_sq : cs.B,
+                promo == PIECE_ROOK   ? cs.R | to_sq : cs.R,
+                promo == PIECE_QUEEN  ? cs.Q | to_sq : cs.Q,
                 cs.K, newf)
         else
             return ChessSet(cs.P ⊻ ft, cs.N, cs.B, cs.R, cs.Q, cs.K, newf)
         end
-    elseif move.type == PIECE_KNIGHT
+    elseif type == PIECE_KNIGHT
         return ChessSet(cs.P, cs.N ⊻ ft, cs.B, cs.R, cs.Q, cs.K, newf)
-    elseif move.type == PIECE_BISHOP
+    elseif type == PIECE_BISHOP
         return ChessSet(cs.P, cs.N, cs.B ⊻ ft, cs.R, cs.Q, cs.K, newf)
-    elseif move.type == PIECE_ROOK
+    elseif type == PIECE_ROOK
         return ChessSet(cs.P, cs.N, cs.B, cs.R ⊻ ft, cs.Q, cs.K, newf)
-    elseif move.type == PIECE_QUEEN
+    elseif type == PIECE_QUEEN
         return ChessSet(cs.P, cs.N, cs.B, cs.R, cs.Q ⊻ ft, cs.K, newf)
     else # PIECE_KING
         return ChessSet(cs.P, cs.N, cs.B, cs.R, cs.Q, cs.K ⊻ ft, newf)
@@ -400,91 +406,97 @@ end
     end
 end
 
+# Reconstruct the captured piece's board square from a packed move.
+# For regular captures the captured piece sits on the destination square.
+# For EP the captured pawn is one rank behind the destination (relative to active side).
+@inline function _capture_sq(m::Move, active::Bool)::UInt64
+    to = mto_sq(m)
+    mis_ep(m) ? (active ? to >> 8 : to << 8) : to
+end
+
 function makeMove(board::Board, move::Move)
     h = board.hash
-    from_idx = sq2idx(move.from)
-    to_idx   = sq2idx(move.to)
+    from_idx = mfrom_idx(move)
+    to_idx   = mto_idx(move)
+
+    capt = mcapture(move)
+    capt_sq = _capture_sq(move, board.active)
 
     # --- board update ---
-    if board.active #true is white, false is black
+    if board.active  # white moves
         new_white = updateSet(board.white, move)
-        new_black = move.take != NONE ? updateSet(board.black, move.take) : board.black
+        new_black = capt != PIECE_NONE ? updateSet(board.black, Piece(capt, capt_sq)) : board.black
 
-        if move.castling == CQ
+        cast = mcastling(move)
+        if cast == CQ
             new_white = updateSet(new_white, Move(PIECE_ROOK, A1, D1, NONE, EMPTY, PIECE_NONE, NOCASTLING))
-        elseif move.castling == CK
+        elseif cast == CK
             new_white = updateSet(new_white, Move(PIECE_ROOK, H1, F1, NONE, EMPTY, PIECE_NONE, NOCASTLING))
         end
     else
         new_black = updateSet(board.black, move)
-        new_white = move.take != NONE ? updateSet(board.white, move.take) : board.white
+        new_white = capt != PIECE_NONE ? updateSet(board.white, Piece(capt, capt_sq)) : board.white
 
-        if move.castling == Cq
+        cast = mcastling(move)
+        if cast == Cq
             new_black = updateSet(new_black, Move(PIECE_ROOK, A8, D8, NONE, EMPTY, PIECE_NONE, NOCASTLING))
-        elseif move.castling == Ck
+        elseif cast == Ck
             new_black = updateSet(new_black, Move(PIECE_ROOK, H8, F8, NONE, EMPTY, PIECE_NONE, NOCASTLING))
         end
     end
 
-    # Castling rights: a single mask handles king-moves, rook-moves-from-corner,
-    # and rook-captured-on-corner — all 4 prior branches collapse into one AND-NOT.
     @inbounds castling = board.castling & ~(CASTLING_DELTA[from_idx] | CASTLING_DELTA[to_idx])
 
     # --- incremental Zobrist hash ---
     color = board.active ? 1 : 2
 
-    # castling rights delta
-    h ⊻= ZOBRIST_CASTLING[board.castling+1]
-    h ⊻= ZOBRIST_CASTLING[castling+1]
+    h ⊻= ZOBRIST_CASTLING[board.castling + 1]
+    h ⊻= ZOBRIST_CASTLING[castling + 1]
 
-    # en passant delta
     if board.enpassant != EMPTY
-        h ⊻= ZOBRIST_EP[(trailing_zeros(board.enpassant)%8)+1]
+        h ⊻= ZOBRIST_EP[(trailing_zeros(board.enpassant) % 8) + 1]
     else
         h ⊻= ZOBRIST_EP[9]
     end
-    if move.enpassant != EMPTY
-        h ⊻= ZOBRIST_EP[(trailing_zeros(move.enpassant)%8)+1]
+    new_ep = mep_new_sq(move)
+    if new_ep != EMPTY
+        h ⊻= ZOBRIST_EP[(trailing_zeros(new_ep) % 8) + 1]
     else
         h ⊻= ZOBRIST_EP[9]
     end
 
-    # moved piece: XOR out from source, XOR in at target
-    moved_type = move.type
+    moved_type  = mpiece(move)
     h ⊻= zobristPiece(moved_type, color, from_idx)
-    promo = move.promotion
+    promo       = mpromo(move)
     placed_type = promo != PIECE_NONE ? promo : moved_type
     h ⊻= zobristPiece(placed_type, color, to_idx)
 
-    # captured piece
-    if move.take != NONE
+    if capt != PIECE_NONE
         opp = board.active ? 2 : 1
-        h ⊻= zobristPiece(move.take.type, opp, sq2idx(move.take.square))
+        h ⊻= zobristPiece(capt, opp, sq2idx(capt_sq))
     end
 
-    # castling rook movement
-    if move.castling != NOCASTLING
-        if move.castling == CQ
+    if cast != NOCASTLING
+        if cast == CQ
             h ⊻= zobristPiece(PIECE_ROOK, color, sq2idx(A1))
             h ⊻= zobristPiece(PIECE_ROOK, color, sq2idx(D1))
-        elseif move.castling == CK
+        elseif cast == CK
             h ⊻= zobristPiece(PIECE_ROOK, color, sq2idx(H1))
             h ⊻= zobristPiece(PIECE_ROOK, color, sq2idx(F1))
-        elseif move.castling == Cq
+        elseif cast == Cq
             h ⊻= zobristPiece(PIECE_ROOK, color, sq2idx(A8))
             h ⊻= zobristPiece(PIECE_ROOK, color, sq2idx(D8))
-        elseif move.castling == Ck
+        elseif cast == Ck
             h ⊻= zobristPiece(PIECE_ROOK, color, sq2idx(H8))
             h ⊻= zobristPiece(PIECE_ROOK, color, sq2idx(F8))
         end
     end
 
-    # flip side
     h ⊻= ZOBRIST_SIDE
 
     taken = new_white.friends | new_black.friends
     return Board(new_white, new_black, taken, !board.active, castling,
-        move.enpassant, board.halfmove, board.fullmove, h)
+        new_ep, board.halfmove, board.fullmove, h)
 end
 
 # In-place variant: mutates board and returns an Undo token.
@@ -494,23 +506,27 @@ function makeMove!(board::Board, move::Move)::Undo
                 board.castling, board.enpassant, board.hash)
 
     h        = board.hash
-    from_idx = sq2idx(move.from)
-    to_idx   = sq2idx(move.to)
+    from_idx = mfrom_idx(move)
+    to_idx   = mto_idx(move)
+
+    capt    = mcapture(move)
+    capt_sq = _capture_sq(move, board.active)
+    cast    = mcastling(move)
 
     if board.active
         new_white = updateSet(board.white, move)
-        new_black = move.take != NONE ? updateSet(board.black, move.take) : board.black
-        if move.castling == CQ
+        new_black = capt != PIECE_NONE ? updateSet(board.black, Piece(capt, capt_sq)) : board.black
+        if cast == CQ
             new_white = updateSet(new_white, Move(PIECE_ROOK, A1, D1, NONE, EMPTY, PIECE_NONE, NOCASTLING))
-        elseif move.castling == CK
+        elseif cast == CK
             new_white = updateSet(new_white, Move(PIECE_ROOK, H1, F1, NONE, EMPTY, PIECE_NONE, NOCASTLING))
         end
     else
         new_black = updateSet(board.black, move)
-        new_white = move.take != NONE ? updateSet(board.white, move.take) : board.white
-        if move.castling == Cq
+        new_white = capt != PIECE_NONE ? updateSet(board.white, Piece(capt, capt_sq)) : board.white
+        if cast == Cq
             new_black = updateSet(new_black, Move(PIECE_ROOK, A8, D8, NONE, EMPTY, PIECE_NONE, NOCASTLING))
-        elseif move.castling == Ck
+        elseif cast == Ck
             new_black = updateSet(new_black, Move(PIECE_ROOK, H8, F8, NONE, EMPTY, PIECE_NONE, NOCASTLING))
         end
     end
@@ -526,34 +542,35 @@ function makeMove!(board::Board, move::Move)::Undo
     else
         h ⊻= ZOBRIST_EP[9]
     end
-    if move.enpassant != EMPTY
-        h ⊻= ZOBRIST_EP[(trailing_zeros(move.enpassant) % 8) + 1]
+    new_ep = mep_new_sq(move)
+    if new_ep != EMPTY
+        h ⊻= ZOBRIST_EP[(trailing_zeros(new_ep) % 8) + 1]
     else
         h ⊻= ZOBRIST_EP[9]
     end
 
-    moved_type  = move.type
+    moved_type  = mpiece(move)
     h ⊻= zobristPiece(moved_type, color, from_idx)
-    promo       = move.promotion
+    promo       = mpromo(move)
     placed_type = promo != PIECE_NONE ? promo : moved_type
     h ⊻= zobristPiece(placed_type, color, to_idx)
 
-    if move.take != NONE
+    if capt != PIECE_NONE
         opp = board.active ? 2 : 1
-        h ⊻= zobristPiece(move.take.type, opp, sq2idx(move.take.square))
+        h ⊻= zobristPiece(capt, opp, sq2idx(capt_sq))
     end
 
-    if move.castling != NOCASTLING
-        if move.castling == CQ
+    if cast != NOCASTLING
+        if cast == CQ
             h ⊻= zobristPiece(PIECE_ROOK, color, sq2idx(A1))
             h ⊻= zobristPiece(PIECE_ROOK, color, sq2idx(D1))
-        elseif move.castling == CK
+        elseif cast == CK
             h ⊻= zobristPiece(PIECE_ROOK, color, sq2idx(H1))
             h ⊻= zobristPiece(PIECE_ROOK, color, sq2idx(F1))
-        elseif move.castling == Cq
+        elseif cast == Cq
             h ⊻= zobristPiece(PIECE_ROOK, color, sq2idx(A8))
             h ⊻= zobristPiece(PIECE_ROOK, color, sq2idx(D8))
-        elseif move.castling == Ck
+        elseif cast == Ck
             h ⊻= zobristPiece(PIECE_ROOK, color, sq2idx(H8))
             h ⊻= zobristPiece(PIECE_ROOK, color, sq2idx(F8))
         end
@@ -566,7 +583,7 @@ function makeMove!(board::Board, move::Move)::Undo
     board.taken     = new_white.friends | new_black.friends
     board.active    = !board.active
     board.castling  = new_castling
-    board.enpassant = move.enpassant
+    board.enpassant = new_ep
     board.hash      = h
 
     return undo
@@ -587,12 +604,13 @@ end
 # ---------------------------------------------------------------------------
 
 function moveToUCI(m::Move)::String
-    from_str = UINT2PGN[m.from]
-    to_str = UINT2PGN[m.to]
-    if m.promotion != PIECE_NONE
-        promo_char = m.promotion == PIECE_QUEEN ? 'q' :
-                     m.promotion == PIECE_ROOK ? 'r' :
-                     m.promotion == PIECE_BISHOP ? 'b' : 'n'
+    from_str = UINT2PGN[mfrom_sq(m)]
+    to_str   = UINT2PGN[mto_sq(m)]
+    promo    = mpromo(m)
+    if promo != PIECE_NONE
+        promo_char = promo == PIECE_QUEEN  ? 'q' :
+                     promo == PIECE_ROOK   ? 'r' :
+                     promo == PIECE_BISHOP ? 'b' : 'n'
         return from_str * to_str * promo_char
     end
     return from_str * to_str
@@ -600,16 +618,17 @@ end
 
 function uciMoveToMove(b::Board, uci::String)::Move
     from_sq = PGN2UINT[uci[1:2]]
-    to_sq = PGN2UINT[uci[3:4]]
-    promo = PIECE_NONE
+    to_sq   = PGN2UINT[uci[3:4]]
+    promo   = PIECE_NONE
     if length(uci) == 5
-        promo = uci[5] == 'q' ? PIECE_QUEEN :
-                uci[5] == 'r' ? PIECE_ROOK :
+        promo = uci[5] == 'q' ? PIECE_QUEEN  :
+                uci[5] == 'r' ? PIECE_ROOK   :
                 uci[5] == 'b' ? PIECE_BISHOP : PIECE_KNIGHT
     end
     moves = getMoves(b, b.active)
-    for m in moves.moves
-        if m.from == from_sq && m.to == to_sq && m.promotion == promo
+    for i in 1:moves.count
+        @inbounds m = moves.data[i]
+        if mfrom_sq(m) == from_sq && mto_sq(m) == to_sq && mpromo(m) == promo
             return m
         end
     end

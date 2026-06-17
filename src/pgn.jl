@@ -9,13 +9,7 @@
 
 # ── Move → UCI ────────────────────────────────────────────────────────────────
 
-function move_to_uci(m::Move)::String
-    promo = m.promotion == PIECE_NONE ? "" :
-            m.promotion == PIECE_QUEEN  ? "q" :
-            m.promotion == PIECE_ROOK   ? "r" :
-            m.promotion == PIECE_BISHOP ? "b" : "n"
-    sq2pgn(m.from) * sq2pgn(m.to) * promo
-end
+move_to_uci(m::Move)::String = moveToUCI(m)
 
 # ── SAN → UCI (single move) ───────────────────────────────────────────────────
 

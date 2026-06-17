@@ -1,0 +1,4 @@
+[deps]
+BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
+Bobby = "bd34264e-e812-11e8-1ee8-bfb20fea2fb4"
+Chess = "717200cc-f167-4fd3-b4bf-b5e480529844"

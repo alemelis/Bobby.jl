@@ -65,17 +65,31 @@ function explore!(pt::PerftTree,
     end
     getPieceMoves!(raw, cs.K, PIECE_KING, friends, enemy, white, b, king_in_check)
 
-    # --- `raw` holds king moves + en passant: filter via makeMove!/inCheck/unmakeMove! ---
+    # --- filter `raw` (king moves + EP): use isAttacked for regular king moves,
+    #     make/unmake only for EP and castling (rare, or have edge-case pin logic). ---
     mover = b.active
-    for m in raw.moves
-        if m.type == PIECE_NONE || m.take.type == PIECE_KING; continue end
-        undo = makeMove!(b, m)
-        legal = !inCheck(b, mover)
-        unmakeMove!(b, undo)
-        legal && push!(filtered, m)
+    king_sq      = white ? b.white.K : b.black.K
+    occ_no_king  = b.taken ⊻ king_sq   # occupancy with the king removed (for attack checks)
+
+    for i in 1:raw.count
+        @inbounds m = raw.data[i]
+        mpiece(m) == PIECE_NONE && continue
+        mcapture(m) == PIECE_KING && continue
+
+        if mis_ep(m) || mcastling_enc(m) != 0
+            # EP: horizontal-pin edge case requires full make/unmake.
+            # Castling: destination validity already pre-checked in getCastlingMoves!,
+            #           but we do a final make/unmake for safety on the rare path.
+            undo = makeMove!(b, m)
+            !inCheck(b, mover) && push!(filtered, m)
+            unmakeMove!(b, undo)
+        else
+            # Regular king move: directly check destination under the modified occupancy.
+            !isAttacked(mto_sq(m), occ_no_king, enemy, white) && push!(filtered, m)
+        end
     end
 
-    n = length(filtered.moves)
+    n = filtered.count
     pt.tot += n
     @inbounds pt.nodes[depth] += n
     if divide && root_move != ""
@@ -87,14 +101,15 @@ function explore!(pt::PerftTree,
     end
 
     for i in 1:n
-        @inbounds m = filtered.moves[i]
+        @inbounds m = filtered.data[i]
 
         if divide && depth == 1
-            root_move = sq2pgn(m.from) * sq2pgn(m.to)
-            if m.promotion != PIECE_NONE
-                root_move *= m.promotion == PIECE_QUEEN  ? "q" :
-                             m.promotion == PIECE_ROOK   ? "r" :
-                             m.promotion == PIECE_BISHOP ? "b" : "n"
+            root_move = sq2pgn(mfrom_sq(m)) * sq2pgn(mto_sq(m))
+            promo = mpromo(m)
+            if promo != PIECE_NONE
+                root_move *= promo == PIECE_QUEEN  ? "q" :
+                             promo == PIECE_ROOK   ? "r" :
+                             promo == PIECE_BISHOP ? "b" : "n"
             end
             pt.div[root_move] = zeros(max_depth)
         end

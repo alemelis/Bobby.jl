@@ -50,6 +50,20 @@ function inCheck(b::Board, white::Bool, K::UInt64=EMPTY)
     return false
 end
 
+# Check whether `sq` is attacked by `enemy` using occupancy `occ`.
+# `white` is the side whose king is on `sq` (determines pawn attack direction).
+# Used to avoid make/unmake for king-move legality in the perft hot loop.
+@inline function isAttacked(sq::UInt64, occ::UInt64, enemy::ChessSet, white::Bool)::Bool
+    idx = sq2idx(sq)
+    @inbounds KNIGHT[idx] & enemy.N != EMPTY && return true
+    @inbounds KING[idx]   & enemy.K != EMPTY && return true
+    getSliderAttack(sq, occ, true)  & (enemy.R | enemy.Q) != EMPTY && return true
+    getSliderAttack(sq, occ, false) & (enemy.B | enemy.Q) != EMPTY && return true
+    @inbounds pawn_attacks = white ? PAWN_X_WHITE[idx] : PAWN_X_BLACK[idx]
+    pawn_attacks & enemy.P != EMPTY && return true
+    return false
+end
+
 function getCastlingMoves!(moves::Moves, K::UInt64, b::Board, white::Bool)
     if b.castling == NOCASTLING || inCheck(b, white); return end
     if white

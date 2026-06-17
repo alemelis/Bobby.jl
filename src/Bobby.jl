@@ -22,4 +22,13 @@ include("tensor.jl")
 include("pgn.jl")
 
 export read_pgn, san_to_uci, move_to_uci
+
+# Attack tables (for move generation and evaluation)
+export KNIGHT, KING, PAWN_X_WHITE, PAWN_X_BLACK
+
+# Slider attacks
+export getSliderAttack
+
+# File masks
+export FILE_A, FILE_H
 end

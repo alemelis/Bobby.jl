@@ -24,3 +24,7 @@ const MASK_FILES = (0x8080808080808080,
 
 const CLEAR_FILE_A = 0x7f7f7f7f7f7f7f7f
 const CLEAR_FILE_H = 0xfefefefefefefefe
+
+# File masks for pawn move generation
+const FILE_A = 0x0101010101010101
+const FILE_H = 0x8080808080808080
